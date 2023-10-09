@@ -8,6 +8,7 @@ import ChatMessageState from '@/components/ChatMessageState';
 import Toolbar from './Toolbar';
 import { useReactive } from '@/util/Reactive';
 import ChatState from './ChatState';
+import ToolbarDrawer from './ToolbarDrawer';
 
 
 type ChatProps = {
@@ -22,7 +23,6 @@ export default function Chat(props: ChatProps) {
 
     const [chatState] = useState(new ChatState());
     const chat = useReactive(chatState);
-    const [waiting, setWaiting] = useState(false);
 
     useEffect(() => {
         setOpenai(new OpenAI({
@@ -31,42 +31,36 @@ export default function Chat(props: ChatProps) {
         }));
     }, [props.apiKey]);
 
+    useEffect(() => {
+        chatState.setOpenAI(openai);
+    }, [openai]);
+
     function onUserSend(message: string) {
         if (message.trim() === '') return;
         promptAI(message);
     }
 
     async function promptAI(newMessage: string) {
-        setWaiting(true);
         chat.addMessage(ChatMessageState.fromUser(newMessage));
-        //const completion = await openai.chat.completions.create({
-        //    //model: "gpt-4",
-        //    model: "gpt-3.5-turbo",
-        //    messages: newHistory.map((message) => message.message),
-        //    n: 1,
-        //});
-        //const chatMessage: OpenAI.Chat.ChatCompletionMessage = completion.choices[0].message;
-        const aiMessage: OpenAI.Chat.ChatCompletionMessage = {
-            role: 'assistant',
-            content: 'Hello, world!',
-        };
-        if (aiMessage.content === null) {
-            setWaiting(false);
-            return;
-        }
-
-        chat.addMessage(await ChatMessageState.fromAIMock(openai, {
+        chat.addMessage(ChatMessageState.fromAI(openai, {
             //model: "gpt-4",
             model: "gpt-3.5-turbo",
             messages: chat.history.map((message) => message.toChatMessage()),
         }));
-        setWaiting(false);
     }
 
     return <div className='flex flex-col items-center max-h-fit justify-center p-2'>
-        <Toolbar
-            targets={chat.history.filter((msg) => msg.selected)}
-        />
+        <ToolbarDrawer>
+            <Toolbar
+                targets={[chat]}
+            />
+            <Toolbar
+                targets={chat.history}
+                filter={(msg) => msg.selected}
+                filterDisplay={(count) => count > 0 ? `${count} selected` : null}
+            />
+        </ToolbarDrawer>
+        <div className='h-2' />
         <div className='flex flex-col items-stretch justify-start gap-2 w-full overflow-auto'>
             {chat.history.map((message, index) => {
                 if (message.role === 'system') return null;
@@ -86,11 +80,15 @@ export default function Chat(props: ChatProps) {
                 </>;
             })}
         </div>
+        <div className='h-2' />
 
-        {waiting && <div>Waiting for response...</div>}
+        {chat.loading && <>
+            <div>Waiting for response...</div>
+            <div className='h-2' />
+        </>}
         <ChatTextBox
             onSend={onUserSend}
-            canSend={!waiting}
+            canSend={!chat.loading}
         />
     </div>
 }
