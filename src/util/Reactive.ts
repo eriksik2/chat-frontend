@@ -6,8 +6,28 @@ import { useEffect, useState } from "react";
 export default class Reactive {
     listeners: (() => void)[] = [];
 
+    addListener(listener: () => void) {
+        this.listeners.push(listener);
+    }
+
+    removeListener(listener: () => void) {
+        this.listeners = this.listeners.filter(l => l !== listener);
+    }
+
+    addReactive(reactive: Reactive) {
+        this.listeners.push(() => reactive.notifyListeners());
+    }
+
+    removeReactive(reactive: Reactive) {
+        this.listeners = this.listeners.filter(l => l !== (() => reactive.notifyListeners()));
+    }
+
     notifyListeners() {
         this.listeners.forEach(listener => listener());
+    }
+
+    clearListeners() {
+        this.listeners = [];
     }
 }
 

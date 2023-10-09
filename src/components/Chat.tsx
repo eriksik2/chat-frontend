@@ -5,6 +5,9 @@ import { useEffect, useState } from 'react';
 import ChatTextBox from './ChatTextBox';
 import ChatMessage from './ChatMessage';
 import ChatMessageState from '@/components/ChatMessageState';
+import Toolbar from './Toolbar';
+import { useReactive } from '@/util/Reactive';
+import ChatState from './ChatState';
 
 
 type ChatProps = {
@@ -17,7 +20,8 @@ export default function Chat(props: ChatProps) {
         dangerouslyAllowBrowser: true,
     }));
 
-    const [history, setHistory] = useState<ChatMessageState[]>([]);
+    const [chatState] = useState(new ChatState());
+    const chat = useReactive(chatState);
     const [waiting, setWaiting] = useState(false);
 
     useEffect(() => {
@@ -39,8 +43,7 @@ export default function Chat(props: ChatProps) {
 
     async function promptAI(newMessage: OpenAI.Chat.ChatCompletionMessage) {
         setWaiting(true);
-        const newHistory = [...history, new ChatMessageState(newMessage)];
-        setHistory(newHistory);
+        chat.addMessage(new ChatMessageState(chat, newMessage));
         //const completion = await openai.chat.completions.create({
         //    //model: "gpt-4",
         //    model: "gpt-3.5-turbo",
@@ -57,16 +60,16 @@ export default function Chat(props: ChatProps) {
             return;
         }
 
-        setHistory([...newHistory, new ChatMessageState(chatMessage)]);
+        chat.addMessage(new ChatMessageState(chat, chatMessage));
         setWaiting(false);
     }
 
     return <div className='flex flex-col items-center max-h-fit justify-center p-2'>
-        <div className='flex flex-row w-full h-12 bg-slate-400'>
-
-        </div>
+        <Toolbar
+            targets={chat.history.filter((msg) => msg.selected)}
+        />
         <div className='flex flex-col items-stretch justify-start gap-2 w-full overflow-auto'>
-            {history.map((message, index) => {
+            {chat.history.map((message, index) => {
                 if (message.message.role === 'system') return null;
                 return <>
                     <ChatMessage
