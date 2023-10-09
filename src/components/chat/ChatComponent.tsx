@@ -3,25 +3,26 @@
 import OpenAI from 'openai';
 import { useEffect, useState } from 'react';
 import ChatTextBox from './ChatTextBox';
-import ChatMessage from './ChatMessage';
-import ChatMessageState from '@/components/ChatMessageState';
-import Toolbar from './Toolbar';
+import ChatMessageComponent from './ChatMessageComponent';
+import ChatMessage from '@/state/ChatMessage';
+import Toolbar from '../toolbar/Toolbar';
 import { useReactive } from '@/util/Reactive';
-import ChatState from './ChatState';
-import ToolbarDrawer from './ToolbarDrawer';
+import ChatSession from '../../state/ChatSession';
+import ToolbarDrawer from '../toolbar/ToolbarDrawer';
+import ChatBot from '@/state/ChatBot';
 
 
-type ChatProps = {
+type ChatComponentProps = {
     apiKey: string;
 };
 
-export default function Chat(props: ChatProps) {
+export default function ChatComponent(props: ChatComponentProps) {
     const [openai, setOpenai] = useState(new OpenAI({
         apiKey: props.apiKey,
         dangerouslyAllowBrowser: true,
     }));
 
-    const [chatState] = useState(new ChatState());
+    const [chatState] = useState(new ChatSession(openai, new ChatBot()));
     const chat = useReactive(chatState);
 
     useEffect(() => {
@@ -41,12 +42,8 @@ export default function Chat(props: ChatProps) {
     }
 
     async function promptAI(newMessage: string) {
-        chat.addMessage(ChatMessageState.fromUser(newMessage));
-        chat.addMessage(ChatMessageState.fromAI(openai, {
-            //model: "gpt-4",
-            model: "gpt-3.5-turbo",
-            messages: chat.history.map((message) => message.toChatMessage()),
-        }));
+        chat.addMessage(ChatMessage.fromUser(chat, newMessage));
+        chat.addMessage(ChatMessage.fromAI(chat, chat.chatbot, chat.history.map((message) => message.toChatMessage())));
     }
 
     return <div className='flex flex-col items-center max-h-fit justify-center p-2'>
@@ -65,7 +62,7 @@ export default function Chat(props: ChatProps) {
             {chat.history.map((message, index) => {
                 if (message.role === 'system') return null;
                 return <>
-                    <ChatMessage
+                    <ChatMessageComponent
                         key={index}
                         message={message}
                     />

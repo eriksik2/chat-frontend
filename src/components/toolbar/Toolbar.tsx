@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from 'react';
-import ToolbarItems, { Tool } from './ToolbarItems';
+import ToolbarItems, { Tool } from '../../util/ToolbarItems';
 import ToolbarButton from './ToolbarButton';
 
 

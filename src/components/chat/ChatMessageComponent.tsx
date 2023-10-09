@@ -1,14 +1,14 @@
 "use client"
 
-import ChatMessageState from '@/components/ChatMessageState';
+import ChatMessage from '@/state/ChatMessage';
 import { useReactive } from '@/util/Reactive';
 import { useState } from 'react';
 
-type ChatMessageProps = {
-    message: ChatMessageState;
+type ChatMessageComponentProps = {
+    message: ChatMessage;
 };
 
-export default function ChatMessage(props: ChatMessageProps) {
+export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     const message = useReactive(props.message);
 
     function handleChange() {
@@ -34,7 +34,7 @@ export default function ChatMessage(props: ChatMessageProps) {
         </div>
         <div>
             <p>
-                {message.message}
+                {message.content}
                 {message.loading && ' ...'}
             </p>
         </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Tool } from './ToolbarItems';
+import { Tool } from '../../util/ToolbarItems';
 
 
 type ToolbarButtonProps<T> = {

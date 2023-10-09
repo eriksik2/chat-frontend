@@ -1,9 +1,10 @@
 import Reactive from '@/util/Reactive';
 import OpenAI from 'openai';
-import ToolbarItems, { Tool, newTool } from './ToolbarItems';
-import ChatState from './ChatState';
+import ToolbarItems, { Tool, newTool } from '../util/ToolbarItems';
+import ChatSession from './ChatSession';
+import ChatBot from './ChatBot';
 
-const tools: Tool<ChatMessageState>[] = [
+const tools: Tool<ChatMessage>[] = [
     newTool({
         name: 'Summarize',
         tooltip: 'summarize this message',
@@ -16,7 +17,7 @@ const tools: Tool<ChatMessageState>[] = [
         tooltip: "edit this message",
         allowMultiple: false,
         invoke: (items) => {
-            items[0].setMessage(prompt("Edit message", items[0].message ?? undefined) ?? items[0].message);
+            items[0].setMessage(prompt("Edit message", items[0].content ?? undefined) ?? items[0].content);
         }
     }),
     newTool({
@@ -28,29 +29,38 @@ const tools: Tool<ChatMessageState>[] = [
     })
 ];
 
-export default class ChatMessageState extends Reactive implements ToolbarItems<ChatMessageState> {
-    chat: ChatState | null = null;
+export default class ChatMessage extends Reactive implements ToolbarItems<ChatMessage> {
+    chat: ChatSession;
     role: OpenAI.Chat.ChatCompletionRole;
-    message: string = "";
+    content: string = "";
     loading: boolean = false;
     selected: boolean = false;
 
-    private constructor(role: OpenAI.Chat.ChatCompletionRole) {
+    private constructor(chat: ChatSession, role: OpenAI.Chat.ChatCompletionRole) {
         super();
+        this.chat = chat;
         this.role = role;
     }
 
-    static fromUser(message: string): ChatMessageState {
-        const state = new ChatMessageState('user');
-        state.message = message;
+    static fromUser(chat: ChatSession, message: string): ChatMessage {
+        const state = new ChatMessage(chat, 'user');
+        state.content = message;
         return state;
     }
 
-    static async fromAI(openai: OpenAI, params: Omit<OpenAI.Chat.ChatCompletionCreateParamsStreaming, "stream" | "n">): Promise<ChatMessageState> {
-        const state = new ChatMessageState('assistant');
+    static async fromAI(chat: ChatSession, bot: ChatBot, history: { role: OpenAI.Chat.ChatCompletionRole, content: string }[]): Promise<ChatMessage> {
+        const state = new ChatMessage(chat, 'assistant');
         state.loading = true;
-        const stream = await openai.chat.completions.create({
-            ...params,
+        const messages = bot.system_message !== null ? [
+            { role: 'system' as OpenAI.Chat.ChatCompletionRole, content: bot.system_message },
+            ...history,
+        ] : history;
+        const stream = await state.chat.openai.chat.completions.create({
+            messages: messages,
+            model: bot.model,
+            //frequency_penalty: bot.frequency_penalty,
+            //presence_penalty: bot.presence_penalty,
+            //temperature: bot.temperature,
             stream: true,
             n: 1,
         });
@@ -62,7 +72,7 @@ export default class ChatMessageState extends Reactive implements ToolbarItems<C
                     break;
                 }
                 if (content === undefined) continue;
-                state.setMessage(state.message + content);
+                state.setMessage(state.content + content);
             }
             state.loading = false;
             state.notifyListeners();
@@ -70,8 +80,8 @@ export default class ChatMessageState extends Reactive implements ToolbarItems<C
         return state;
     }
 
-    static async fromAIMock(openai: OpenAI, params: Omit<OpenAI.Chat.ChatCompletionCreateParamsStreaming, "stream" | "n">): Promise<ChatMessageState> {
-        const state = new ChatMessageState('assistant');
+    static async fromAIMock(chat: ChatSession, params: Omit<OpenAI.Chat.ChatCompletionCreateParamsStreaming, "stream" | "n">): Promise<ChatMessage> {
+        const state = new ChatMessage(chat, 'assistant');
         state.loading = true;
         await new Promise(resolve => setTimeout(resolve, 1000));
         new Promise(async (resolve, reject) => {
@@ -84,7 +94,7 @@ export default class ChatMessageState extends Reactive implements ToolbarItems<C
                 message = message.substring(endIdx);
             }
             for (const msgPart of msgParts) {
-                state.setMessage(state.message + msgPart);
+                state.setMessage(state.content + msgPart);
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
             state.loading = false;
@@ -93,10 +103,10 @@ export default class ChatMessageState extends Reactive implements ToolbarItems<C
         return state;
     }
 
-    toChatMessage(): OpenAI.Chat.ChatCompletionMessage {
+    toChatMessage(): { role: OpenAI.Chat.ChatCompletionRole, content: string } {
         return {
             role: this.role,
-            content: this.message,
+            content: this.content,
         }
     }
 
@@ -106,7 +116,7 @@ export default class ChatMessageState extends Reactive implements ToolbarItems<C
     }
 
     setMessage(message: string) {
-        this.message = message;
+        this.content = message;
         this.notifyListeners();
     }
 
