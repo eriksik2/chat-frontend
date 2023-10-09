@@ -62,6 +62,9 @@ export default function Chat(props: ChatProps) {
     }
 
     return <div className='flex flex-col items-center max-h-fit justify-center p-2'>
+        <div className='flex flex-row w-full h-12 bg-slate-400'>
+
+        </div>
         <div className='flex flex-col items-stretch justify-start gap-2 w-full overflow-auto'>
             {history.map((message, index) => {
                 if (message.message.role === 'system') return null;
