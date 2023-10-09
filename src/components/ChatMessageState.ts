@@ -15,6 +15,17 @@ const tools: Tool<ChatMessageState>[] = [
         },
     }),
     newTool({
+        name: "Edit",
+        tooltip: "edit this message",
+        allowMultiple: false,
+        invoke: (items) => {
+            items[0].setMessage({
+                role: items[0].message.role,
+                content: prompt("Edit message", items[0].message.content ?? undefined) ?? items[0].message.content,
+            });
+        }
+    }),
+    newTool({
         name: "Delete",
         tooltip: "delete this message",
         invoke: (items) => {

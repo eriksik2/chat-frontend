@@ -13,9 +13,12 @@ export default function Toolbar<T extends ToolbarItems<T>>(props: ToolbarProps<T
     const commonTools = useMemo(() => getCommonTools(props.targets), [props.targets]);
     return <div className='flex flex-row w-full gap-2 p-2 bg-slate-400'>
         {commonTools.map((target) => {
+            var enable = true;
+            if(!target.allowMultiple && props.targets.length > 1) enable = false;
             return <ToolbarButton
                 key={target.name}
                 targets={props.targets as T[]}
+                enable={enable}
                 tool={target}
             />;
         })}
