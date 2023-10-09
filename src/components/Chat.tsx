@@ -33,17 +33,12 @@ export default function Chat(props: ChatProps) {
 
     function onUserSend(message: string) {
         if (message.trim() === '') return;
-        const chatMessage: OpenAI.Chat.ChatCompletionMessage = {
-            role: 'user',
-            content: message,
-        };
-
-        promptAI(chatMessage);
+        promptAI(message);
     }
 
-    async function promptAI(newMessage: OpenAI.Chat.ChatCompletionMessage) {
+    async function promptAI(newMessage: string) {
         setWaiting(true);
-        chat.addMessage(new ChatMessageState(chat, newMessage));
+        chat.addMessage(ChatMessageState.fromUser(newMessage));
         //const completion = await openai.chat.completions.create({
         //    //model: "gpt-4",
         //    model: "gpt-3.5-turbo",
@@ -51,16 +46,20 @@ export default function Chat(props: ChatProps) {
         //    n: 1,
         //});
         //const chatMessage: OpenAI.Chat.ChatCompletionMessage = completion.choices[0].message;
-        const chatMessage: OpenAI.Chat.ChatCompletionMessage = {
+        const aiMessage: OpenAI.Chat.ChatCompletionMessage = {
             role: 'assistant',
             content: 'Hello, world!',
         };
-        if (chatMessage.content === null) {
+        if (aiMessage.content === null) {
             setWaiting(false);
             return;
         }
 
-        chat.addMessage(new ChatMessageState(chat, chatMessage));
+        chat.addMessage(await ChatMessageState.fromAIMock(openai, {
+            //model: "gpt-4",
+            model: "gpt-3.5-turbo",
+            messages: chat.history.map((message) => message.toChatMessage()),
+        }));
         setWaiting(false);
     }
 
@@ -70,7 +69,7 @@ export default function Chat(props: ChatProps) {
         />
         <div className='flex flex-col items-stretch justify-start gap-2 w-full overflow-auto'>
             {chat.history.map((message, index) => {
-                if (message.message.role === 'system') return null;
+                if (message.role === 'system') return null;
                 return <>
                     <ChatMessage
                         key={index}

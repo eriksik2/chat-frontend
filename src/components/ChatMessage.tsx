@@ -23,7 +23,7 @@ export default function ChatMessage(props: ChatMessageProps) {
         onClick={handleChange}
     >
         <div className='px-4 py-2 flex flex-col items-start text-white bg-gray-500'>
-            <p>{message.message.role}</p>
+            <p>{message.role}</p>
             <div className='flex-grow' />
             <input
                 className="hidden checked:block group-hover/msg:block"
@@ -32,6 +32,11 @@ export default function ChatMessage(props: ChatMessageProps) {
                 onChange={handleChange}
             />
         </div>
-        <div>{message.message.content}</div>
+        <div>
+            <p>
+                {message.message}
+                {message.loading && ' ...'}
+            </p>
+        </div>
     </div>
 }
