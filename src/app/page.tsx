@@ -2,24 +2,41 @@
 
 import ChatComponent from '@/components/chat/ChatComponent'
 import ChatBotList from '@/components/chatbot/ChatBotList';
+import { navPage } from '@/components/nav/NavController';
+import SideTabsNav from '@/components/nav/SideTabs/SideTabsNav';
 import App from '@/state/App'
+import ChatSession from '@/state/ChatSession';
 import { useReactive } from '@/util/Reactive';
 import { useState } from 'react';
+import { FaGithub, FaRegComments, FaRegIdBadge, FaUsersGear } from 'react-icons/fa6';
 
 export default function Home() {
   const [state] = useState(new App());
+  state.addChat(new ChatSession(state, state.chatbots[0]));
 
+  const [keyInput, setKeyInput] = useState("");
 
   return (
-    <main className="min-h-screen max-h-screen p-12 flex flex-col justify-stretch">
-      <h1
-        className=' text-7xl font-bold text-center'
-      >Horik GPT</h1>
-      <ChatBotList
-        app={state}
-      />
-      <ChatComponent
-        apiKey={"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"}
+    <main className="h-screen relative bg-slate-200 flex flex-col">
+      <div className='flex items-center justify-center p-6 gap-2 bg-slate-400 relative'>
+        <h1 className='flex text-4xl gap-2'>
+          Chatbot Explorer
+        </h1>
+
+        <div className='absolute top-0 bottom-0 right-0 flex text-4xl items-center gap-4 px-4'>
+          <a href="https://github.com/eriksik2/chat-frontend"><FaGithub /></a>
+        </div>
+
+      </div>
+      <SideTabsNav
+        pages={[
+          navPage("Chatbots", <ChatBotList app={state} />, {
+            icon: <FaUsersGear className="text-2xl" />,
+          }),
+          navPage("Quick chat", <ChatComponent chat={state.chats[0]} />, {
+            icon: <FaRegComments className="text-2xl" />,
+          }),
+        ]}
       />
     </main>
   )

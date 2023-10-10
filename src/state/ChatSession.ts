@@ -3,6 +3,7 @@ import ChatMessage from './ChatMessage';
 import ToolbarItems, { Tool, newTool } from '../util/ToolbarItems';
 import OpenAI from 'openai';
 import ChatBot from './ChatBot';
+import App from './App';
 
 const tools: Tool<ChatSession>[] = [
     newTool({
@@ -31,14 +32,14 @@ const tools: Tool<ChatSession>[] = [
 ];
 
 export default class ChatSession extends Reactive implements ToolbarItems<ChatSession> {
-    openai: OpenAI;
+    app: App;
     chatbot: ChatBot;
     history: ChatMessage[] = [];
     loading: boolean = false;
 
-    constructor(openai: OpenAI, chatbot: ChatBot) {
+    constructor(app: App, chatbot: ChatBot) {
         super();
-        this.openai = openai;
+        this.app = app;
         this.chatbot = chatbot;
     }
 
@@ -69,11 +70,6 @@ export default class ChatSession extends Reactive implements ToolbarItems<ChatSe
             message.removeReactive(this);
         }
         this.history = [];
-        this.notifyListeners();
-    }
-
-    setOpenAI(openai: OpenAI) {
-        this.openai = openai;
         this.notifyListeners();
     }
 

@@ -29,6 +29,12 @@ const tools: Tool<ChatMessage>[] = [
     })
 ];
 
+export class NoApiKeyError extends Error {
+    constructor() {
+        super("OpenAI API key not set");
+    }
+}
+
 export default class ChatMessage extends Reactive implements ToolbarItems<ChatMessage> {
     chat: ChatSession;
     role: OpenAI.Chat.ChatCompletionRole;
@@ -49,13 +55,15 @@ export default class ChatMessage extends Reactive implements ToolbarItems<ChatMe
     }
 
     static async fromAI(chat: ChatSession, bot: ChatBot, history: { role: OpenAI.Chat.ChatCompletionRole, content: string }[]): Promise<ChatMessage> {
+        if (bot.model === "mock") return ChatMessage.fromAIMock(chat, bot, history);
         const state = new ChatMessage(chat, 'assistant');
         state.loading = true;
         const messages = bot.system_message !== null ? [
             { role: 'system' as OpenAI.Chat.ChatCompletionRole, content: bot.system_message },
             ...history,
         ] : history;
-        const stream = await state.chat.openai.chat.completions.create({
+        console.log(chat);
+        const stream = await state.chat.app.openai!.chat.completions.create({
             messages: messages,
             model: bot.model,
             //frequency_penalty: bot.frequency_penalty,
@@ -80,12 +88,12 @@ export default class ChatMessage extends Reactive implements ToolbarItems<ChatMe
         return state;
     }
 
-    static async fromAIMock(chat: ChatSession, params: Omit<OpenAI.Chat.ChatCompletionCreateParamsStreaming, "stream" | "n">): Promise<ChatMessage> {
+    static async fromAIMock(chat: ChatSession, bot: ChatBot, history: { role: OpenAI.Chat.ChatCompletionRole, content: string }[]): Promise<ChatMessage> {
         const state = new ChatMessage(chat, 'assistant');
         state.loading = true;
         await new Promise(resolve => setTimeout(resolve, 1000));
         new Promise(async (resolve, reject) => {
-            var message = `You wrote: ${params.messages[params.messages.length - 1].content}.`;
+            var message = `My temperature: ${bot.temperature}. You wrote: ${history[history.length - 1].content}.`;
             var msgParts = [];
             const partLen = 4;
             while (message.length > 0) {

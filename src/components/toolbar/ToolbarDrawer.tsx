@@ -42,11 +42,13 @@ export default function ToolbarDrawer(props: ToolbarDrawerProps) {
             }}
         >
 
-            {(props.children ?? []).filter(child => child !== null).map((child) => {
-                return <>
-                    <div className='w-px my-2 bg-slate-700 first:hidden last:hidden' />
-                    {child}
-                </>;
+            {(props.children ?? []).filter(child => child !== null).map((child, i) => {
+                return <div key={i} className='group flex flex-row items-stretch'>
+                    <div className='w-px my-2 mr-4 bg-slate-700 group-first:hidden' />
+                    <div className=''>
+                        {child}
+                    </div>
+                </div>;
             })}
         </div>
     </div>

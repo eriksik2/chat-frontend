@@ -2,19 +2,22 @@
 import Reactive from "@/util/Reactive";
 import generateUUID from "@/util/generateUUID";
 import OpenAI from "openai";
+import App from "./App";
 
 export default class ChatBot extends Reactive {
+    app: App;
     id: string;
     name: string = "New chatbot";
     description: string = "A cool chatbot.";
     model: OpenAI.Chat.Completions.ChatCompletionCreateParams["model"] = "gpt-3.5-turbo";
     system_message: string | null = null;
-    frequency_penalty: number | null = null;
-    presence_penalty: number | null = null;
-    temperature: number | null = null;
+    frequency_penalty: number = 0;
+    presence_penalty: number = 0;
+    temperature: number = 0.7;
 
-    constructor() {
+    constructor(app: App) {
         super();
+        this.app = app;
         this.id = generateUUID();
     }
 
@@ -38,17 +41,17 @@ export default class ChatBot extends Reactive {
         this.notifyListeners();
     }
 
-    setFrequencyPenalty(penalty: number | null) {
+    setFrequencyPenalty(penalty: number) {
         this.frequency_penalty = penalty;
         this.notifyListeners();
     }
 
-    setPresencePenalty(penalty: number | null) {
+    setPresencePenalty(penalty: number) {
         this.presence_penalty = penalty;
         this.notifyListeners();
     }
 
-    setTemperature(temperature: number | null) {
+    setTemperature(temperature: number) {
         this.temperature = temperature;
         this.notifyListeners();
     }

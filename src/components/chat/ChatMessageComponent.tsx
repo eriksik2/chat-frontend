@@ -16,7 +16,7 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     }
 
     return <div
-        className='flex flex-row gap-2 group/msg min-h-[4rem] rounded-xl overflow-hidden border-2 border-transparent hover:border-gray-400'
+        className='flex flex-row gap-2 group/msg min-h-[4rem] rounded-xl border-2 border-transparent hover:border-gray-400'
         style={{
             borderColor: message.selected ? 'blue' : undefined,
         }}

@@ -33,13 +33,13 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
             }}
         >
             <input
-                className='px-4 py-2 text-black bg-white rounded-full flex-grow'
+                className='px-4 py-2 text-black bg-white rounded-full flex-grow drop-shadow-lg '
                 type="text"
                 value={value}
                 onChange={onChange}
             />
             <button
-                className='px-4 py-2 text-white bg-blue-500 rounded-full'
+                className='px-4 py-2 text-white bg-blue-500 rounded-full drop-shadow-lg '
                 onClick={(event) => {
                     event.preventDefault();
                     onSubmit();
