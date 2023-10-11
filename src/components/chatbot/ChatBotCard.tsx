@@ -9,6 +9,7 @@ import ChatBotEdit from './ChatBotEdit';
 import Modal from '../Modal';
 
 import { FaPen, FaTrash } from 'react-icons/fa6';
+import clsx from 'clsx';
 
 type ChatBotCardProps = {
     chatbot: ChatBot;
@@ -16,10 +17,17 @@ type ChatBotCardProps = {
 
 export default function ChatBotCard(props: ChatBotCardProps) {
     const chatbot = useReactive(props.chatbot);
+    const _ = useReactive(chatbot.app);
 
     const [showEdit, setShowEdit] = useState(false);
 
-    return <div className='bg-zinc-400 rounded p-2 shadow-md'>
+    return <div
+        className={clsx(
+            'bg-zinc-400 rounded p-2 shadow-md border-2 border-transparent',
+            chatbot.isSelectedDefault() && 'border-blue-500'
+        )}
+        onClick={() => chatbot.app.setDefaultChatbot(chatbot)}
+    >
         {showEdit &&
             <Modal onClose={() => setShowEdit(false)}>
                 <ChatBotEdit

@@ -6,12 +6,13 @@ import { navPage } from '@/components/nav/NavController';
 import SideTabsNav from '@/components/nav/SideTabs/SideTabsNav';
 import App from '@/state/App'
 import ChatSession from '@/state/ChatSession';
+import { useReactive } from '@/util/Reactive';
 import { useState } from 'react';
 import { FaGithub, FaRegComments, FaUsersGear } from 'react-icons/fa6';
 
 export default function Home() {
   const [state] = useState(new App());
-  state.addChat(new ChatSession(state, state.chatbots[0]));
+  const app = useReactive(state);
 
   const [keyInput, setKeyInput] = useState("");
 
@@ -32,7 +33,7 @@ export default function Home() {
           navPage("Chatbots", <ChatBotList app={state} />, {
             icon: <FaUsersGear className="text-2xl" />,
           }),
-          navPage("Quick chat", <ChatComponent chat={state.chats[0]} />, {
+          navPage("Quick chat", <ChatComponent chat={state.getDefaultChat()} />, {
             icon: <FaRegComments className="text-2xl" />,
           }),
         ]}

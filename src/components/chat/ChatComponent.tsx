@@ -66,13 +66,15 @@ export default function ChatComponent(props: ChatComponentProps) {
             </ToolbarDrawer>
         </div>
 
-        <div className='absolute top-0 left-0 right-0 bottom-0 overflow-auto flex flex-col gap-2 px-4 pt-14 pb-16'>
+        <div className='absolute top-0 left-0 right-0 bottom-0 overflow-auto px-4 pt-14 pb-16'>
             {chat.history.map((message, index) => {
                 if (message.role === 'system') return null;
-                return <ChatMessageComponent
-                    key={index}
-                    message={message}
-                />;
+                return <div key={index}>
+                    {index > 0 && <div className='h-2' />}
+                    <ChatMessageComponent
+                        message={message}
+                    />
+                </div>;
             })}
         </div>
 

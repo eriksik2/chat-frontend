@@ -3,9 +3,11 @@ import Reactive from "@/util/Reactive";
 import generateUUID from "@/util/generateUUID";
 import OpenAI from "openai";
 import App from "./App";
+import ChatSession from "./ChatSession";
 
 export default class ChatBot extends Reactive {
     app: App;
+    quickChat: ChatSession;
     id: string;
     name: string = "New chatbot";
     description: string = "A cool chatbot.";
@@ -19,6 +21,11 @@ export default class ChatBot extends Reactive {
         super();
         this.app = app;
         this.id = generateUUID();
+        this.quickChat = new ChatSession(app, this);
+    }
+
+    isSelectedDefault() {
+        return this.app.selectedDefaultChatbot === this;
     }
 
     setName(name: string) {
