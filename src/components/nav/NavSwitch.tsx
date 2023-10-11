@@ -18,6 +18,7 @@ export default function NavSwitch<Tparams>(props: NavSwitchProps<Tparams>) {
     }, [props.pages, nav]);
 
     return props.pages.map((page, i) => {
+        if (nav.getCurrentName() !== page.name) return null;
         return <div
             key={i}
             className='h-full w-full'

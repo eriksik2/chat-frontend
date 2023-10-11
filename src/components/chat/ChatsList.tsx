@@ -15,7 +15,7 @@ export default function ChatsList(props: ChatsListProps) {
 
     return <TabsNav
         buttonBuilder={(name, params, isPage) => <div className={clsx(
-            "flex flex-row items-center text-lg gap-2 p-2 w-44",
+            "flex flex-row items-center justify-between text-lg gap-4 p-3 hover:bg-slate-600",
             isPage ? "bg-slate-500" : "bg-transparent",
         )}>
             {params.icon}
