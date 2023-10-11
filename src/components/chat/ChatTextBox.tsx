@@ -63,13 +63,13 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
             onKeyDown={onKey}
         >
             <textarea
-                wrap={"off"}
-                rows={lines}
-                cols={Math.max(cols * 1.5, 40)}
-                className='px-3 py-2 text-black bg-white rounded-xl flex-grow drop-shadow-lg resize-none'
+                wrap={bigEditor ? "soft" : "off"}
+                rows={1}
+                cols={40}
+                className='px-3 py-2 text-black bg-white rounded-xl flex-grow drop-shadow-lg resize-none flex items-center no-scrollbar'
                 style={{
-                    height: !bigEditor ? `calc(1rem + ${lines}lh)` : "65vh",
-                    width: !bigEditor ? `calc(1.5rem + ${cols}ch)` : "50vw",
+                    height: !bigEditor ? `calc(1rem + ${1}lh)` : "65vh",
+                    width: !bigEditor ? `calc(1.5rem + ${60}ch)` : "50vw",
                     transition: "height 0.2s ease-in-out, width 0.2s ease-in-out",
                 }}
                 value={value}
