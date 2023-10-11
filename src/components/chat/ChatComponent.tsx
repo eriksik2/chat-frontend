@@ -9,8 +9,6 @@ import Toolbar from '../toolbar/Toolbar';
 import { useReactive } from '@/util/Reactive';
 import ChatSession from '../../state/ChatSession';
 import ToolbarDrawer from '../toolbar/ToolbarDrawer';
-import ChatBot from '@/state/ChatBot';
-import App from '@/state/App';
 import clsx from 'clsx';
 
 
