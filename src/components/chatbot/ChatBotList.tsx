@@ -3,12 +3,13 @@
 import App from '@/state/App';
 import ChatBot from '@/state/ChatBot';
 import { useReactive } from '@/util/Reactive';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import ChatBotCard from './ChatBotCard';
 import Modal from '../Modal';
 import ChatBotAdd from './ChatBotAdd';
 
-import { FaCirclePlus } from 'react-icons/fa6';
+import { FaAngleDown, FaCirclePlus } from 'react-icons/fa6';
+import ChatBotListCategory from './ChatBotListCategory';
 
 type ChatBotListProps = {
     app: App;
@@ -17,15 +18,29 @@ type ChatBotListProps = {
 export default function ChatBotList(props: ChatBotListProps) {
     const state = useReactive(props.app);
 
+    const allCategories = useMemo(() => {
+        const categories = new Set<string>();
+        state.chatbots.forEach((chatbot) => {
+            chatbot.tags.forEach((tag) => {
+                categories.add(tag);
+            });
+        });
+        return Array.from(categories);
+    }, [state]);
+
     const [showAdd, setShowAdd] = useState(false);
 
     function onSave(chatbot: ChatBot) {
         state.addChatbot(chatbot);
         setShowAdd(false);
     }
-    return <div className='flex flex-row flex-wrap gap-4 items-center content-start justify-start h-full w-full p-4'>
-        {state.chatbots.map((chatbot, i) => {
-            return <ChatBotCard key={i} chatbot={chatbot} />;
+    return <div className='flex flex-col gap-4 items-stretch justify-start h-full w-full p-4'>
+        {([...allCategories, null]).map((category) => {
+            return <ChatBotListCategory
+                key={category}
+                app={state}
+                category={category}
+            />;
         })}
         <button
             className="text-xl"

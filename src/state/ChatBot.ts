@@ -11,6 +11,7 @@ export default class ChatBot extends Reactive {
     id: string;
     name: string = "New chatbot";
     description: string = "A cool chatbot.";
+    tags: string[] = [];
     model: OpenAI.Chat.Completions.ChatCompletionCreateParams["model"] = "gpt-3.5-turbo";
     system_message: string | null = null;
     frequency_penalty: number = 0;
@@ -28,6 +29,7 @@ export default class ChatBot extends Reactive {
         return this.app.selectedDefaultChatbot === this;
     }
 
+
     setName(name: string) {
         this.name = name;
         this.notifyListeners();
@@ -35,6 +37,20 @@ export default class ChatBot extends Reactive {
 
     setDescription(description: string) {
         this.description = description;
+        this.notifyListeners();
+    }
+
+    hasTag(tag: string) {
+        return this.tags.includes(tag);
+    }
+
+    addTag(tag: string) {
+        this.tags.push(tag);
+        this.notifyListeners();
+    }
+
+    removeTag(tag: string) {
+        this.tags = this.tags.filter(t => t !== tag);
         this.notifyListeners();
     }
 
