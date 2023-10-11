@@ -44,7 +44,7 @@ export default function ChatBotList(props: ChatBotListProps) {
             </p>
             <br />
             <p>
-                After selecting a chatbot (indicated by the blue outline), you can chat with it in the "Chat" tab.
+                After selecting a chatbot (indicated by the blue outline), you can chat with it in the Chat tab.
             </p>
         </div>
         {([...allCategories, null]).map((category) => {
