@@ -26,6 +26,9 @@ export class NavContextType<Tparams> extends Reactive {
     }
 
     setPages(value: NavPage<Tparams>[]) {
+        if (this.currentName === null && value.length > 0) {
+            this.currentName = value[0].name;
+        }
         this.pages = value;
         this.notifyListeners();
     }
