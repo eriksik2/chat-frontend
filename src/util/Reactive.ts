@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 
 export default class Reactive {
+    generation: number = 0;
     listeners: (() => void)[] = [];
 
     addListener(listener: () => void) {
@@ -24,6 +25,7 @@ export default class Reactive {
 
     notifyListeners() {
         this.listeners.forEach(listener => listener());
+        this.generation++;
     }
 
     clearListeners() {
@@ -34,14 +36,16 @@ export default class Reactive {
 
 export function useReactive<T extends Reactive>(reactive: T) {
     const [forceReloadHack, setForceReloadHack] = useState<number>(0);
+    const [value, setValue] = useState<T>(reactive);
     function listener() {
+        setValue(reactive);
         setForceReloadHack(v => v + 1);
     }
     useEffect(() => {
-        reactive.listeners.push(listener);
+        value.listeners.push(listener);
         return () => {
-            reactive.listeners = reactive.listeners.filter(l => l !== listener);
+            value.listeners = value.listeners.filter(l => l !== listener);
         }
-    }, [reactive]);
-    return reactive;
+    }, [value]);
+    return value;
 }

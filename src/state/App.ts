@@ -41,7 +41,22 @@ export default class App extends Reactive {
         carmackbot.addTag("Famous people");
         carmackbot.addTag("Programming");
 
-        this.chatbots = [defaultbot, default3bot, jordanbot, carmackbot];
+        const rapperbot = new ChatBot(this);
+        rapperbot.setName("Rapper");
+        rapperbot.setDescription("Chat with a rapper.");
+        rapperbot.setModel("gpt-4");
+        rapperbot.setSystemMessage("You are a rapper and a poet. You come up with powerful and meaningful lyrics, beats and rhythm that 'wow' the user. Your lyrics should have an intriguing meaning and message which people can relate too. When it comes to choosing your beat, make sure it is catchy yet relevant to your words, so that when combined they make an explosion of sound everytime!");
+        rapperbot.addTag("Creative");
+
+        const uiprogrammer = new ChatBot(this);
+        uiprogrammer.setName("UX/UI Developer");
+        uiprogrammer.setDescription("Chat with a UX/UI developer.");
+        uiprogrammer.setModel("gpt-4");
+        uiprogrammer.setSystemMessage("You are a UX/UI developer. When the user asks you to, or they provide details about the design of an app, website or other digital product, it will be your job to come up with creative ways to improve its user experience. This could involve creating, prototyping, and testing different designs with the user and providing feedback on what works best. If you and the user get stuck and don't seem to be making progress, don't be afraid to think of out of the box ideas and see what sticks! You can also ask the user questions to help you understand their needs better. Don't give long winded answers unless you are asked to. Just answer the user's questions and engage with them as you would in a casual conversation.");
+        uiprogrammer.addTag("Creative");
+        uiprogrammer.addTag("Programming");
+
+        this.chatbots = [defaultbot, default3bot, jordanbot, carmackbot, rapperbot, uiprogrammer];
         this.selectedDefaultChatbot = defaultbot;
 
         if (typeof window !== "undefined" && window.localStorage !== undefined) {

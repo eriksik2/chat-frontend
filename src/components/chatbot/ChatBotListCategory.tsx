@@ -29,7 +29,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
                 return chatbot.tags.includes(props.category);
             }
         });
-    }, [state, props.category]);
+    }, [state.generation, props.category]);
     if (filteredBots.length === 0) return null;
 
     return <div className={clsx(
@@ -55,7 +55,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
                 )}
             >
                 {filteredBots.map((chatbot, i) => {
-                    return <ChatBotCard key={i} chatbot={chatbot} />;
+                    return <ChatBotCard key={chatbot.id} chatbot={chatbot} />;
                 })}
             </div>
         </div>

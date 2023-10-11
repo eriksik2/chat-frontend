@@ -32,13 +32,21 @@ export default function ChatBotList(props: ChatBotListProps) {
 
     function onSave(chatbot: ChatBot) {
         state.addChatbot(chatbot);
+        console.log(state.chatbots);
         setShowAdd(false);
     }
     return <div className='flex flex-col gap-4 items-stretch justify-start h-full w-full p-4'>
         <h1 className='text-4xl'>Chatbots</h1>
-        <p className='w-1/3'>
-            List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
-        </p>
+        <div className='w-2/5'>
+            <p>
+                List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
+
+            </p>
+            <br />
+            <p>
+                After selecting a chatbot (indicated by the blue outline), you can chat with it in the "Chat" tab.
+            </p>
+        </div>
         {([...allCategories, null]).map((category) => {
             return <ChatBotListCategory
                 key={category}
