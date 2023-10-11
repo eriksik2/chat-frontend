@@ -18,9 +18,9 @@ export default function Home() {
 
   return (
     <main className="h-screen relative bg-slate-200 flex flex-col">
-      <div className='flex items-center justify-center p-6 gap-2 bg-slate-400 relative'>
-        <h1 className='flex text-4xl gap-2'>
-          Chatbot Explorer
+      <div className='flex items-center justify-start py-4 px-3 gap-2 bg-slate-400 relative'>
+        <h1 className='flex text-2xl gap-2'>
+          chat.eriksik
         </h1>
 
         <div className='absolute top-0 bottom-0 right-0 flex text-4xl items-center gap-4 px-4'>
