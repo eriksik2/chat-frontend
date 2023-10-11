@@ -29,6 +29,7 @@ export default function Home() {
 
       </div>
       <SideTabsNav
+        tabsLocation='bottom'
         pages={[
           navPage("Chatbots", <ChatBotList app={state} />, {
             icon: <FaUsersGear className="text-2xl" />,

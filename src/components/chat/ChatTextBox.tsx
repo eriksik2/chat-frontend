@@ -66,7 +66,7 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
                 wrap={bigEditor ? "soft" : "off"}
                 rows={1}
                 cols={40}
-                className='px-3 py-2 text-black bg-white rounded-xl flex-grow drop-shadow-lg resize-none flex items-center no-scrollbar'
+                className='px-3 py-2 text-black bg-white rounded-xl drop-shadow-lg resize-none no-scrollbar'
                 style={{
                     height: !bigEditor ? `calc(1rem + ${1}lh)` : "65vh",
                     width: !bigEditor ? `calc(1.5rem + ${60}ch)` : "50vw",

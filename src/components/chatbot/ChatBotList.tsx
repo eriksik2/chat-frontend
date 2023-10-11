@@ -35,37 +35,43 @@ export default function ChatBotList(props: ChatBotListProps) {
         console.log(state.chatbots);
         setShowAdd(false);
     }
-    return <div className='flex flex-col gap-4 items-stretch justify-start h-full w-full p-4'>
-        <h1 className='text-4xl'>Chatbots</h1>
-        <div className='w-2/5'>
-            <p>
-                List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
+    return <div className='h-full relative'>
+        <div className='flex flex-col items-stretch justify-start absolute top-0 left-0 right-0 bottom-0'>
+            <div className='w-full shadow-xl z-30'>
+                <div className='w-2/5 p-4 py-6'>
+                    <h1 className='text-5xl pb-2'>Chatbots</h1>
+                    <p>
+                        List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
 
-            </p>
-            <br />
-            <p>
-                After selecting a chatbot (indicated by the blue outline), you can chat with it in the Chat tab.
-            </p>
+                    </p>
+                    <br />
+                    <p>
+                        After selecting a chatbot (indicated by the blue outline), you can chat with it in the Chat tab.
+                    </p>
+                </div>
+            </div>
+            <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
+                {([...allCategories, null]).map((category) => {
+                    return <ChatBotListCategory
+                        key={category}
+                        app={state}
+                        category={category}
+                    />;
+                })}
+                <button
+                    className="text-xl"
+                    onClick={() => setShowAdd(true)}
+                ><FaCirclePlus /></button>
+                {showAdd &&
+                    <Modal onClose={() => setShowAdd(false)}>
+                        <ChatBotAdd
+                            app={state}
+                            onDiscard={() => setShowAdd(false)}
+                            onSave={onSave}
+                        />
+                    </Modal>
+                }
+            </div>
         </div>
-        {([...allCategories, null]).map((category) => {
-            return <ChatBotListCategory
-                key={category}
-                app={state}
-                category={category}
-            />;
-        })}
-        <button
-            className="text-xl"
-            onClick={() => setShowAdd(true)}
-        ><FaCirclePlus /></button>
-        {showAdd &&
-            <Modal onClose={() => setShowAdd(false)}>
-                <ChatBotAdd
-                    app={state}
-                    onDiscard={() => setShowAdd(false)}
-                    onSave={onSave}
-                />
-            </Modal>
-        }
     </div>
 }

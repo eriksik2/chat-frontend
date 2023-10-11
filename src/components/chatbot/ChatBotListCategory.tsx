@@ -19,7 +19,7 @@ type ChatBotListCategoryProps = {
 export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
     const state = useReactive(props.app);
 
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
     const filteredBots = useMemo(() => {
         return state.chatbots.filter((chatbot) => {

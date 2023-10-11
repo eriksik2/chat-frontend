@@ -21,7 +21,6 @@ export default function ChatComponent(props: ChatComponentProps) {
     const chatbot = useReactive(chat.chatbot);
     const app = useReactive(chat.app);
 
-    console.log(chatbot);
     const needApiKey = app.openai === null && chatbot.model !== "mock";
     const [apiKeyInput, setApiKeyInput] = useState('');
 
@@ -58,7 +57,7 @@ export default function ChatComponent(props: ChatComponentProps) {
                 </div>
             </div>
         }
-        <div className='px-6 absolute left-0 right-0 top-0 z-10'>
+        {false && <div className='px-6 absolute left-0 right-0 top-0 z-10'>
             <ToolbarDrawer>
                 <Toolbar
                     targets={[chat]}
@@ -69,7 +68,7 @@ export default function ChatComponent(props: ChatComponentProps) {
                     filterDisplay={(count) => count > 0 ? `${count} selected` : null}
                 />
             </ToolbarDrawer>
-        </div>
+        </div>}
 
         <div className='absolute top-0 left-0 right-0 bottom-0 overflow-auto scroll-smooth snap-y snap-proximity'>
             <div className='px-4 pt-14 pb-16 flex flex-col items-center justify-start'>

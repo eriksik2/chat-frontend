@@ -46,7 +46,7 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
                         onChange={(e) => chatbot.setModel(e.target.value)}
                     >
                         <option value="gpt-4">GPT-4 (8K)</option>
-                        <option value="gpt-4-32k">GPT-4 (32K)</option>
+                        <option value="gpt-4-32k" disabled>GPT-4 (32K)</option>
                         <option value="gpt-3.5-turbo">GPT-3.5</option>
                         <option value="mock">Test mock</option>
                     </select>
