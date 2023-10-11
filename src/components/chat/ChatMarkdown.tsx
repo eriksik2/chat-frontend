@@ -13,7 +13,6 @@ type ChatMarkdownProps = {
 export default function ChatMarkdown(props: ChatMarkdownProps) {
     const text = `${props.content}${props.loading ? ' ...' : ''}`;
     return <Markdown
-        children={text}
         components={{
             h1(props) {
                 return <h1 className='text-2xl' {...props} />;
@@ -38,5 +37,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
                 />;
             }
         }}
-    />;
+    >
+        {text}
+    </Markdown>;
 }
