@@ -83,10 +83,11 @@ export default function ChatCode(props: ChatCodeProps) {
 
     return <SyntaxHighlighter
         showLineNumbers={true}
-        children={props.content}
         language={props.language}
         renderer={render}
         style={{}}
         PreTag={"a"}
-    />;
+    >
+        {props.content}
+    </SyntaxHighlighter>;
 }
