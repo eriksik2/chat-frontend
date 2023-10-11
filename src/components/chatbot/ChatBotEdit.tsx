@@ -32,8 +32,8 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
             <div className='flex items-center h-full col-start-1 row-start-2'>
                 <p>Description</p>
             </div>
-            <input
-                className='h-36 col-start-2 row-start-2'
+            <textarea
+                className='h-36 col-start-2 row-start-2 resize-none'
                 value={chatbot.description}
                 onChange={(e) => chatbot.setDescription(e.target.value)}
             />
@@ -91,8 +91,8 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
             <div className='flex items-center h-full col-start-1 row-start-3'>
                 <p>System message</p>
             </div>
-            <input
-                className='h-56 col-start-2 row-start-3 col-span-2'
+            <textarea
+                className='h-56 col-start-2 row-start-3 col-span-2 resize-none'
                 value={chatbot.system_message ?? ""}
                 onChange={(e) => chatbot.setSystemMessage(e.target.value)}
             />

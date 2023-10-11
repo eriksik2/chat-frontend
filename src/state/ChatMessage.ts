@@ -38,6 +38,7 @@ export class NoApiKeyError extends Error {
 export default class ChatMessage extends Reactive implements ToolbarItems<ChatMessage> {
     chat: ChatSession;
     role: OpenAI.Chat.ChatCompletionRole;
+    producer: ChatBot | null = null;
     content: string = "";
     loading: boolean = false;
     selected: boolean = false;
@@ -57,6 +58,7 @@ export default class ChatMessage extends Reactive implements ToolbarItems<ChatMe
     static async fromAI(chat: ChatSession, bot: ChatBot, history: { role: OpenAI.Chat.ChatCompletionRole, content: string }[]): Promise<ChatMessage> {
         if (bot.model === "mock") return ChatMessage.fromAIMock(chat, bot, history);
         const state = new ChatMessage(chat, 'assistant');
+        state.producer = bot;
         state.loading = true;
         const messages = bot.system_message !== null ? [
             { role: 'system' as OpenAI.Chat.ChatCompletionRole, content: bot.system_message },
@@ -90,6 +92,7 @@ export default class ChatMessage extends Reactive implements ToolbarItems<ChatMe
 
     static async fromAIMock(chat: ChatSession, bot: ChatBot, history: { role: OpenAI.Chat.ChatCompletionRole, content: string }[]): Promise<ChatMessage> {
         const state = new ChatMessage(chat, 'assistant');
+        state.producer = bot;
         state.loading = true;
         await new Promise(resolve => setTimeout(resolve, 1000));
         new Promise(async (resolve, reject) => {

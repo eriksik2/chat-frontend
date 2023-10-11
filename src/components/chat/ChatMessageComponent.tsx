@@ -28,8 +28,8 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
         )}
         onClick={handleChange}
     >
-        <div className='px-4 py-2 flex flex-col items-start text-white bg-gray-500'>
-            <p>{message.role}</p>
+        <div className='px-4 py-2 flex flex-col flex-none items-start text-white bg-gray-500'>
+            <p>{message.producer?.name ?? message.role}</p>
             <div className='flex-grow' />
             <input
                 className="hidden checked:block group-hover/msg:block"

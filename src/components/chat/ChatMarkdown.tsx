@@ -30,7 +30,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
             code({ children, className }) {
                 const text = String(children).replace(/\n$/, '');
                 const match = /language-(\w+)/.exec(className || '')
-                const language = match ? match[1] : undefined;
+                const language = match ? match[1].toLowerCase() : undefined;
                 return <ChatCode
                     language={language}
                     content={text}
