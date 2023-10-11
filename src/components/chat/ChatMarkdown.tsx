@@ -3,7 +3,11 @@ import { LegacyRef } from "react";
 import Markdown from "react-markdown";
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
+import rehypeKatex from "rehype-katex";
+import remarkMath from "remark-math";
+
 import ChatCode from "./ChatCode";
+import remarkGfm from "remark-gfm";
 
 type ChatMarkdownProps = {
     content: string;
@@ -12,7 +16,11 @@ type ChatMarkdownProps = {
 
 export default function ChatMarkdown(props: ChatMarkdownProps) {
     const text = `${props.content}${props.loading ? ' ...' : ''}`;
+
     return <Markdown
+        className="markdown-body"
+        remarkPlugins={[remarkMath, remarkGfm]}
+        rehypePlugins={[rehypeKatex]}
         components={{
             h1(props) {
                 return <h1 className='text-2xl' {...props} />;
@@ -27,15 +35,69 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
                 return <h4 className='text-base' {...props} />;
             },
 
-            code({ children, className }) {
-                const text = String(children).replace(/\n$/, '');
-                const match = /language-(\w+)/.exec(className || '')
+            hr(props) {
+                return <hr className='border-gray-400' {...props} />;
+            },
+
+            blockquote(props) {
+                return <blockquote className='border-l-4 border-gray-400 pl-2' {...props} />;
+            },
+
+            ul(props) {
+                return <ul className='list-disc' {...props} />;
+            },
+
+            ol(props) {
+                return <ol className='list-decimal' {...props} />;
+            },
+
+            li(props) {
+                return <li className='ml-7' {...props} />;
+            },
+
+            pre({ children, className }) {
+                if ((children as any)?.type == undefined || (children as any)?.type.name != 'code') {
+                    return <pre className={className}>{children}</pre>;
+                }
+                const codeTag = children as React.ReactElement;
+                const codeChildren = codeTag.props.children as string;
+                const codeClassName = codeTag.props.className as string;
+                const text = String(codeChildren).replace(/\n$/, '');
+                const match = /language-(\w+)/.exec(codeClassName || '')
                 const language = match ? match[1].toLowerCase() : undefined;
                 return <ChatCode
                     language={language}
                     content={text}
                 />;
-            }
+            },
+
+            code(props) {
+                return <code className='bg-gray-400 px-1 rounded' {...props} />;
+            },
+
+            img(props) {
+                return <img className='max-w-1/2 max-h-[40vh]' {...props} />;
+            },
+
+            table(props) {
+                return <table className='border border-gray-400' {...props} />;
+            },
+
+            thead(props) {
+                return <thead className='border-b border-gray-500 bg-slate-400' {...props} />;
+            },
+
+            th(props) {
+                return <th className='border border-gray-500 px-2' {...props} />;
+            },
+
+            td(props) {
+                return <td className='border border-gray-400 px-2' {...props} />;
+            },
+
+            a(props) {
+                return <a className='text-blue-500 hover:underline visited:text-purple-500' {...props} />;
+            },
         }}
     >
         {text}

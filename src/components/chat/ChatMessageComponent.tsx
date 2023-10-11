@@ -21,7 +21,7 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     return <div
         className={clsx(
             'overflow-hidden',
-            'flex flex-row flex-grow gap-2 group/msg min-h-[4rem] rounded-xl border-2',
+            'flex flex-row flex-grow group/msg min-h-[4rem] rounded-xl border-2',
             message.selected
                 ? 'border-blue-500 hover:border-blue-800'
                 : 'border-transparent hover:border-gray-400'
@@ -38,7 +38,7 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
                 onChange={handleChange}
             />
         </div>
-        <div>
+        <div className='p-4 pb-2'>
             <ChatMarkdown
                 content={message.content}
                 loading={message.loading}

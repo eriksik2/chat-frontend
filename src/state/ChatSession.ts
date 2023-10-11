@@ -55,19 +55,16 @@ export default class ChatSession extends Reactive implements ToolbarItems<ChatSe
         }
         if (message.chat !== this) throw new Error("Cannot add message from another chat");
         this.history.push(message);
-        message.addReactive(this);
         this.notifyListeners();
     }
 
     removeMessage(message: ChatMessage) {
         this.history = this.history.filter(m => m !== message);
-        message.removeReactive(this);
         this.notifyListeners();
     }
 
     clearMessages() {
         for (const message of this.history) {
-            message.removeReactive(this);
         }
         this.history = [];
         this.notifyListeners();
