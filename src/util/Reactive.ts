@@ -36,16 +36,14 @@ export default class Reactive {
 
 export function useReactive<T extends Reactive>(reactive: T) {
     const [forceReloadHack, setForceReloadHack] = useState<number>(0);
-    const [value, setValue] = useState<T>(reactive);
     function listener() {
-        setValue(reactive);
         setForceReloadHack(v => v + 1);
     }
     useEffect(() => {
-        value.listeners.push(listener);
+        reactive.listeners.push(listener);
         return () => {
-            value.listeners = value.listeners.filter(l => l !== listener);
+            reactive.listeners = reactive.listeners.filter(l => l !== listener);
         }
-    }, [value]);
-    return value;
+    }, [reactive]);
+    return reactive;
 }

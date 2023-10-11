@@ -21,6 +21,7 @@ export default function ChatComponent(props: ChatComponentProps) {
     const chatbot = useReactive(chat.chatbot);
     const app = useReactive(chat.app);
 
+    console.log(chatbot);
     const needApiKey = app.openai === null && chatbot.model !== "mock";
     const [apiKeyInput, setApiKeyInput] = useState('');
 
