@@ -1,7 +1,7 @@
 "use client"
 
 import OpenAI from 'openai';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ChatTextBox from './ChatTextBox';
 import ChatMessageComponent from './ChatMessageComponent';
 import ChatMessage, { NoApiKeyError } from '@/state/ChatMessage';
@@ -11,6 +11,7 @@ import ChatSession from '../../state/ChatSession';
 import ToolbarDrawer from '../toolbar/ToolbarDrawer';
 import ChatBot from '@/state/ChatBot';
 import App from '@/state/App';
+import clsx from 'clsx';
 
 
 type ChatComponentProps = {
@@ -24,6 +25,11 @@ export default function ChatComponent(props: ChatComponentProps) {
 
     const needApiKey = app.openai === null && chatbot.model !== "mock";
     const [apiKeyInput, setApiKeyInput] = useState('');
+
+    const scrollDownRef = useRef<HTMLDivElement>(null);
+    scrollDownRef.current?.scrollIntoView({
+        behavior: 'smooth',
+    });
 
     function onUserSend(message: string) {
         if (message.trim() === '') return;
@@ -66,17 +72,33 @@ export default function ChatComponent(props: ChatComponentProps) {
             </ToolbarDrawer>
         </div>
 
-        <div className='absolute top-0 left-0 right-0 bottom-0 overflow-auto px-4 pt-14 pb-16'>
-            {chat.history.map((message, index) => {
-                if (message.role === 'system') return null;
+        <div className='absolute top-0 left-0 right-0 bottom-0 overflow-auto scroll-smooth snap-y snap-proximity'>
+            <div className='px-4 pt-14 pb-16 flex flex-col items-center justify-start'>
+                <div className={clsx(
+                    'mt-8 w-1/3 rounded-xl',
+                    chat.history.length === 0
+                        ? 'opacity-100 translate-y-0'
+                        : 'opacity-0 translate-y-[-2rem] h-0',
+                    "transition-all duration-1000 ease-in-out",
+                    "flex flex-col items-center justify-center"
+                )}>
+                    <h2 className='text-2xl'>
+                        What will you ask {chatbot.name}?
+                    </h2>
+                </div>
+                {chat.history.map((message, index) => {
+                    if (message.role === 'system') return null;
 
-                return <div key={index}>
-                    {index > 0 && <div className='h-2' />}
-                    <ChatMessageComponent
-                        message={message}
-                    />
-                </div>;
-            })}
+                    return <div key={index} className='w-full'>
+                        {index > 0 && <div className='h-2' />}
+                        <ChatMessageComponent
+                            message={message}
+                        />
+                    </div>;
+                })}
+            </div>
+
+            <div ref={scrollDownRef} className='snap-end'></div>
         </div>
 
         <div className='flex flex-col items-center absolute left-0 right-0 bottom-0 z-10'>
