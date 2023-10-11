@@ -23,8 +23,10 @@ export default function ChatBotCard(props: ChatBotCardProps) {
 
     return <div
         className={clsx(
-            'bg-zinc-400 rounded p-2 shadow-md border-2 border-transparent',
-            chatbot.isSelectedDefault() && 'border-blue-500'
+            'bg-zinc-400 rounded p-2 shadow-md border-2',
+            chatbot.isSelectedDefault()
+                ? 'border-blue-500'
+                : 'border-transparent',
         )}
         onClick={() => chatbot.app.setDefaultChatbot(chatbot)}
     >
