@@ -1,9 +1,10 @@
 "use client"
 
 import ChatComponent from '@/components/chat/ChatComponent'
+import ChatsList from '@/components/chat/ChatsList';
 import ChatBotList from '@/components/chatbot/ChatBotList';
 import { navPage } from '@/components/nav/NavController';
-import SideTabsNav from '@/components/nav/SideTabs/SideTabsNav';
+import TabsNav from '@/components/nav/SideTabs/TabsNav';
 import App from '@/state/App'
 import ChatSession from '@/state/ChatSession';
 import { useReactive } from '@/util/Reactive';
@@ -28,13 +29,14 @@ export default function Home() {
         </div>
 
       </div>
-      <SideTabsNav
+      <TabsNav
         tabsLocation='bottom'
         pages={[
           navPage("Chatbots", <ChatBotList app={state} />, {
             icon: <FaUsersGear className="text-2xl" />,
           }),
-          navPage("Chat", <ChatComponent chat={state.getDefaultChat()} />, {
+          navPage("Chat", <ChatsList app={app} />, {
+            //navPage("Chat", <ChatComponent chat={state.getDefaultChat()} />, {
             icon: <FaRegComments className="text-2xl" />,
           }),
         ]}

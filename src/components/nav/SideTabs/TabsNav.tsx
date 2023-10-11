@@ -6,25 +6,26 @@ import NavButtons from "../NavButtons";
 import NavSwitch from "../NavSwitch";
 
 import { FaChevronRight } from "react-icons/fa6";
-import SideTabButtonIndicator from "./SideTabsButtonIndicator";
+import TabButtonIndicator from "./TabsButtonIndicator";
 
 import clsx from 'clsx';
 
-type SideTabsNavParams = {
+type TabsNavParams = {
     icon: React.ReactNode;
 };
 
-type SideTabsNavProps = {
-    pages: NavPage<SideTabsNavParams>[];
+type TabsNavProps = {
+    pages: NavPage<TabsNavParams>[];
     showPageName?: boolean;
     tabsLocation?: "left" | "right" | "top" | "bottom";
     tabsAlign?: "start" | "center" | "end";
     tabsGap?: number;
+    buttonBuilder?: (name: string, params: TabsNavParams, isPage: boolean) => React.ReactNode;
 };
 
 
 
-export default function SideTabsNav(props: SideTabsNavProps) {
+export default function TabsNav(props: TabsNavProps) {
     const showPageName = props.showPageName ?? true;
     const tabsLocation = props.tabsLocation ?? "left";
 
@@ -34,11 +35,18 @@ export default function SideTabsNav(props: SideTabsNavProps) {
     const tabsAlign = props.tabsAlign ?? (tabsDir === "col" ? "start" : "center");
     const tabsGap = props.tabsGap ?? "1rem";
 
+    const buttonBuilder = props.buttonBuilder ?? ((name, params, isPage) => <TabButtonIndicator
+        name={name}
+        icon={params.icon}
+        showPageName={showPageName}
+        isActive={isPage}
+    />);
 
-    return <NavController<SideTabsNavParams>>
+
+    return <NavController<TabsNavParams>>
         <div
             className={clsx(
-                "flex items-stretch flex-grow",
+                "flex items-stretch flex-grow w-full h-full",
                 tabsDir === "row" ?
                     (tabsOrder === "first" ? "flex-col" : "flex-col-reverse")
                     :
@@ -49,9 +57,9 @@ export default function SideTabsNav(props: SideTabsNavProps) {
                 className={clsx(
                     "bg-slate-400 flex flex-none",
                     tabsDir === "col" ?
-                        "flex-col h-full px-2"
+                        "flex-col h-full"
                         :
-                        "flex-row w-full py-2",
+                        "flex-row w-full",
                     tabsAlign === "center" ? "justify-center" :
                         tabsAlign === "end" ? "justify-end" :
                             "justify-start",
@@ -64,20 +72,15 @@ export default function SideTabsNav(props: SideTabsNavProps) {
                     paddingRight: tabsDir === "row" ? tabsGap : undefined,
                 }}
             >
-                <NavButtons<SideTabsNavParams>>
+                <NavButtons<TabsNavParams>>
                     {(name, params, isPage, setPage) =>
                         <button onClick={setPage}>
-                            <SideTabButtonIndicator
-                                name={name}
-                                icon={params.icon}
-                                showPageName={showPageName}
-                                isActive={isPage}
-                            />
+                            {buttonBuilder(name, params, isPage)}
                         </button>
                     }
                 </NavButtons>
             </div>
-            <NavSwitch<SideTabsNavParams>
+            <NavSwitch<TabsNavParams>
                 pages={props.pages}
             />
         </div>

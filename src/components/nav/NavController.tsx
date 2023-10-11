@@ -51,7 +51,7 @@ export default function NavController<Tparams>(props: NavControllerProps) {
 
 export class NavPage<Tparams> {
     name: string;
-    node: React.ReactElement;
+    private node: React.ReactElement;
     params: Tparams;
 
     constructor(name: string, node: React.ReactElement, params: Tparams) {
@@ -59,8 +59,19 @@ export class NavPage<Tparams> {
         this.node = node;
         this.params = params;
     }
+
+    getNode(): React.ReactElement {
+        return this.node;
+    }
 }
 
 export function navPage<Tparams>(name: string, node: React.ReactElement, params: Tparams) {
     return new NavPage(name, node, params);
+}
+
+export function navPageBuilder<Tparams, Tdata>(name: string, params: Tparams & {
+    builder: (params: Tparams, extraData: Tdata) => React.ReactElement,
+    extraData?: Tdata,
+}) {
+    return new NavPage(name, params.builder(params, params.extraData as Tdata), params);
 }

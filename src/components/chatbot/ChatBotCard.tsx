@@ -10,6 +10,8 @@ import Modal from '../Modal';
 
 import { FaPen, FaTrash } from 'react-icons/fa6';
 import clsx from 'clsx';
+import { Chat } from 'openai/resources/index.mjs';
+import ChatSession from '@/state/ChatSession';
 
 type ChatBotCardProps = {
     chatbot: ChatBot;
@@ -20,6 +22,11 @@ export default function ChatBotCard(props: ChatBotCardProps) {
     const _ = useReactive(chatbot.app);
 
     const [showEdit, setShowEdit] = useState(false);
+
+    function onNewChat() {
+        chatbot.app.addChat(new ChatSession(chatbot.app, chatbot));
+        alert("New chat has been created. Go to Chats tab");
+    }
 
     return <div
         className={clsx(
@@ -40,7 +47,14 @@ export default function ChatBotCard(props: ChatBotCardProps) {
         }
         <p>{chatbot.name}</p>
         <p>{chatbot.description}</p>
-        <div className='flex flex-row justify-end gap-2'>
+        <div className='flex flex-row justify-end gap-2 pt-2'>
+            <button
+                className='bg-green-100 rounded p-1 text-sm'
+                onClick={onNewChat}
+            >
+                New Chat
+            </button>
+            <div className='flex-grow' />
             <button
                 className='bg-slate-500 rounded p-1'
                 onClick={() => setShowEdit(true)}

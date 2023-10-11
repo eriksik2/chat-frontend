@@ -25,7 +25,7 @@ export default function NavSwitch<Tparams>(props: NavSwitchProps<Tparams>) {
                 display: nav.getCurrentName() === page.name ? 'block' : 'none'
             }}
         >
-            {page.node}
+            {page.getNode()}
         </div>
     });
 }
