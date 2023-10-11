@@ -25,8 +25,10 @@ export default class App extends Reactive {
 
         this.chatbots = [jordanbot, defaultbot];
 
-        const key = localStorage.getItem("apiKey");
-        if (key !== null) this.setOpenAI(key);
+        if (typeof window !== "undefined" && window.localStorage !== undefined) {
+            const key = window.localStorage.getItem("apiKey");
+            if (key !== null) this.setOpenAI(key);
+        }
     }
 
     setOpenAI(apiKey: string) {
@@ -35,7 +37,9 @@ export default class App extends Reactive {
             apiKey: apiKey,
             dangerouslyAllowBrowser: true,
         });
-        localStorage.setItem("apiKey", apiKey);
+        if (typeof window !== "undefined" && window.localStorage !== undefined) {
+            localStorage.setItem("apiKey", apiKey);
+        }
         this.notifyListeners();
     }
 

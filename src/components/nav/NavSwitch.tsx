@@ -15,7 +15,7 @@ export default function NavSwitch<Tparams>(props: NavSwitchProps<Tparams>) {
 
     React.useEffect(() => {
         nav.setPages(props.pages);
-    }, [props.pages]);
+    }, [props.pages, nav]);
 
     return props.pages.map((page, i) => {
         return <div

@@ -6,9 +6,8 @@ import { navPage } from '@/components/nav/NavController';
 import SideTabsNav from '@/components/nav/SideTabs/SideTabsNav';
 import App from '@/state/App'
 import ChatSession from '@/state/ChatSession';
-import { useReactive } from '@/util/Reactive';
 import { useState } from 'react';
-import { FaGithub, FaRegComments, FaRegIdBadge, FaUsersGear } from 'react-icons/fa6';
+import { FaGithub, FaRegComments, FaUsersGear } from 'react-icons/fa6';
 
 export default function Home() {
   const [state] = useState(new App());
