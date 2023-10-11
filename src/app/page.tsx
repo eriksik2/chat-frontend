@@ -35,7 +35,7 @@ export default function Home() {
           navPage("Chatbots", <ChatBotList app={state} />, {
             icon: <FaUsersGear className="text-2xl" />,
           }),
-          navPage("Chat", <ChatsList app={app} />, {
+          navPage("Chats", <ChatsList app={app} />, {
             //navPage("Chat", <ChatComponent chat={state.getDefaultChat()} />, {
             icon: <FaRegComments className="text-2xl" />,
           }),
