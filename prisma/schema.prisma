@@ -8,13 +8,57 @@ datasource db {
     directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model User {
-    id        Int      @id @default(autoincrement())
-    name      String?
-    email     String?  @unique
-    createdAt DateTime @default(now()) @map(name: "created_at")
-    updatedAt DateTime @updatedAt @map(name: "updated_at")
+// Required by NextAuth
+model Account {
+    id                 String  @id @default(cuid())
+    userId             Int     @map("user_id")
+    type               String
+    provider           String
+    providerAccountId  String  @map("provider_account_id")
+    refresh_token      String?
+    access_token       String?
+    expires_at         Int?
+    token_type         String?
+    scope              String?
+    id_token           String?
+    session_state      String?
+    oauth_token_secret String?
+    oauth_token        String?
 
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+// Required by NextAuth
+model Session {
+    id           String   @id @default(cuid())
+    sessionToken String   @unique @map("session_token")
+    userId       Int      @map("user_id")
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Required by NextAuth
+model VerificationToken {
+    id         Int      @id @default(autoincrement())
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model User {
+    id              Int       @id @default(autoincrement())
+    name            String?
+    email           String?   @unique
+    emailVerifiedAt DateTime? @map(name: "emailVerified")
+    createdAt       DateTime  @default(now()) @map(name: "created_at")
+    updatedAt       DateTime  @updatedAt @map(name: "updated_at")
+
+    accounts Account[]
+    sessions Session[]
     chatbots ChatBot[]
     chats    Chat[]
 
