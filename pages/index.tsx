@@ -33,7 +33,7 @@ export default function Home() {
           navPage("Chatbots", <ChatBotList />, {
             icon: <FaUsersGear className="text-2xl" />,
           }),
-          navPage("Chats", <ChatsList app={app} />, {
+          navPage("Chats", <ChatsList />, {
             //navPage("Chat", <ChatComponent chat={state.getDefaultChat()} />, {
             icon: <FaRegComments className="text-2xl" />,
           }),

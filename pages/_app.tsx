@@ -9,12 +9,15 @@ import clsx from 'clsx'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function MyApp({ Component, pageProps }: AppProps) {
+
+    const getLayout = (Component as any).getLayout ?? ((page: JSX.Element) => page);
+
     return <div className={clsx(
         inter.className,
         'relative h-screen w-screen'
     )}>
         <SessionProvider session={pageProps.session}>
-            <Component {...pageProps} />
+            {getLayout(<Component {...pageProps} />)}
         </SessionProvider>
     </div>
 }

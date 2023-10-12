@@ -1,14 +1,14 @@
 import TabsLayout from "@/components/Layout/TabsLayout";
-import ChatBotList from "@/components/chatbot/ChatBotList";
+import ChatsList from "@/components/chat/ChatsList";
 import { ReactElement } from "react";
 import { FaRegComments, FaUsersGear } from "react-icons/fa6";
 
 
-export default function BotsPage() {
-    return <ChatBotList />;
+export default function ChatsPage() {
+    return <ChatsList />;
 }
 
-BotsPage.getLayout = function getLayout(page: ReactElement) {
+ChatsPage.getLayout = function getLayout(page: ReactElement) {
     return <TabsLayout
         tabsLocation="bottom"
         pages={[

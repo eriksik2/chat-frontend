@@ -4,7 +4,6 @@ import Link from "next/link";
 import useSWR, { preload } from "swr";
 
 type ChatsListProps = {
-    app: App;
 };
 
 export default function ChatsList(props: ChatsListProps) {
