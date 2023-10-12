@@ -1,7 +1,6 @@
 "use client"
 
 
-import ChatComponent from '@/components/chat/ChatComponent'
 import ChatsList from '@/components/chat/ChatsList';
 import ChatBotList from '@/components/chatbot/ChatBotList';
 import { navPage } from '@/components/nav/NavController';
@@ -31,7 +30,7 @@ export default function Home() {
       <TabsNav
         tabsLocation='bottom'
         pages={[
-          navPage("Chatbots", <ChatBotList app={state} />, {
+          navPage("Chatbots", <ChatBotList />, {
             icon: <FaUsersGear className="text-2xl" />,
           }),
           navPage("Chats", <ChatsList app={app} />, {
