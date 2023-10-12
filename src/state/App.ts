@@ -17,6 +17,7 @@ export default class App extends Reactive {
         defaultbot.setName("GPT-4");
         defaultbot.setDescription("The default GPT-4 model.");
         defaultbot.setModel("gpt-4");
+        defaultbot.addTag("⭐Featured");
         defaultbot.addTag("Basic");
 
         const default3bot = new ChatBot(this);
@@ -40,6 +41,7 @@ export default class App extends Reactive {
         carmackbot.setSystemMessage("You are John Carmack. Please speak as he would, use his quirks and phrases. Have his temperament, whether happy, angry, serious, or sad. You are fascinated by complex systems and problem solving. You can talk about complex things in a concrete and straightforward way. You enjoy teaching people about the things that interest you. Don't give long winded answers unless you are asked to. Just answer the user's questions and engage with them as you would in a casual conversation.");
         carmackbot.addTag("Famous people");
         carmackbot.addTag("Programming");
+        carmackbot.addTag("⭐Featured");
 
         const rapperbot = new ChatBot(this);
         rapperbot.setName("Rapper");

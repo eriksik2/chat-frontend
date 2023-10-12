@@ -46,7 +46,7 @@ export default function ChatBotList(props: ChatBotListProps) {
                     </p>
                     <br />
                     <p>
-                        After selecting a chatbot (indicated by the blue outline), you can chat with it in the Chat tab.
+                        Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
                     </p>
                 </div>
             </div>

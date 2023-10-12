@@ -21,6 +21,11 @@ export default function ChatsList(props: ChatsListProps) {
             {params.icon}
             <p className="">{name}</p>
         </div>}
+        emptyBuilder={() => <div className="flex flex-col items-center justify-center  w-full h-full.">
+            <p className="text-2xl">No chats yet.</p>
+            <br />
+            <p className="text-lg">Go to the Chatbots tab and start a new chat.</p>
+        </div>}
         pages={app.chats.map(chat => {
             return navPageBuilder(`Chat with ${chat.chatbot.name}`, {
                 icon: <FaRegComments />,

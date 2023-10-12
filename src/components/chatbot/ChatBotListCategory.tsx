@@ -16,10 +16,14 @@ type ChatBotListCategoryProps = {
     category: string | null;
 };
 
+const featured = "⭐Featured";
+
 export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
     const state = useReactive(props.app);
 
-    const [open, setOpen] = useState(false);
+    const isFeatured = props.category === featured;
+
+    const [open, setOpen] = useState(isFeatured ? true : false);
 
     const filteredBots = useMemo(() => {
         return state.chatbots.filter((chatbot) => {
@@ -36,14 +40,14 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
     )}>
         <div
             className='w-full bg-slate-300 rounded px-2 flex flex-row items-center gap-2'
-            onClick={() => setOpen(!open)}
+            onClick={() => !isFeatured && setOpen(!open)}
         >
-            <FaAngleDown
+            {!isFeatured && <FaAngleDown
                 className={clsx(
                     "transition-transform transform",
                     open ? "rotate-0" : "-rotate-90",
                 )}
-            />
+            />}
             <h1 className='text-lg'>{props.category ?? "Other"}</h1>
         </div>
         <div className='overflow-hidden'>

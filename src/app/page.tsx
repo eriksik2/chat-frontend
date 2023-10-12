@@ -15,8 +15,6 @@ export default function Home() {
   const [state] = useState(new App());
   const app = useReactive(state);
 
-  const [keyInput, setKeyInput] = useState("");
-
   return (
     <main className="h-screen relative bg-slate-200 flex flex-col">
       <div className='flex items-center justify-start py-4 px-3 gap-2 bg-slate-400 relative'>

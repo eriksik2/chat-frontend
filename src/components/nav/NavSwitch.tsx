@@ -7,6 +7,7 @@ import { useReactive } from "@/util/Reactive";
 
 type NavSwitchProps<Tparams> = {
     pages: NavPage<Tparams>[];
+    emptyBuilder?: () => React.ReactNode;
 };
 
 export default function NavSwitch<Tparams>(props: NavSwitchProps<Tparams>) {
@@ -17,7 +18,13 @@ export default function NavSwitch<Tparams>(props: NavSwitchProps<Tparams>) {
         nav.setPages(props.pages);
     }, [props.pages, nav]);
 
-    return props.pages.map((page, i) => {
+    const page = props.pages.filter(page => nav.getCurrentName() === page.name);
+
+    if (page.length === 0) {
+        return props.emptyBuilder ? props.emptyBuilder() : null;
+    }
+
+    return page.map((page, i) => {
         if (nav.getCurrentName() !== page.name) return null;
         return <div
             key={i}

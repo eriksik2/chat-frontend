@@ -21,6 +21,7 @@ type TabsNavProps = {
     tabsAlign?: "start" | "center" | "end";
     tabsGap?: number;
     buttonBuilder?: (name: string, params: TabsNavParams, isPage: boolean) => React.ReactNode;
+    emptyBuilder?: () => React.ReactNode;
 };
 
 
@@ -82,6 +83,7 @@ export default function TabsNav(props: TabsNavProps) {
             </div>
             <NavSwitch<TabsNavParams>
                 pages={props.pages}
+                emptyBuilder={props.emptyBuilder}
             />
         </div>
     </NavController>;
