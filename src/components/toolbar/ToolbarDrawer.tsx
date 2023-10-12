@@ -1,7 +1,7 @@
 "use client"
 
 import ChatMessage from '@/state/ChatMessage';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import { useState } from 'react';
 import Toolbar from './Toolbar';
 

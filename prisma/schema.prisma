@@ -1,0 +1,62 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("POSTGRES_PRISMA_URL")
+    directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    name      String?
+    email     String?  @unique
+    createdAt DateTime @default(now()) @map(name: "created_at")
+    updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+    chatbots ChatBot[]
+    chats    Chat[]
+
+    @@map(name: "users")
+}
+
+model ChatBot {
+    id             String    @id @default(cuid())
+    name           String
+    description    String
+    model          String
+    systemMessage  String
+    temperature    Float     @default(0.7)
+    frequency_bias Float     @default(0.0)
+    presence_bias  Float     @default(0.0)
+    publishedAt    DateTime?
+
+    author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    authorId Int
+}
+
+model Chat {
+    id       String        @id @default(cuid())
+    name     String?
+    messages ChatMessage[]
+
+    author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+    authorId Int
+}
+
+model ChatMessage {
+    id String @id @default(cuid())
+
+    author    ChatMessageAuthor
+    content   String
+    createdAt DateTime          @default(now()) @map(name: "created_at")
+
+    chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+    chatId String
+}
+
+enum ChatMessageAuthor {
+    USER
+    CHATBOT
+}

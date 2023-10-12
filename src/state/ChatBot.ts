@@ -1,6 +1,6 @@
 
-import Reactive from "@/util/Reactive";
-import generateUUID from "@/util/generateUUID";
+import Reactive from "@/lib/Reactive";
+import generateUUID from "@/lib/generateUUID";
 import OpenAI from "openai";
 import App from "./App";
 import ChatSession from "./ChatSession";

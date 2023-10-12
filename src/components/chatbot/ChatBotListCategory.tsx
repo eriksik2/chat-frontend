@@ -2,7 +2,7 @@
 
 import App from '@/state/App';
 import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import { useEffect, useMemo, useState } from 'react';
 import ChatBotCard from './ChatBotCard';
 import Modal from '../Modal';

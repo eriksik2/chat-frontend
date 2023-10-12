@@ -3,7 +3,7 @@ import { navPage, navPageBuilder } from "../nav/NavController";
 import TabsNav from "../nav/SideTabs/TabsNav";
 import clsx from "clsx";
 import App from "@/state/App";
-import { useReactive } from "@/util/Reactive";
+import { useReactive } from "@/lib/Reactive";
 import ChatComponent from "./ChatComponent";
 
 type ChatsListProps = {

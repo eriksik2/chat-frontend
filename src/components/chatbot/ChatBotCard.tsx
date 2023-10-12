@@ -2,7 +2,7 @@
 
 import App from '@/state/App';
 import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import ChatBotEdit from './ChatBotEdit';

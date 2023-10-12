@@ -6,7 +6,7 @@ import ChatTextBox from './ChatTextBox';
 import ChatMessageComponent from './ChatMessageComponent';
 import ChatMessage, { NoApiKeyError } from '@/state/ChatMessage';
 import Toolbar from '../toolbar/Toolbar';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import ChatSession from '../../state/ChatSession';
 import ToolbarDrawer from '../toolbar/ToolbarDrawer';
 import clsx from 'clsx';
