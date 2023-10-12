@@ -74,7 +74,7 @@ export default function ChatCode(props: ChatCodeProps) {
             setHighlight(null);
         }}>
             <div className='flex flex-col items-stretch '>
-                {rows.map((row, i) => <span className='px-2 border-y border-transparent hover:border-slate-400 '>
+                {rows.map((row, i) => <span key={i} className='px-2 border-y border-transparent hover:border-slate-400 '>
                     {innerRender(row, prism, i)}
                 </span>)}
             </div>

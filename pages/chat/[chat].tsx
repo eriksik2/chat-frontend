@@ -11,9 +11,9 @@ type ChatPageProps = {};
 export default function ChatPage(props: ChatPageProps) {
     const router = useRouter();
     // TODO null handling
-    if (router.query.chat === undefined) return <div>Chat not found.</div>;
+    const request = router.query.chat !== undefined ? `/api/chat/${router.query.chat}` : null;
 
-    const data = useSWR<ApiChatGETResponse>(`/api/chat/${router.query.chat}`, (url: string) => fetch(url).then(res => res.json()));
+    const data = useSWR<ApiChatGETResponse>(request, (url: string) => fetch(url).then(res => res.json()));
     const chat = data.data;
     const loading = data.isLoading;
 
