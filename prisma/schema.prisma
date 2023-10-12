@@ -67,15 +67,19 @@ model User {
 }
 
 model ChatBot {
-    id             String    @id @default(cuid())
-    name           String
-    description    String
+    id          String   @id @default(cuid())
+    name        String
+    description String
+    categories  String[] @default([])
+    featured    Boolean  @default(false)
+
     model          String
     systemMessage  String
-    temperature    Float     @default(0.7)
-    frequency_bias Float     @default(0.0)
-    presence_bias  Float     @default(0.0)
-    publishedAt    DateTime?
+    temperature    Float  @default(0.7)
+    frequency_bias Float  @default(0.0)
+    presence_bias  Float  @default(0.0)
+
+    publishedAt DateTime?
 
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
