@@ -4,12 +4,10 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import GitHubProvider from 'next-auth/providers/github';
 import prisma from '@/lib/prisma';
 
-const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, options);
+const authHandler: NextApiHandler = (req, res) => NextAuth(req, res, authOptions);
 export default authHandler;
 
-if (!process.env.GITHUB_ID || !process.env.GITHUB_SECRET) throw new Error('Missing GitHub env variables');
-
-const options = {
+export const authOptions = {
     providers: [
         GitHubProvider({
             clientId: process.env.GITHUB_ID!,

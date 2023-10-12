@@ -5,6 +5,9 @@ import clsx from "clsx";
 import App from "@/state/App";
 import { useReactive } from "@/lib/Reactive";
 import ChatComponent from "./ChatComponent";
+import { useEffect, useState } from "react";
+import { ApiChatsResponseData } from "../../../pages/api/chats";
+import Link from "next/link";
 
 type ChatsListProps = {
     app: App;
@@ -13,24 +16,26 @@ type ChatsListProps = {
 export default function ChatsList(props: ChatsListProps) {
     const app = useReactive(props.app);
 
-    return <TabsNav
-        buttonBuilder={(name, params, isPage) => <div className={clsx(
-            "flex flex-row items-center justify-between text-lg gap-4 p-3 hover:bg-slate-600",
-            isPage ? "bg-slate-500" : "bg-transparent",
-        )}>
-            {params.icon}
-            <p className="">{name}</p>
-        </div>}
-        emptyBuilder={() => <div className="flex flex-col items-center justify-center  w-full h-full.">
-            <p className="text-2xl">No chats yet.</p>
-            <br />
-            <p className="text-lg">Go to the Chatbots tab and start a new chat.</p>
-        </div>}
-        pages={app.chats.map(chat => {
-            return navPageBuilder(`Chat with ${chat.chatbot.name}`, {
-                icon: <FaRegComments />,
-                builder: (params) => <ChatComponent chat={chat} />,
-            });
-        })}
-    />
+    const [chats, setChats] = useState<ApiChatsResponseData>([]);
+
+    useEffect(() => {
+        (async () => {
+            const res = await fetch("/api/chats");
+            const json = (await res.json()) as ApiChatsResponseData;
+            setChats(json);
+        })();
+    });
+
+    return <div>
+        <h1 className="text-2xl">Chats</h1>
+        <div className="flex flex-col gap-2">
+            {chats.map((chat) => {
+                return <Link href={`/chat/${chat.id}`}>
+                    <div className="bg-slate-400">
+                        {chat.name}
+                    </div>
+                </Link>;
+            })}
+        </div>
+    </div>
 }
