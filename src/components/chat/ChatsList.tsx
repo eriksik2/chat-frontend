@@ -1,7 +1,7 @@
 import App from "@/state/App";
 import { ApiChatsResponseData } from "../../../pages/api/chats";
 import Link from "next/link";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 
 type ChatsListProps = {
     app: App;
@@ -20,6 +20,7 @@ export default function ChatsList(props: ChatsListProps) {
         <h1 className="text-2xl">Chats</h1>
         <div className="flex flex-col gap-2">
             {chats!.map((chat) => {
+                preload(`/api/chat/${chat.id}`, url => fetch(url).then(res => res.json()));
                 return <Link href={`/chat/${chat.id}`}>
                     <div className="bg-slate-400">
                         {chat.name}
