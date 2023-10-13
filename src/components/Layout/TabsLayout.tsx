@@ -35,7 +35,7 @@ export const TabsLayoutDefaultProps: OnlyOptional<TabsLayoutProps, {
     tabsLocation: () => "left",
     tabsAlign: ({ tabsLocation }) => (tabsLocation === "left" || tabsLocation === "right") ? "start" : "center",
     tabsGap: () => "1rem",
-    buttonBuilder: ({ showPageName }) => defaultButtonBuilder(showPageName),
+    buttonBuilder: ({ showPageName }) => defaultButtonBuilderBuilder(showPageName),
 } as const;
 
 export function getTabsLayoutProps(props: TabsLayoutProps): Required<TabsLayoutProps> {
@@ -134,8 +134,8 @@ export function TabBar(props: TabBarProps) {
     </div>
 }
 
-export function defaultButtonBuilder(showPageName: boolean): (params: { name: string, icon: React.ReactNode, route: string }) => React.ReactElement {
-    return (params) => {
+export function defaultButtonBuilderBuilder(showPageName: boolean): (params: { name: string, icon: React.ReactNode, route: string }) => React.ReactElement {
+    return function defaultButtonBuilder(params) {
         return <DefaultTabButton
             name={params.name}
             icon={params.icon}

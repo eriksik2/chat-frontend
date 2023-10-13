@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, ReactElement } from "react";
+import { useState, useEffect, useRef, ReactElement, ReactNode } from "react";
 import { ApiChatGETResponse, ApiChatPOSTBody } from "../api/chats/[chat]";
 import { useRouter } from "next/router";
 import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
@@ -19,6 +19,18 @@ export default function ChatPage(props: ChatPageProps) {
     return <Chat id={router.query.chat} />
 }
 
+function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNode, route: string }) {
+    const router = useRouter();
+    const active = router.asPath.includes(route);
+    return <div className={clsx(
+        "bg-slate-400 px-2 flex flex-row",
+        active ? "bg-slate-500" : "bg-slate-400",
+    )}>
+        {icon}
+        {name}
+    </div>;
+}
+
 function ChatPageLayout(props: { page: ReactElement }) {
     const data = useSWR("/api/chats", (url: string) => fetch(url).then(res => res.json() as Promise<ApiChatsResponseData>));
     const chats = data.data;
@@ -36,17 +48,7 @@ function ChatPageLayout(props: { page: ReactElement }) {
                     icon: "🤖",
                 }
             })}
-            buttonBuilder={({ name, icon, route }) => {
-                const router = useRouter();
-                const active = router.asPath.includes(route);
-                return <div className={clsx(
-                    "bg-slate-400 px-2 flex flex-row",
-                    active ? "bg-slate-500" : "bg-slate-400",
-                )}>
-                    {icon}
-                    {name}
-                </div>;
-            }}
+            buttonBuilder={ChatButtonBuilder}
         >
             {props.page}
         </TabsLayout>

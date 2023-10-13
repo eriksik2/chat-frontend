@@ -1,5 +1,5 @@
 import { FaGithub } from "react-icons/fa6";
-import TabsLayout, { TabBar, TabsLayoutProps, defaultButtonBuilder, getTabsLayoutProps } from "./TabsLayout";
+import TabsLayout, { TabBar, TabsLayoutProps, defaultButtonBuilderBuilder, getTabsLayoutProps } from "./TabsLayout";
 import Link from "next/link";
 
 
