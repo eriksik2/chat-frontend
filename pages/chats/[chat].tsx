@@ -19,8 +19,7 @@ export default function ChatPage(props: ChatPageProps) {
     return <Chat id={router.query.chat} />
 }
 
-ChatPage.getLayout = function getLayout(page: ReactElement) {
-
+function ChatPageLayout(props: { page: ReactElement }) {
     const data = useSWR("/api/chats", (url: string) => fetch(url).then(res => res.json() as Promise<ApiChatsResponseData>));
     const chats = data.data;
     const reloading = data.isLoading;
@@ -49,7 +48,11 @@ ChatPage.getLayout = function getLayout(page: ReactElement) {
                 </div>;
             }}
         >
-            {page}
+            {props.page}
         </TabsLayout>
     );
+}
+
+ChatPage.getLayout = function getLayout(page: ReactElement) {
+    return <ChatPageLayout page={page} />;
 }
