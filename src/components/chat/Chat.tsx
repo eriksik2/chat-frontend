@@ -1,9 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
+import ChatMessageComponent, { ChatMessageStreamingComponent } from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
 import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 import { useApiGET, useApiPOST } from "@/api/fetcher";
+import OpenAI from "openai";
+import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
+import Completion from "@/state/Completion";
 
 type ChatPageProps = {
     id: string;
@@ -11,25 +14,27 @@ type ChatPageProps = {
 
 export default function ChatPage(props: ChatPageProps) {
 
-    const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`, {
-        refreshInterval: 150,
-    });
+    const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
     const loading = data === null && reloading;
     const chat = data;
 
     const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
 
-    const [optimisticLatestMessage, setOptimisticLatestMessage] = useState<string | null>(null);
-    useEffect(() => {
-        setOptimisticLatestMessage(null);
-    }, [data]);
+    const [aiCompletion, setAiCompletion] = useState<Completion | null>(null);
 
     const [apiKeyInput, setApiKeyInput] = useState<string>('');
     const [apiKey, setApiKey] = useState<string | null>(null);
+    const [openai, setOpenai] = useState<OpenAI | null>(null);
 
     useEffect(() => {
         // get/set openai key from localstorage
-        if (apiKey !== null) localStorage.setItem('openai-key', apiKey);
+        if (apiKey !== null) {
+            localStorage.setItem('openai-key', apiKey);
+            setOpenai(new OpenAI({
+                apiKey: apiKey,
+                dangerouslyAllowBrowser: true,
+            }));
+        }
         else {
             const key = localStorage.getItem('openai-key');
             if (key !== null) setApiKey(key);
@@ -37,10 +42,37 @@ export default function ChatPage(props: ChatPageProps) {
     }, [apiKey]);
 
     async function onUserSend(message: string) {
-        setOptimisticLatestMessage(message);
+        const newChat = chat === null ? null : {
+            messages: [...chat.messages, {
+                id: "",
+                author: "USER" as const,
+                content: message,
+            }],
+            chatbot: chat.chatbot,
+        };
+        newChat && mutate(newChat, false);
         await postMessage({
+            author: "USER",
             content: message,
         });
+
+        if (openai === null) return;
+        if (chat === null) return;
+
+        const messages: Array<ChatCompletionMessageParam> = new Array();
+        if (chat.chatbot.systemMessage !== null) {
+            messages.push({
+                role: "system",
+                content: chat.chatbot.systemMessage,
+            });
+        }
+        messages.push(...chat.messages.map(message => ({
+            role: message.author === "USER" ? "user" as const : "assistant" as const,
+            content: message.content,
+        })));
+
+        const comp = new Completion(openai, chat.chatbot.model, chat.chatbot.temperature, chat.chatbot.frequency_bias, chat.chatbot.presence_bias, messages);
+        setAiCompletion(comp);
     }
 
     const scrollDownRef = useRef<HTMLDivElement>(null);
@@ -93,19 +125,32 @@ export default function ChatPage(props: ChatPageProps) {
                             return <div key={index} className='w-full'>
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
-                                    id={message.id}
                                     content={message.content}
                                     author={message.author}
-                                    streaming={message.streaming}
+                                    streaming={false}
                                 />
                             </div>;
                         })}
-                        {optimisticLatestMessage !== null && <div key={chat?.messages.length ?? 0} className='w-full'>
-                            <ChatMessageComponent
-                                id={null}
-                                content={optimisticLatestMessage}
-                                author={"USER"}
-                                streaming={false}
+                        {aiCompletion !== null && <div key={chat?.messages.length} className='w-full'>
+                            <ChatMessageStreamingComponent
+                                author={chat?.chatbot.name ?? ""}
+                                completion={aiCompletion}
+                                onComplete={(message) => {
+                                    setAiCompletion(null);
+                                    const newChat = chat === null ? null : {
+                                        messages: [...chat.messages, {
+                                            id: "",
+                                            author: "CHATBOT" as const,
+                                            content: message,
+                                        }],
+                                        chatbot: chat.chatbot,
+                                    };
+                                    newChat && mutate(newChat, false);
+                                    postMessage({
+                                        author: "CHATBOT" as const,
+                                        content: message,
+                                    });
+                                }}
                             />
                         </div>}
                     </div>

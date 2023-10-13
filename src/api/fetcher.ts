@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useSWR, { KeyedMutator } from "swr";
+import { SWRGlobalState, useSWRConfig } from "swr/_internal";
 
 export class ApiError extends Error {
     data: any;
@@ -19,8 +20,7 @@ export function fetcherGET<T>(): (url: string) => Promise<T> {
             const errdata = await res.text();
             throw new ApiError(errdata, errdata, res.status);
         }
-        const data = await res.json() as T;
-        return data;
+        return res.json() as Promise<T>;
     };
 }
 
@@ -72,6 +72,7 @@ export function fetcherPOST<T>(): (url: string, body: T) => Promise<T> {
 }
 
 export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody, Tresponse> {
+    const swr = useSWRConfig();
     const [error, setError] = useState<ApiError | null>(null);
 
     async function post(body: Tbody) {
@@ -87,8 +88,8 @@ export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody
             setError(new ApiError(errdata, errdata, res.status));
             throw error;
         }
-        const data = await res.json() as Tresponse;
-        return data;
+        swr.mutate(url);
+        return res.json() as Promise<Tresponse>;
     }
 
     return {

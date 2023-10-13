@@ -2,20 +2,17 @@ import clsx from 'clsx';
 import ChatMarkdown from './ChatMarkdown';
 import { useApiGET } from '@/api/fetcher';
 import { ApiChatMsgResponseData } from '../../../pages/api/chats/msg/[msg]';
+import Completion from '@/state/Completion';
+import { useEffect, useState } from 'react';
 
 
 type ChatMessageComponentProps = {
-    id: string | null;
     content: string;
     author: string;
     streaming: boolean;
 };
 
 export default function ChatMessageComponent(props: ChatMessageComponentProps) {
-    if (props.streaming) {
-        if (props.id === null) return null;
-        return <ChatMessageStreamingComponent id={props.id} />;
-    }
     return <div
         className={clsx(
             'overflow-hidden',
@@ -28,30 +25,36 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
         <div className='p-4 pb-2 w-full'>
             <ChatMarkdown
                 content={props.content}
-                loading={false}
+                loading={props.streaming}
             />
         </div>
     </div>
 }
 
 type ChatMessageStreamingComponentProps = {
-    id: string;
+    onComplete: (message: string) => void;
+    completion: Completion;
+    author: string;
 };
 
-function ChatMessageStreamingComponent(props: ChatMessageStreamingComponentProps) {
-    const { data, error, reloading } = useApiGET<ApiChatMsgResponseData>(`/api/chats/msg/${props.id}`, {
-        refreshInterval(data) {
-            if (props.id.length === 0) return 0;
-            if (data === undefined) return 1;
-            if (data?.streaming) return 1;
-            return 0;
-        },
-    });
+export function ChatMessageStreamingComponent(props: ChatMessageStreamingComponentProps) {
+    const [message, setMessage] = useState<string>("");
+
+    useEffect(() => {
+        props.completion.run(
+            (chunk, stop_reason) => {
+                console.log(stop_reason);
+                setMessage((msg) => msg + chunk);
+            },
+            (full_message) => {
+                props.onComplete(full_message);
+            }
+        );
+    }, [props.completion]);
 
     return <ChatMessageComponent
-        id={null}
-        content={(data?.content ?? "") + "..."}
-        author={data?.author ?? ""}
-        streaming={false}
+        content={message}
+        author={props.author}
+        streaming={true}
     />;
 }

@@ -11,20 +11,22 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 // GET: get the chat and its messages
 export type ApiChatGETResponse = Prisma.ChatGetPayload<{
     select: {
-        name: true,
         messages: {
             select: {
                 id: true,
                 content: true,
                 author: true,
-                streaming: true,
-                createdAt: true,
             },
             orderBy: { createdAt: "asc" },
         },
         chatbot: {
             select: {
                 name: true,
+                model: true,
+                systemMessage: true,
+                temperature: true,
+                frequency_bias: true,
+                presence_bias: true,
             },
         },
     },
@@ -32,6 +34,7 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
 
 // POST: post a message to the chat
 export type ApiChatPOSTBody = {
+    author: "USER" | "CHATBOT";
     content: string;
 };
 export type ApiChatPOSTResponse = {
@@ -75,20 +78,22 @@ async function getHandler(
             },
         },
         select: {
-            name: true,
             messages: {
                 select: {
                     id: true,
                     content: true,
                     author: true,
-                    streaming: true,
-                    createdAt: true,
                 },
                 orderBy: { createdAt: "asc" },
             },
             chatbot: {
                 select: {
                     name: true,
+                    model: true,
+                    systemMessage: true,
+                    temperature: true,
+                    frequency_bias: true,
+                    presence_bias: true,
                 },
             },
         }
@@ -131,7 +136,7 @@ async function postHandler(
 
     const message = await prisma.chatMessage.create({
         data: {
-            author: "USER",
+            author: body.author,
             content: body.content,
             chat: {
                 connect: {
@@ -140,101 +145,6 @@ async function postHandler(
             },
         },
     });
-
-    (async () => {
-        const dataPromise = prisma.chat.findUnique({
-            where: {
-                id: req.query.chat as string,
-                author: {
-                    email: session.user!.email,
-                },
-            },
-            select: {
-                messages: {
-                    select: {
-                        author: true,
-                        content: true,
-                    },
-                    orderBy: { createdAt: "asc" },
-                },
-                chatbot: {
-                    select: {
-                        systemMessage: true,
-                        model: true,
-                        temperature: true,
-                        frequency_bias: true,
-                        presence_bias: true,
-                    },
-                },
-            }
-        });
-        const openai = new OpenAI({});
-
-        const data = (await dataPromise)!;
-
-        var messages: Array<ChatCompletionMessageParam> = [];
-        if ((data.chatbot.systemMessage ?? "").trim().length > 0) {
-            messages.push({
-                content: data.chatbot.systemMessage!,
-                role: "system",
-            });
-        }
-        for (const message of data.messages) {
-            messages.push({
-                content: message.content,
-                role: message.author === "USER" ? "user" : "assistant",
-            });
-        }
-
-        const response = await openai.chat.completions.create({
-            stream: true,
-            model: data.chatbot.model,
-            temperature: data.chatbot.temperature,
-            frequency_penalty: data.chatbot.frequency_bias,
-            presence_penalty: data.chatbot.presence_bias,
-            messages: messages,
-            n: 1,
-        });
-
-        const newMessage = await prisma.chatMessage.create({
-            data: {
-                author: "CHATBOT",
-                content: "",
-                streaming: true,
-                chat: {
-                    connect: {
-                        id: chat.id,
-                    },
-                },
-            },
-        });
-        var messageAcc = "";
-        for await (const chunk of response) {
-            const choice = chunk.choices[0];
-            messageAcc += choice.delta.content ?? "";
-            if (choice.finish_reason === "stop") {
-                await prisma.chatMessage.update({
-                    where: {
-                        id: newMessage.id,
-                    },
-                    data: {
-                        content: messageAcc,
-                        streaming: false,
-                    },
-                });
-                break;
-            } else if (choice.finish_reason === null) {
-                await prisma.chatMessage.update({
-                    where: {
-                        id: newMessage.id,
-                    },
-                    data: {
-                        content: messageAcc + " ...",
-                    },
-                });
-            }
-        }
-    })();
 
     res.statusCode = 200;
     res.json({
