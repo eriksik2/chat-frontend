@@ -13,11 +13,12 @@ export type ApiChatsResponseData = Prisma.ChatGetPayload<{
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ApiChatsResponseData>
+    res: NextApiResponse<ApiChatsResponseData | string>
 ) {
     const session = await getSession({ req });
     if (!session || !session.user) {
         res.statusCode = 403;
+        res.send("Not authenticated");
         res.end();
         return;
     }

@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/router";
 import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import useSWR from 'swr';
 import { ApiChatGETResponse, ApiChatPOSTBody } from "../../../pages/api/chats/[chat]";
+import { useApiGET, useApiPOST } from "@/api/fetcher";
 
 type ChatPageProps = {
     id: string;
@@ -12,9 +11,11 @@ type ChatPageProps = {
 
 export default function ChatPage(props: ChatPageProps) {
 
-    const data = useSWR<ApiChatGETResponse>(`/api/chats/${props.id}`, (url: string) => fetch(url).then(res => res.json()));
-    const chat = data.data;
-    const loading = data.isLoading;
+    const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
+    const loading = data === null && reloading;
+    const chat = data;
+
+    const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody>(`/api/chats/${props.id}`);
 
     const [apiKeyInput, setApiKeyInput] = useState<string>('');
     const [apiKey, setApiKey] = useState<string | null>(null);
@@ -31,22 +32,16 @@ export default function ChatPage(props: ChatPageProps) {
     async function onUserSend(message: string) {
         const newChat = chat === null ? null : {
             ...chat!, messages: [...chat!.messages, {
-                author: "USER" as "USER",
+                author: "USER" as const,
                 content: message,
                 createdAt: new Date(),
             }]
         };
-        if (newChat !== null) data.mutate(newChat, false);
-        await fetch(`/api/chat/${props.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                content: message,
-            } satisfies ApiChatPOSTBody),
+        if (newChat !== null) mutate(newChat, false);
+        await postMessage({
+            content: message,
         });
-        if (newChat !== null) data.mutate(newChat, true);
+        if (newChat !== null) mutate(newChat, true);
     }
 
     const scrollDownRef = useRef<HTMLDivElement>(null);
@@ -56,7 +51,11 @@ export default function ChatPage(props: ChatPageProps) {
 
     // TODO better loading and null handling
     if (loading) return <div>Loading...</div>;
-    if (chat === null) return <div>Chat not found.</div>;
+    if (error !== null) return <div>
+        <h1 className="text-2xl">Error</h1>
+        <div>{error.status}</div>
+        <div>{error.message}</div>
+    </div>;
 
     return <div className='absolute top-0 bottom-0 right-0 left-0'>
         {apiKey === null ?
@@ -78,10 +77,10 @@ export default function ChatPage(props: ChatPageProps) {
             :
             <div className='absolute top-0 bottom-0 right-0 left-0'>
                 <div className='overflow-auto scroll-smooth snap-y snap-proximity h-full'>
-                    <div className='px-4 pt-14 pb-16 flex flex-col items-center justify-start'>
+                    <div className='px-4 pt-8 pb-16 flex flex-col items-center justify-start'>
                         <div className={clsx(
                             'mt-8 w-1/3 rounded-xl',
-                            chat!.messages.length === 0
+                            (chat?.messages ?? []).length === 0
                                 ? 'opacity-100 translate-y-0'
                                 : 'opacity-0 translate-y-[-2rem] h-0',
                             "transition-all duration-1000 ease-in-out",
@@ -91,7 +90,7 @@ export default function ChatPage(props: ChatPageProps) {
                                 What will you ask {"chatbot.name"}?
                             </h2>
                         </div>
-                        {chat!.messages.map((message, index) => {
+                        {(chat?.messages ?? []).map((message, index) => {
 
                             return <div key={index} className='w-full'>
                                 {index > 0 && <div className='h-2' />}

@@ -9,6 +9,7 @@ import BotsPage from "../bots";
 import TabsLayout from "@/components/Layout/TabsLayout";
 import { ApiChatsResponseData } from "../api/chats";
 import Chat from "@/components/chat/Chat";
+import { useApiGET } from "@/api/fetcher";
 
 type ChatPageProps = {};
 
@@ -23,38 +24,42 @@ function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNod
     const router = useRouter();
     const active = router.asPath.includes(route);
     return <div className={clsx(
-        "bg-slate-400 px-2 flex flex-row",
+        "bg-slate-400 px-4 py-3 flex flex-row justify-start gap-2",
         active ? "bg-slate-500" : "bg-slate-400",
     )}>
-        {icon}
-        {name}
+        <div>{icon}</div>
+        <div>{name}</div>
     </div>;
 }
 
 function ChatPageLayout(props: { page: ReactElement }) {
-    const data = useSWR("/api/chats", (url: string) => fetch(url).then(res => res.json() as Promise<ApiChatsResponseData>));
-    const chats = data.data;
-    const reloading = data.isLoading;
-    const loading = chats === undefined && reloading;
-    const noChats = chats === undefined && !reloading;
+    const { data, error, reloading } = useApiGET<ApiChatsResponseData>("/api/chats");
+    const chats = data;
+    const loading = chats === null && reloading;
 
-    return BotsPage.getLayout(
-        <TabsLayout
-            tabsLocation="left"
-            pages={(chats ?? []).map(chat => {
-                return {
-                    name: chat.name ?? "Chat",
-                    route: `/chats/${chat.id}`,
-                    icon: "🤖",
-                }
-            })}
-            buttonBuilder={ChatButtonBuilder}
-        >
-            {props.page}
-        </TabsLayout>
-    );
+    // TODO better loading and null handling
+    if (error !== null) return <div>
+        <h1 className="text-2xl">Error</h1>
+        <div>{error.status}</div>
+        <div>{error.message}</div>
+    </div>;
+
+    return <TabsLayout
+        tabsLocation="left"
+        tabsGap="0"
+        pages={(chats ?? []).map(chat => {
+            return {
+                name: chat.name ?? "Chat",
+                route: `/chats/${chat.id}`,
+                icon: "🤖",
+            }
+        })}
+        buttonBuilder={ChatButtonBuilder}
+    >
+        {props.page}
+    </TabsLayout>;
 }
 
 ChatPage.getLayout = function getLayout(page: ReactElement) {
-    return <ChatPageLayout page={page} />;
+    return BotsPage.getLayout(<ChatPageLayout page={page} />);
 }

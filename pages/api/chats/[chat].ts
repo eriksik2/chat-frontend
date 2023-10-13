@@ -21,19 +21,23 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
     }
 }>;
 
+export type ErrorCode = "unauthorized" | "not_found";
+
 // POST: post a message to the chat
 export type ApiChatPOSTBody = {
     content: string;
 };
-export type ApiChatPOSTResponse = {};
+export type ApiChatPOSTResponse = {
+};
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ApiChatGETResponse | ApiChatPOSTResponse>
+    res: NextApiResponse<ApiChatGETResponse | ApiChatPOSTResponse | string>
 ) {
     const session = await getServerSession(req, res, authOptions);
     if (session === null || session.user === undefined) {
-        res.statusCode = 403;
+        res.statusCode = 401;
+        res.send("Not authenticated");
         res.end();
         return;
     }
@@ -46,13 +50,14 @@ export default async function handler(
             break;
         default:
             res.statusCode = 405;
+            res.end();
     }
 }
 
 async function getHandler(
     session: Session,
     req: NextApiRequest,
-    res: NextApiResponse<ApiChatGETResponse>
+    res: NextApiResponse<ApiChatGETResponse | string>
 ) {
 
     const chat = await prisma.chat.findUnique({
@@ -77,6 +82,7 @@ async function getHandler(
 
     if (!chat) {
         res.statusCode = 404;
+        res.send("Chat not found");
         res.end();
         return;
     }
@@ -89,7 +95,7 @@ async function getHandler(
 async function postHandler(
     session: Session,
     req: NextApiRequest,
-    res: NextApiResponse<ApiChatPOSTResponse>
+    res: NextApiResponse<ApiChatPOSTResponse | string>
 ) {
     const chat = await prisma.chat.findUnique({
         where: {
@@ -102,6 +108,7 @@ async function postHandler(
 
     if (!chat) {
         res.statusCode = 404;
+        res.send("Chat not found");
         res.end();
         return;
     }
@@ -119,6 +126,8 @@ async function postHandler(
     });
 
     res.statusCode = 200;
-    res.json(message);
+    res.json({
+        type: "success",
+    });
     res.end();
 }
