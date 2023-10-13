@@ -46,10 +46,6 @@ export default function ChatBotList(props: ChatBotListProps) {
         return keys;
     }).entries()), [bots]);
 
-    // TODO better loading and null handling
-    if (loading) return <div>Loading...</div>;
-    if (bots === null) return <div>Chatbots not found.</div>;
-
     return <div className='h-full relative'>
         <div className='flex flex-col items-stretch justify-start absolute top-0 left-0 right-0 bottom-0'>
             <div className='w-full shadow-xl z-30'>
@@ -66,6 +62,7 @@ export default function ChatBotList(props: ChatBotListProps) {
                 </div>
             </div>
             <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
+                {loading && <div>Loading...</div>}
                 {groupedBots.map(([category, bots]) => {
                     return <ChatBotListCategory
                         key={category}

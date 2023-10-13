@@ -26,9 +26,18 @@ export default async function handler(
 
     const bots = await prisma.chatBot.findMany({
         where: {
-            author: {
-                email: session.user.email,
-            },
+            OR: [
+                {
+                    author: {
+                        email: session.user.email,
+                    },
+                },
+                {
+                    publishedAt: {
+                        lte: new Date(),
+                    }
+                }
+            ],
         },
         select: {
             id: true,
