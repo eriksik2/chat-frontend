@@ -1,36 +1,36 @@
-import { FaRegComments } from "react-icons/fa6";
-import { navPage, navPageBuilder } from "../nav/NavController";
-import TabsNav from "../nav/SideTabs/TabsNav";
-import clsx from "clsx";
 import App from "@/state/App";
-import { useReactive } from "@/util/Reactive";
-import ChatComponent from "./ChatComponent";
+import { ApiChatsGETResponse } from "../../../pages/api/chats";
+import Link from "next/link";
+import useSWR, { preload } from "swr";
+import { useApiGET } from "@/api/fetcher";
 
 type ChatsListProps = {
-    app: App;
 };
 
 export default function ChatsList(props: ChatsListProps) {
-    const app = useReactive(props.app);
+    const { data, error, reloading } = useApiGET<ApiChatsGETResponse>("/api/chats");
+    const chats = data;
+    const loading = chats === null && reloading;
 
-    return <TabsNav
-        buttonBuilder={(name, params, isPage) => <div className={clsx(
-            "flex flex-row items-center justify-between text-lg gap-4 p-3 hover:bg-slate-600",
-            isPage ? "bg-slate-500" : "bg-transparent",
-        )}>
-            {params.icon}
-            <p className="">{name}</p>
-        </div>}
-        emptyBuilder={() => <div className="flex flex-col items-center justify-center  w-full h-full.">
-            <p className="text-2xl">No chats yet.</p>
-            <br />
-            <p className="text-lg">Go to the Chatbots tab and start a new chat.</p>
-        </div>}
-        pages={app.chats.map(chat => {
-            return navPageBuilder(`Chat with ${chat.chatbot.name}`, {
-                icon: <FaRegComments />,
-                builder: (params) => <ChatComponent chat={chat} />,
-            });
-        })}
-    />
+    // TODO better loading and null handling
+    if (error !== null) return <div>
+        <h1 className="text-2xl">Error</h1>
+        <div>{error.status}</div>
+        <div>{error.message}</div>
+    </div>;
+
+    return <div>
+        <h1 className="text-2xl">Chats</h1>
+        <div className="flex flex-col gap-2">
+            {loading && <div>Loading...</div>}
+            {(chats ?? []).map((chat) => {
+                preload(`/api/chats/${chat.id}`, url => fetch(url).then(res => res.json()));
+                return <Link key={chat.id} href={`/chats/${chat.id}`}>
+                    <div className="bg-slate-400">
+                        {chat.name}
+                    </div>
+                </Link>;
+            })}
+        </div>
+    </div>
 }

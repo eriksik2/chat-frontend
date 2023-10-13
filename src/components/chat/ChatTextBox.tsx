@@ -13,24 +13,6 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
     const [value, setValue] = useState('');
     const [bigEditor, setBigEditor] = useState(false);
 
-    const [lines, cols] = useMemo(() => {
-        var maxcol = 0;
-        var col = 0;
-        var lines = 1;
-        for (const char of value) {
-            if (char === '\n') {
-                lines++;
-                col = 0;
-            } else {
-                col++;
-                if (col > maxcol) {
-                    maxcol = col;
-                }
-            }
-        }
-        return [lines, Math.max(maxcol, 40)];
-    }, [value]);
-
     function onKey(event: React.KeyboardEvent<HTMLDivElement>) {
         if (event.key === 'Enter') {
             if (bigEditor) return;

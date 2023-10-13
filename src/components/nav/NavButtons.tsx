@@ -1,7 +1,7 @@
 "use client"
 import React from "react";
 import { NavContext, NavContextType, NavPage } from "./NavController";
-import { useReactive } from "@/util/Reactive";
+import { useReactive } from "@/lib/Reactive";
 
 
 type NavButtonsProps<Tparams> = {

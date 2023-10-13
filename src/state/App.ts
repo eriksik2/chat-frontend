@@ -1,4 +1,4 @@
-import Reactive from "@/util/Reactive";
+import Reactive from "@/lib/Reactive";
 import ChatBot from "./ChatBot";
 import ChatSession from "./ChatSession";
 import OpenAI from "openai";

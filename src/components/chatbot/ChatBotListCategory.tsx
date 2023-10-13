@@ -2,7 +2,7 @@
 
 import App from '@/state/App';
 import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import { useEffect, useMemo, useState } from 'react';
 import ChatBotCard from './ChatBotCard';
 import Modal from '../Modal';
@@ -10,34 +10,25 @@ import ChatBotAdd from './ChatBotAdd';
 
 import { FaAngleDown } from 'react-icons/fa6';
 import clsx from 'clsx';
+import { ApibotsResponseData } from '../../../pages/api/bots';
 
 type ChatBotListCategoryProps = {
-    app: App;
+    bots: ApibotsResponseData;
     category: string | null;
 };
 
-const featured = "⭐Featured";
 
 export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
-    const state = useReactive(props.app);
 
-    const isFeatured = props.category === featured;
+    const isFeatured = props.category === '⭐Featured';
 
     const [open, setOpen] = useState(isFeatured ? true : false);
 
-    const filteredBots = useMemo(() => {
-        return state.chatbots.filter((chatbot) => {
-            if (props.category === null) {
-                return chatbot.tags.length === 0;
-            } else {
-                return chatbot.tags.includes(props.category);
-            }
-        });
-    }, [state.generation, props.category]);
-    if (filteredBots.length === 0) return null;
-
-    return <div className={clsx(
-    )}>
+    return <div
+        style={{
+            order: isFeatured ? -1 : undefined,
+        }}
+    >
         <div
             className='w-full bg-slate-300 rounded px-2 flex flex-row items-center gap-2'
             onClick={() => !isFeatured && setOpen(!open)}
@@ -53,12 +44,12 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
         <div className='overflow-hidden'>
             <div
                 className={clsx(
-                    'flex flex-row flex-wrap gap-4 items-center content-start justify-start px-4',
+                    'flex flex-row flex-wrap gap-4 items-stretch content-start justify-start px-4',
                     open ? 'max-h-screen py-4' : 'max-h-0 py-0 -translate-y-[10rem]',
                     "transition-height duration-300 ease-in-out"
                 )}
             >
-                {filteredBots.map((chatbot, i) => {
+                {props.bots.map((chatbot, i) => {
                     return <ChatBotCard key={chatbot.id} chatbot={chatbot} />;
                 })}
             </div>

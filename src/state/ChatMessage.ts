@@ -1,6 +1,6 @@
-import Reactive from '@/util/Reactive';
+import Reactive from '@/lib/Reactive';
 import OpenAI from 'openai';
-import ToolbarItems, { Tool, newTool } from '../util/ToolbarItems';
+import ToolbarItems, { Tool, newTool } from '../lib/ToolbarItems';
 import ChatSession from './ChatSession';
 import ChatBot from './ChatBot';
 

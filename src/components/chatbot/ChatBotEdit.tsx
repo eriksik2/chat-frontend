@@ -1,7 +1,7 @@
 "use client"
 
 import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/util/Reactive';
+import { useReactive } from '@/lib/Reactive';
 import { FaX } from 'react-icons/fa6';
 
 type ChatBotEditProps = {
