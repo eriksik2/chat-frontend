@@ -12,6 +12,11 @@ export type ApibotsResponseData = Prisma.ChatBotGetPayload<{
         description: true,
         categories: true,
         featured: true,
+        author: {
+            select: {
+                name: true,
+            },
+        },
     }
 }>[];
 
@@ -46,6 +51,11 @@ export default async function handler(
             description: true,
             categories: true,
             featured: true,
+            author: {
+                select: {
+                    name: true,
+                },
+            },
         }
     }) ?? [];
 

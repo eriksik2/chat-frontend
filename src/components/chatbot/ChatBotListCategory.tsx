@@ -44,7 +44,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
         <div className='overflow-hidden'>
             <div
                 className={clsx(
-                    'flex flex-row flex-wrap gap-4 items-center content-start justify-start px-4',
+                    'flex flex-row flex-wrap gap-4 items-stretch content-start justify-start px-4',
                     open ? 'max-h-screen py-4' : 'max-h-0 py-0 -translate-y-[10rem]',
                     "transition-height duration-300 ease-in-out"
                 )}

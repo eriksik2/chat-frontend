@@ -13,9 +13,16 @@ export default function ChatBotCard(props: ChatBotCardProps) {
     const router = useRouter();
     const { post, error } = useApiPOST<ApiChatsPOSTBody, ApiChatsPOSTResponse>(`/api/chats`);
 
-    return <div className={clsx('bg-zinc-400 rounded p-2 shadow-md border-2')}>
-        <p>{props.chatbot.name}</p>
-        <p>{props.chatbot.description}</p>
+    return <div className='bg-zinc-400 rounded p-2 shadow-md flex flex-col justify-between'>
+        <div className='px-2 pt-1'>
+            <div className='flex flex-row items-baseline gap-2'>
+                <p className='text-xl'>{props.chatbot.name}</p>
+                <p className='text-sm'>by {props.chatbot.author.name}</p>
+            </div>
+            <br />
+            <p className='max-w-xs'>{props.chatbot.description}</p>
+            <br />
+        </div>
         <div className='flex flex-row justify-end gap-2 pt-2'>
             <button
                 className='bg-green-100 rounded p-1 text-sm'

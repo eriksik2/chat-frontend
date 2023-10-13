@@ -1,6 +1,7 @@
 import { FaGithub } from "react-icons/fa6";
 import TabsLayout, { TabBar, TabsLayoutProps, defaultButtonBuilderBuilder, getTabsLayoutProps } from "./TabsLayout";
 import Link from "next/link";
+import LogInButton from "../LogInButton";
 
 
 type RootLayoutProps = {
@@ -36,12 +37,7 @@ export default function RootLayout(props: RootLayoutProps) {
             </div>
             {tabBar}
             <div className='absolute top-0 bottom-0 right-0 flex text-4xl items-center gap-4 px-4'>
-                <Link
-                    href="/api/auth/signin"
-                    className="flex items-center gap-2 bg-slate-500 rounded-full p-2 text-base"
-                >
-                    Log in
-                </Link>
+                <LogInButton />
                 <a href="https://github.com/eriksik2/chat-frontend"><FaGithub /></a>
             </div>
 
