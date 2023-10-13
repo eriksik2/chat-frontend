@@ -12,7 +12,7 @@ type ChatPageProps = {
 export default function ChatPage(props: ChatPageProps) {
 
     const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`, {
-        refreshInterval: 250,
+        refreshInterval: 150,
     });
     const loading = data === null && reloading;
     const chat = data;
