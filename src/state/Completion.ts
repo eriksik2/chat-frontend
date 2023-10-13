@@ -33,7 +33,6 @@ export default class Completion {
             return;
         }
 
-        console.log("prompting with: ", this.messages)
         this.didRun = true;
         const stream = await this.openai.chat.completions.create({
             model: this.model,

@@ -28,6 +28,7 @@ export default function ChatBotCard(props: ChatBotCardProps) {
                 className='bg-green-100 rounded p-1 text-sm'
                 onClick={async () => {
                     const response = await post({
+                        chatName: `New chat with ${props.chatbot.name}`,
                         chatbotId: props.chatbot.id,
                     });
                     if (response.chatId !== null) {

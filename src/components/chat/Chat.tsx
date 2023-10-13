@@ -2,11 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import ChatMessageComponent, { ChatMessageStreamingComponent } from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 import { useApiGET, useApiPOST } from "@/api/fetcher";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import Completion from "@/state/Completion";
+import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 
 type ChatPageProps = {
     id: string;
@@ -84,7 +84,7 @@ export default function ChatPage(props: ChatPageProps) {
     });
 
     // TODO better loading and null handling
-    if (loading) return <div>Loading...</div>;
+    //if (loading) return <div>Loading...</div>;
     if (error !== null) return <div>
         <h1 className="text-2xl">Error</h1>
         <div>{error.status}</div>
@@ -129,7 +129,7 @@ export default function ChatPage(props: ChatPageProps) {
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
                                     content={message.content}
-                                    author={message.author}
+                                    author={message.author === "USER" ? "You" : chat?.chatbot.name ?? "assistant"}
                                     streaming={false}
                                 />
                             </div>;

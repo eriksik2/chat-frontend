@@ -13,6 +13,7 @@ export type ApiChatsGETResponse = Prisma.ChatGetPayload<{
 }>[];
 
 export type ApiChatsPOSTBody = {
+    chatName: string;
     chatbotId: string;
 };
 
@@ -77,6 +78,7 @@ async function postHandler(
 
     const chat = await prisma.chat.create({
         data: {
+            name: body.chatName,
             author: {
                 connect: {
                     email: session.user!.email!,

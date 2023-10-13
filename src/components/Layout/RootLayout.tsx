@@ -1,6 +1,5 @@
 import { FaGithub } from "react-icons/fa6";
-import TabsLayout, { TabBar, TabsLayoutProps, defaultButtonBuilderBuilder, getTabsLayoutProps } from "./TabsLayout";
-import Link from "next/link";
+import TabsLayout, { TabBar, TabsLayoutProps, getTabsLayoutProps } from "./TabsLayout";
 import LogInButton from "../LogInButton";
 
 
@@ -21,9 +20,11 @@ export default function RootLayout(props: RootLayoutProps) {
                 tabsAlign={"start"}
                 tabsGap={tabsProps.tabsGap}
             >
-                {tabsProps.pages.map((page, index) => <Link href={page.route} key={index}>
-                    {tabsProps.buttonBuilder({ name: page.name, icon: page.icon, route: page.route })}
-                </Link>)}
+                {tabsProps.pages.map((page) => {
+                    return <div key={page.route}>
+                        {tabsProps.buttonBuilder({ name: page.name, icon: page.icon, route: page.route })}
+                    </div>;
+                })}
             </TabBar>;
         }
     }

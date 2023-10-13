@@ -86,13 +86,15 @@ export default function TabsLayout(_props: TabsLayoutProps) {
                 tabsAlign={tabsAlign}
                 tabsGap={tabsGap}
             >
-                {pages.map((page, index) => <Link href={page.route} key={index}>
-                    {buttonBuilder({
-                        name: page.name,
-                        icon: page.icon,
-                        route: page.route,
-                    })}
-                </Link>)}
+                {pages.map((page) => {
+                    return <div key={page.route}>
+                        {buttonBuilder({
+                            name: page.name,
+                            icon: page.icon,
+                            route: page.route,
+                        })}
+                    </div>;
+                })}
             </TabBar>
         </div>
         <div className="flex-grow relative">
@@ -155,21 +157,17 @@ type DefaultTabButtonProps = {
 function DefaultTabButton(params: DefaultTabButtonProps) {
     const router = useRouter();
     const isActive = router.asPath.includes(params.route);
-    const inner = <div className="flex flex-col items-center">
-        {params.icon}
-        {params.showPageName &&
-            <p className="text-xs">{params.name}</p>
-        }
-    </div>;
-    return <div className="m-2">
-        {isActive ?
-            <div className="p-2 px-4 rounded-full w-24 bg-slate-500 shadow-xl">
-                {inner}
+    return <Link href={params.route}>
+        <div className={clsx(
+            "p-2 px-4 w-24",
+            isActive && "rounded-full bg-slate-500 shadow-xl"
+        )}>
+            <div className="flex flex-col items-center">
+                {params.icon}
+                {params.showPageName &&
+                    <p className="text-xs">{params.name}</p>
+                }
             </div>
-            :
-            <div className="p-2 px-4 w-24">
-                {inner}
-            </div>
-        }
-    </div>;
+        </div>
+    </Link>;
 }

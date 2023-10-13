@@ -53,23 +53,6 @@ export type ApiPOSTResponse<Tbody, Tresponse> = {
     error: ApiError | null;
 };
 
-export function fetcherPOST<T>(): (url: string, body: T) => Promise<T> {
-    return async (url: string, body: T) => {
-        const res = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-
-        });
-        if (!res.ok) {
-            const errdata = await res.text();
-            throw new ApiError(errdata, errdata, res.status);
-        }
-        const data = await res.json() as T;
-        return data;
-    };
-}
 
 export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody, Tresponse> {
     const swr = useSWRConfig();

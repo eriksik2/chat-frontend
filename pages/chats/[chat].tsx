@@ -1,15 +1,14 @@
-import { useState, useEffect, useRef, ReactElement, ReactNode } from "react";
-import { ApiChatGETResponse, ApiChatPOSTBody } from "../api/chats/[chat]";
+import { ReactElement, ReactNode } from "react";
 import { useRouter } from "next/router";
-import ChatMessageStreamingComponent from "@/components/chat/ChatMessageComponent";
-import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import useSWR from 'swr';
 import BotsPage from "../bots";
 import TabsLayout from "@/components/Layout/TabsLayout";
 import { ApiChatsGETResponse } from "../api/chats";
 import Chat from "@/components/chat/Chat";
 import { useApiGET } from "@/api/fetcher";
+import Link from "next/link";
+import { FaTrash } from "react-icons/fa6";
+import { preload, useSWRConfig } from "swr";
 
 type ChatPageProps = {};
 
@@ -22,14 +21,30 @@ export default function ChatPage(props: ChatPageProps) {
 
 function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNode, route: string }) {
     const router = useRouter();
+    const swr = useSWRConfig();
     const active = router.asPath.includes(route);
-    return <div className={clsx(
-        "bg-slate-400 px-4 py-3 flex flex-row justify-start gap-2",
+    preload(`${route}`, url => fetch(url).then(res => res.json()));
+    return <Link href={route} className={clsx(
+        "flex flex-row justify-between items-center gap-2 p-2",
         active ? "bg-slate-500" : "bg-slate-400",
     )}>
-        <div>{icon}</div>
-        <div>{name}</div>
-    </div>;
+        <span className="flex flex-row gap-2">
+            <span>{icon}</span>
+            <span>{name}</span>
+        </span>
+        <button
+            onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const response = await fetch(`/api${route}`, {
+                    method: "DELETE",
+                });
+                swr.mutate("/api/chats");
+            }}
+        >
+            <FaTrash />
+        </button>
+    </Link>;
 }
 
 function ChatPageLayout(props: { page: ReactElement }) {

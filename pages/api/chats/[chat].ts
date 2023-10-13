@@ -2,10 +2,8 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next"
 import { Session, getServerSession } from "next-auth";
-import { getSession } from "next-auth/react";
-import { authOptions } from "../../auth/[...nextauth]";
-import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
+import { authOptions } from "../auth/[...nextauth]";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 
 // GET: get the chat and its messages
@@ -57,6 +55,9 @@ export default async function handler(
             break;
         case "POST":
             await postHandler(session, req, res);
+            break;
+        case "DELETE":
+            await deleteHandler(session, req, res);
             break;
         default:
             res.statusCode = 405;
@@ -116,39 +117,64 @@ async function postHandler(
     req: NextApiRequest,
     res: NextApiResponse<ApiChatPOSTResponse | string>
 ) {
-    const chat = await prisma.chat.findUnique({
-        where: {
-            id: req.query.chat as string,
-        },
-        select: {
-            id: true,
-        },
-    });
-
-    if (!chat) {
-        res.statusCode = 404;
-        res.send("Chat not found");
-        res.end();
-        return;
-    }
-
     const body = req.body as ApiChatPOSTBody;
 
-    const message = await prisma.chatMessage.create({
-        data: {
-            author: body.author,
-            content: body.content,
-            chat: {
-                connect: {
-                    id: chat.id,
+    try {
+        await prisma.chatMessage.create({
+            data: {
+                author: body.author,
+                content: body.content,
+                chat: {
+                    connect: {
+                        id: req.query.chat as string,
+                    },
                 },
             },
-        },
-    });
+        });
+    } catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            res.statusCode = 500;
+            res.send(`Failed to post message: ${e.code}`);
+            res.end();
+            return;
+        } else {
+            res.statusCode = 500;
+            res.send("Failed to post message: error occurred");
+            res.end();
+            return;
+        }
+    }
 
     res.statusCode = 200;
-    res.json({
-        type: "success",
-    });
+    res.json({});
+    res.end();
+}
+
+async function deleteHandler(
+    session: Session,
+    req: NextApiRequest,
+    res: NextApiResponse<string>
+) {
+    try {
+        await prisma.chat.delete({
+            where: {
+                id: req.query.chat as string,
+            }
+        });
+    } catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            res.statusCode = 500;
+            res.send(`Failed to delete chat: ${e.code}`);
+            res.end();
+            return;
+        } else {
+            res.statusCode = 500;
+            res.send("Failed to delete chat: error occurred");
+            res.end();
+            return;
+        }
+    }
+
+    res.statusCode = 200;
     res.end();
 }

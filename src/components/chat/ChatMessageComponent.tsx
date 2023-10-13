@@ -1,7 +1,5 @@
 import clsx from 'clsx';
 import ChatMarkdown from './ChatMarkdown';
-import { useApiGET } from '@/api/fetcher';
-import { ApiChatMsgResponseData } from '../../../pages/api/chats/msg/[msg]';
 import Completion from '@/state/Completion';
 import { useEffect, useState } from 'react';
 
@@ -43,7 +41,6 @@ export function ChatMessageStreamingComponent(props: ChatMessageStreamingCompone
     useEffect(() => {
         props.completion.run(
             (chunk, stop_reason) => {
-                console.log(stop_reason);
                 setMessage((msg) => msg + chunk);
             },
             (full_message) => {
