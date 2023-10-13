@@ -32,6 +32,8 @@ export default class Completion {
             console.error("Completion.run() called twice");
             return;
         }
+
+        console.log("prompting with: ", this.messages)
         this.didRun = true;
         const stream = await this.openai.chat.completions.create({
             model: this.model,

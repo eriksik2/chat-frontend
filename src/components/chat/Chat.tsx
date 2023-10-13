@@ -60,7 +60,7 @@ export default function ChatPage(props: ChatPageProps) {
         if (chat === null) return;
 
         const messages: Array<ChatCompletionMessageParam> = new Array();
-        if (chat.chatbot.systemMessage !== null) {
+        if (chat.chatbot.systemMessage !== null && chat.chatbot.systemMessage.trim() !== "") {
             messages.push({
                 role: "system",
                 content: chat.chatbot.systemMessage,
@@ -69,7 +69,10 @@ export default function ChatPage(props: ChatPageProps) {
         messages.push(...chat.messages.map(message => ({
             role: message.author === "USER" ? "user" as const : "assistant" as const,
             content: message.content,
-        })));
+        })), {
+            role: "user",
+            content: message,
+        });
 
         const comp = new Completion(openai, chat.chatbot.model, chat.chatbot.temperature, chat.chatbot.frequency_bias, chat.chatbot.presence_bias, messages);
         setAiCompletion(comp);
