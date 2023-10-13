@@ -62,7 +62,7 @@ export default function ChatBotList(props: ChatBotListProps) {
                 </div>
             </div>
             <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
-                {loading && <div>Loading...</div>}
+                {(loading && bots === undefined) && <div>Loading...</div>}
                 {groupedBots.map(([category, bots]) => {
                     return <ChatBotListCategory
                         key={category}

@@ -21,23 +21,27 @@ export default async function handler(
     const session = await getSession({ req });
     if (!session || !session.user) {
         res.statusCode = 403;
-        return { notFound: true, };
+        res.end();
     }
 
     const bots = await prisma.chatBot.findMany({
         where: {
-            OR: [
-                {
-                    author: {
-                        email: session.user.email,
-                    },
-                },
-                {
+            OR: (() => {
+                const or: Prisma.ChatBotWhereInput[] = [];
+                if (session && session.user && session.user.email) {
+                    or.push({
+                        author: {
+                            email: session.user.email,
+                        },
+                    });
+                }
+                or.push({
                     publishedAt: {
                         lte: new Date(),
                     }
-                }
-            ],
+                });
+                return or;
+            })(),
         },
         select: {
             id: true,
@@ -50,4 +54,5 @@ export default async function handler(
 
     res.statusCode = 200;
     res.json(bots);
+    res.end();
 }
