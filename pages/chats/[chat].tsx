@@ -7,7 +7,7 @@ import clsx from "clsx";
 import useSWR from 'swr';
 import BotsPage from "../bots";
 import TabsLayout from "@/components/Layout/TabsLayout";
-import { ApiChatsResponseData } from "../api/chats";
+import { ApiChatsGETResponse } from "../api/chats";
 import Chat from "@/components/chat/Chat";
 import { useApiGET } from "@/api/fetcher";
 
@@ -33,7 +33,7 @@ function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNod
 }
 
 function ChatPageLayout(props: { page: ReactElement }) {
-    const { data, error, reloading } = useApiGET<ApiChatsResponseData>("/api/chats");
+    const { data, error, reloading } = useApiGET<ApiChatsGETResponse>("/api/chats");
     const chats = data;
     const loading = chats === null && reloading;
 

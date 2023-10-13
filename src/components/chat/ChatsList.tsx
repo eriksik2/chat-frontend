@@ -1,5 +1,5 @@
 import App from "@/state/App";
-import { ApiChatsResponseData } from "../../../pages/api/chats";
+import { ApiChatsGETResponse } from "../../../pages/api/chats";
 import Link from "next/link";
 import useSWR, { preload } from "swr";
 import { useApiGET } from "@/api/fetcher";
@@ -8,7 +8,7 @@ type ChatsListProps = {
 };
 
 export default function ChatsList(props: ChatsListProps) {
-    const { data, error, reloading } = useApiGET<ApiChatsResponseData>("/api/chats");
+    const { data, error, reloading } = useApiGET<ApiChatsGETResponse>("/api/chats");
     const chats = data;
     const loading = chats === null && reloading;
 

@@ -17,11 +17,14 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
                 createdAt: true,
             },
             orderBy: { createdAt: "asc" },
-        }
-    }
+        },
+        chatbot: {
+            select: {
+                name: true,
+            },
+        },
+    },
 }>;
-
-export type ErrorCode = "unauthorized" | "not_found";
 
 // POST: post a message to the chat
 export type ApiChatPOSTBody = {
@@ -76,7 +79,12 @@ async function getHandler(
                     createdAt: true,
                 },
                 orderBy: { createdAt: "asc" },
-            }
+            },
+            chatbot: {
+                select: {
+                    name: true,
+                },
+            },
         }
     });
 

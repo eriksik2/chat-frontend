@@ -81,6 +81,8 @@ model ChatBot {
 
     publishedAt DateTime?
 
+    chats Chat[]
+
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
 }
@@ -92,6 +94,9 @@ model Chat {
 
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
+
+    chatbot   ChatBot @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+    chatbotId String
 }
 
 model ChatMessage {

@@ -42,8 +42,8 @@ export function useApiGET<T>(url: string): ApiGETResponse<T> {
     };
 }
 
-export type ApiPOSTResponse<T> = {
-    post: (body: T) => Promise<void>;
+export type ApiPOSTResponse<Tbody, Tresponse> = {
+    post: (body: Tbody) => Promise<Tresponse>;
     error: ApiError | null;
 };
 
@@ -65,10 +65,10 @@ export function fetcherPOST<T>(): (url: string, body: T) => Promise<T> {
     };
 }
 
-export function useApiPOST<T>(url: string): ApiPOSTResponse<T> {
+export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody, Tresponse> {
     const [error, setError] = useState<ApiError | null>(null);
 
-    async function post(body: T) {
+    async function post(body: Tbody) {
         const res = await fetch(url, {
             method: "POST",
             headers: {
@@ -79,7 +79,10 @@ export function useApiPOST<T>(url: string): ApiPOSTResponse<T> {
         if (!res.ok) {
             const errdata = await res.text();
             setError(new ApiError(errdata, errdata, res.status));
+            throw error;
         }
+        const data = await res.json() as Tresponse;
+        return data;
     }
 
     return {

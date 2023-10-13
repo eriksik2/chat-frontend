@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import { ApiChatGETResponse, ApiChatPOSTBody } from "../../../pages/api/chats/[chat]";
+import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 import { useApiGET, useApiPOST } from "@/api/fetcher";
 
 type ChatPageProps = {
@@ -15,7 +15,7 @@ export default function ChatPage(props: ChatPageProps) {
     const loading = data === null && reloading;
     const chat = data;
 
-    const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody>(`/api/chats/${props.id}`);
+    const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
 
     const [apiKeyInput, setApiKeyInput] = useState<string>('');
     const [apiKey, setApiKey] = useState<string | null>(null);
@@ -87,7 +87,7 @@ export default function ChatPage(props: ChatPageProps) {
                             "flex flex-col items-center justify-center"
                         )}>
                             <h2 className='text-2xl'>
-                                What will you ask {"chatbot.name"}?
+                                What will you ask {chat?.chatbot.name}?
                             </h2>
                         </div>
                         {(chat?.messages ?? []).map((message, index) => {
