@@ -11,11 +11,18 @@ type ChatPageProps = {
 
 export default function ChatPage(props: ChatPageProps) {
 
-    const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
+    const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`, {
+        refreshInterval: 250,
+    });
     const loading = data === null && reloading;
     const chat = data;
 
     const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
+
+    const [optimisticLatestMessage, setOptimisticLatestMessage] = useState<string | null>(null);
+    useEffect(() => {
+        setOptimisticLatestMessage(null);
+    }, [data]);
 
     const [apiKeyInput, setApiKeyInput] = useState<string>('');
     const [apiKey, setApiKey] = useState<string | null>(null);
@@ -30,17 +37,10 @@ export default function ChatPage(props: ChatPageProps) {
     }, [apiKey]);
 
     async function onUserSend(message: string) {
-        const newChat = chat === null ? null : {
-            ...chat!, messages: [...chat!.messages, {
-                id: "temp",
-                createdAt: new Date(),
-            }]
-        };
-        if (newChat !== null) mutate(newChat, false);
+        setOptimisticLatestMessage(message);
         await postMessage({
             content: message,
         });
-        if (newChat !== null) mutate(newChat, true);
     }
 
     const scrollDownRef = useRef<HTMLDivElement>(null);
@@ -76,7 +76,7 @@ export default function ChatPage(props: ChatPageProps) {
             :
             <div className='absolute top-0 bottom-0 right-0 left-0'>
                 <div className='overflow-auto scroll-smooth snap-y snap-proximity h-full'>
-                    <div className='px-4 pt-8 pb-16 flex flex-col items-center justify-start'>
+                    <div className='px-4 pt-8 pb-20 flex flex-col items-center justify-start'>
                         <div className={clsx(
                             'mt-8 w-1/3 rounded-xl',
                             (chat?.messages ?? []).length === 0
@@ -90,21 +90,31 @@ export default function ChatPage(props: ChatPageProps) {
                             </h2>
                         </div>
                         {(chat?.messages ?? []).map((message, index) => {
-
                             return <div key={index} className='w-full'>
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
                                     id={message.id}
+                                    content={message.content}
+                                    author={message.author}
+                                    streaming={message.streaming}
                                 />
                             </div>;
                         })}
+                        {optimisticLatestMessage !== null && <div key={chat?.messages.length ?? 0} className='w-full'>
+                            <ChatMessageComponent
+                                id={null}
+                                content={optimisticLatestMessage}
+                                author={"USER"}
+                                streaming={false}
+                            />
+                        </div>}
                     </div>
 
                     <div ref={scrollDownRef} className='snap-end'></div>
                 </div>
 
                 <div className='flex flex-col items-center absolute left-0 right-0 bottom-0 z-10'>
-                    {true && <>
+                    {false && <>
                         <div>Waiting for response...</div>
                         <div className='h-2' />
                     </>}

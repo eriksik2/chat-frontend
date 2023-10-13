@@ -15,6 +15,9 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
         messages: {
             select: {
                 id: true,
+                content: true,
+                author: true,
+                streaming: true,
                 createdAt: true,
             },
             orderBy: { createdAt: "asc" },
@@ -76,6 +79,9 @@ async function getHandler(
             messages: {
                 select: {
                     id: true,
+                    content: true,
+                    author: true,
+                    streaming: true,
                     createdAt: true,
                 },
                 orderBy: { createdAt: "asc" },

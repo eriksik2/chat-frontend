@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, ReactElement, ReactNode } from "react";
 import { ApiChatGETResponse, ApiChatPOSTBody } from "../api/chats/[chat]";
 import { useRouter } from "next/router";
-import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
+import ChatMessageStreamingComponent from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
 import useSWR from 'swr';
