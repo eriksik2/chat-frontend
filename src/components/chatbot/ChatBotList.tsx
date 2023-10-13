@@ -1,17 +1,14 @@
 "use client"
 
-import App from '@/state/App';
-import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/lib/Reactive';
-import { useEffect, useMemo, useState } from 'react';
-import ChatBotCard from './ChatBotCard';
+import { useMemo, useState } from 'react';
 import Modal from '../Modal';
-import ChatBotAdd from './ChatBotAdd';
 
-import { FaAngleDown, FaCirclePlus } from 'react-icons/fa6';
+import { FaCirclePlus } from 'react-icons/fa6';
 import ChatBotListCategory from './ChatBotListCategory';
 import useSWR from 'swr';
-import { ApibotsResponseData } from '../../../pages/api/bots';
+import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
+import ChatBotEdit from './ChatBotEdit';
+import { useApiPOST } from '@/api/fetcher';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
     const map = new Map<string, T[]>();
@@ -34,9 +31,13 @@ type ChatBotListProps = {
 
 export default function ChatBotList(props: ChatBotListProps) {
 
-    const data = useSWR("/api/bots", (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsResponseData>));
+    const data = useSWR("/api/bots", (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>));
     const bots = data.data;
     const loading = data.isLoading;
+
+    const { post: postBot, error: postError } = useApiPOST<ApibotsPOSTBody, never>(`/api/bots`);
+
+    const [showAdd, setShowAdd] = useState<boolean>(false);
 
     const groupedBots = useMemo(() => Array.from(groupByMulti(bots ?? [], bot => {
         const keys = new Array<string>();
@@ -71,8 +72,21 @@ export default function ChatBotList(props: ChatBotListProps) {
             })}
             <button
                 className="text-xl"
-                onClick={() => { }}
+                onClick={() => setShowAdd(true)}
             ><FaCirclePlus /></button>
         </div>
+
+        {showAdd && <Modal onClose={() => setShowAdd(false)}>
+            <ChatBotEdit
+                onClose={() => setShowAdd(false)}
+                onSave={(bot) => {
+                    setShowAdd(false);
+                    console.log(bot);
+                    postBot({
+                        ...bot,
+                    });
+                }}
+            />
+        </Modal>}
     </div>
 }

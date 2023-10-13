@@ -1,49 +1,63 @@
 "use client"
 
-import ChatBot from '@/state/ChatBot';
-import { useReactive } from '@/lib/Reactive';
 import { FaX } from 'react-icons/fa6';
+import { Prisma } from '@prisma/client';
+import { useState } from 'react';
+
+type ChatBot = Prisma.ChatBotGetPayload<{
+    select: {
+        name: true;
+        description: true;
+        model: true;
+        frequency_bias: true;
+        presence_bias: true;
+        temperature: true;
+        systemMessage: true;
+        categories: true;
+    }
+}>;
 
 type ChatBotEditProps = {
-    chatbot: ChatBot;
+    chatbot?: ChatBot;
     onClose: () => void;
+    onSave: (chatbot: ChatBot) => void;
 };
 
 export default function ChatBotEdit(props: ChatBotEditProps) {
-    const chatbot = useReactive(props.chatbot);
+
+    const [name, setName] = useState<string>(props.chatbot?.name ?? "");
+    const [description, setDescription] = useState<string>(props.chatbot?.description ?? "");
+    const [model, setModel] = useState<string>(props.chatbot?.model ?? "gpt-4");
+    const [frequency_bias, setFrequencyBias] = useState<number>(props.chatbot?.frequency_bias ?? 0);
+    const [presence_bias, setPresenceBias] = useState<number>(props.chatbot?.presence_bias ?? 0);
+    const [temperature, setTemperature] = useState<number>(props.chatbot?.temperature ?? 0.7);
+    const [systemMessage, setSystemMessage] = useState<string>(props.chatbot?.systemMessage ?? "");
 
     return <div className='bg-slate-300 p-2'>
-        <div className='flex flex-row justify-end'>
-            <button
-                onClick={() => {
-                    props.onClose();
-                }}
-            ><FaX /></button>
-        </div>
         <div className='grid grid-cols-3 gap-6 align-middle p-3'>
             <div className='flex items-center h-full col-start-1 row-start-1'>
                 <p>Name</p>
             </div>
             <input
                 className='col-start-2 row-start-1'
-                value={chatbot.name}
-                onChange={(e) => chatbot.setName(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
             />
             <div className='flex items-center h-full col-start-1 row-start-2'>
                 <p>Description</p>
             </div>
             <textarea
                 className='h-36 col-start-2 row-start-2 resize-none'
-                value={chatbot.description}
-                onChange={(e) => chatbot.setDescription(e.target.value)}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
             />
             <div className='col-start-3 row-start-1 row-span-2 flex flex-col gap-6'>
                 <div className='flex flex-row w-full gap-3 justify-stretch'>
                     <p>Model</p>
                     <select
                         className='flex-grow'
-                        value={chatbot.model}
-                        onChange={(e) => chatbot.setModel(e.target.value)}
+                        value={model}
+                        onChange={(e) => setModel(e.target.value)}
                     >
                         <option value="gpt-4">GPT-4 (8K)</option>
                         <option value="gpt-4-32k" disabled>GPT-4 (32K)</option>
@@ -57,11 +71,11 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
                         <input
                             type="range" min="-2.0" max="2.0" step="0.1"
                             className='flex-grow'
-                            value={chatbot.frequency_penalty ?? undefined}
-                            onChange={(e) => chatbot.setFrequencyPenalty(parseFloat(e.target.value))}
+                            value={frequency_bias}
+                            onChange={(e) => setFrequencyBias(parseFloat(e.target.value))}
                         />
                     </div>
-                    {chatbot.frequency_penalty ?? 0}
+                    {frequency_bias}
                 </div>
                 <div>
                     <div className='flex flex-row w-full gap-3'>
@@ -69,11 +83,11 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
                         <input
                             type="range" min="-2.0" max="2.0" step="0.1"
                             className='flex-grow'
-                            value={chatbot.presence_penalty ?? undefined}
-                            onChange={(e) => chatbot.setPresencePenalty(parseFloat(e.target.value))}
+                            value={presence_bias}
+                            onChange={(e) => setPresenceBias(parseFloat(e.target.value))}
                         />
                     </div>
-                    {chatbot.presence_penalty ?? 0}
+                    {presence_bias}
                 </div>
                 <div>
                     <div className='flex flex-row w-full gap-3'>
@@ -81,11 +95,11 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
                         <input
                             type="range" min="0" max="2.0" step="0.1"
                             className='flex-grow'
-                            value={chatbot.temperature ?? undefined}
-                            onChange={(e) => chatbot.setTemperature(parseFloat(e.target.value))}
+                            value={temperature}
+                            onChange={(e) => setTemperature(parseFloat(e.target.value))}
                         />
                     </div>
-                    {chatbot.temperature ?? 0}
+                    {temperature}
                 </div>
             </div>
             <div className='flex items-center h-full col-start-1 row-start-3'>
@@ -93,9 +107,32 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
             </div>
             <textarea
                 className='h-56 col-start-2 row-start-3 col-span-2 resize-none'
-                value={chatbot.system_message ?? ""}
-                onChange={(e) => chatbot.setSystemMessage(e.target.value)}
+                value={systemMessage}
+                onChange={(e) => setSystemMessage(e.target.value)}
             />
+        </div>
+        <div className='flex flex-row justify-end gap-2'>
+            <button
+                className='bg-gray-500 rounded p-2'
+                onClick={() => {
+                    props.onClose();
+                }}
+            >Cancel</button>
+            <button
+                className='bg-blue-400 rounded p-2'
+                onClick={() => {
+                    props.onSave({
+                        name,
+                        description,
+                        model,
+                        frequency_bias,
+                        presence_bias,
+                        temperature,
+                        systemMessage,
+                        categories: [],
+                    });
+                }}
+            >Save</button>
         </div>
     </div>;
 }

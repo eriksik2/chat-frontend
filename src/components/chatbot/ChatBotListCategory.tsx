@@ -10,10 +10,10 @@ import ChatBotAdd from './ChatBotAdd';
 
 import { FaAngleDown } from 'react-icons/fa6';
 import clsx from 'clsx';
-import { ApibotsResponseData } from '../../../pages/api/bots';
+import { ApibotsGETResponse } from '../../../pages/api/bots';
 
 type ChatBotListCategoryProps = {
-    bots: ApibotsResponseData;
+    bots: ApibotsGETResponse;
     category: string | null;
 };
 

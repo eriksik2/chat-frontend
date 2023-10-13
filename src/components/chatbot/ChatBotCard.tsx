@@ -1,12 +1,12 @@
 import { FaPen, FaTrash } from 'react-icons/fa6';
 import clsx from 'clsx';
-import { ApibotsResponseData } from '../../../pages/api/bots';
+import { ApibotsGETResponse } from '../../../pages/api/bots';
 import { useApiPOST } from '@/api/fetcher';
 import { ApiChatsPOSTBody, ApiChatsPOSTResponse } from '../../../pages/api/chats';
 import { useRouter } from 'next/router';
 
 type ChatBotCardProps = {
-    chatbot: ApibotsResponseData[0];
+    chatbot: ApibotsGETResponse[0];
 };
 
 export default function ChatBotCard(props: ChatBotCardProps) {
