@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next"
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./auth/[...nextauth]";
 
 
 export type ApibotsResponseData = Prisma.ChatBotGetPayload<{
@@ -18,7 +19,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<ApibotsResponseData>
 ) {
-    const session = await getSession({ req });
+    const session = await getServerSession(req, res, authOptions);
 
     const bots = await prisma.chatBot.findMany({
         where: {

@@ -31,8 +31,14 @@ export type ApiGETResponse<T> = {
     mutate: KeyedMutator<T>;
 };
 
-export function useApiGET<T>(url: string): ApiGETResponse<T> {
-    const { data, error, isLoading, mutate } = useSWR<T, ApiError>(url, fetcherGET<T>());
+export type ApiGETOptions<T> = {
+    refreshInterval?: number | ((data: T | undefined) => number);
+};
+
+export function useApiGET<T>(url: string, opts?: ApiGETOptions<T>): ApiGETResponse<T> {
+    const { data, error, isLoading, mutate } = useSWR<T, ApiError>(url, fetcherGET<T>(), {
+        refreshInterval: opts?.refreshInterval,
+    });
 
     return {
         data: data ?? null,

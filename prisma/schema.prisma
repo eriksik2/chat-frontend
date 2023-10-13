@@ -74,10 +74,10 @@ model ChatBot {
     featured    Boolean  @default(false)
 
     model          String
-    systemMessage  String
-    temperature    Float  @default(0.7)
-    frequency_bias Float  @default(0.0)
-    presence_bias  Float  @default(0.0)
+    systemMessage  String?
+    temperature    Float   @default(0.7)
+    frequency_bias Float   @default(0.0)
+    presence_bias  Float   @default(0.0)
 
     publishedAt DateTime?
 
@@ -104,6 +104,7 @@ model ChatMessage {
 
     author    ChatMessageAuthor
     content   String
+    streaming Boolean           @default(false)
     createdAt DateTime          @default(now()) @map(name: "created_at")
 
     chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)

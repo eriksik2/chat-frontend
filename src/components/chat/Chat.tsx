@@ -32,8 +32,7 @@ export default function ChatPage(props: ChatPageProps) {
     async function onUserSend(message: string) {
         const newChat = chat === null ? null : {
             ...chat!, messages: [...chat!.messages, {
-                author: "USER" as const,
-                content: message,
+                id: "temp",
                 createdAt: new Date(),
             }]
         };
@@ -95,9 +94,7 @@ export default function ChatPage(props: ChatPageProps) {
                             return <div key={index} className='w-full'>
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
-                                    content={message.content}
-                                    author={message.author}
-                                    typing={false}
+                                    id={message.id}
                                 />
                             </div>;
                         })}
