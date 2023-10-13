@@ -19,6 +19,9 @@ export type TabsLayoutProps = {
     tabsLocation?: "left" | "right" | "top" | "bottom";
     tabsAlign?: "start" | "center" | "end";
     tabsGap?: `${number}${"" | "em" | "rem" | "px"}`;
+    tabBarWidth?: `${number}${"" | "em" | "rem" | "px"}` | "auto";
+    before?: React.ReactNode;
+    after?: React.ReactNode;
     buttonBuilder?: (params: { name: string, icon: React.ReactNode, route: string }) => React.ReactElement;
 };
 
@@ -35,6 +38,9 @@ export const TabsLayoutDefaultProps: OnlyOptional<TabsLayoutProps, {
     tabsLocation: () => "left",
     tabsAlign: ({ tabsLocation }) => (tabsLocation === "left" || tabsLocation === "right") ? "start" : "center",
     tabsGap: () => "1rem",
+    tabBarWidth: () => "auto",
+    before: () => <></>,
+    after: () => <></>,
     buttonBuilder: ({ showPageName }) => defaultButtonBuilderBuilder(showPageName),
 } as const;
 
@@ -43,6 +49,9 @@ export function getTabsLayoutProps(props: TabsLayoutProps): Required<TabsLayoutP
     const tabsLocation = props.tabsLocation ?? TabsLayoutDefaultProps.tabsLocation({});
     const tabsAlign = props.tabsAlign ?? TabsLayoutDefaultProps.tabsAlign({ tabsLocation });
     const tabsGap = props.tabsGap ?? TabsLayoutDefaultProps.tabsGap({});
+    const tabBarWidth = props.tabBarWidth ?? TabsLayoutDefaultProps.tabBarWidth({});
+    const before = props.before ?? TabsLayoutDefaultProps.before({});
+    const after = props.after ?? TabsLayoutDefaultProps.after({});
     const buttonBuilder = props.buttonBuilder ?? TabsLayoutDefaultProps.buttonBuilder({ showPageName });
 
     return {
@@ -50,6 +59,9 @@ export function getTabsLayoutProps(props: TabsLayoutProps): Required<TabsLayoutP
         tabsLocation,
         tabsAlign,
         tabsGap,
+        tabBarWidth,
+        before,
+        after,
         buttonBuilder,
         children: props.children,
         pages: props.pages,
@@ -62,6 +74,9 @@ export default function TabsLayout(_props: TabsLayoutProps) {
         tabsLocation,
         tabsAlign,
         tabsGap,
+        tabBarWidth,
+        before,
+        after,
         buttonBuilder,
         children,
         pages,
@@ -85,7 +100,9 @@ export default function TabsLayout(_props: TabsLayoutProps) {
                 tabsDir={tabsDir}
                 tabsAlign={tabsAlign}
                 tabsGap={tabsGap}
+                tabBarWidth={tabBarWidth}
             >
+                {before}
                 {pages.map((page) => {
                     return <div key={page.route}>
                         {buttonBuilder({
@@ -95,6 +112,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
                         })}
                     </div>;
                 })}
+                {after}
             </TabBar>
         </div>
         <div className="flex-grow relative">
@@ -109,10 +127,12 @@ type TabBarProps = {
     tabsDir: "row" | "col";
     tabsAlign: "start" | "center" | "end";
     tabsGap: `${number}${"" | "em" | "rem" | "px"}`;
-    children: React.ReactElement[];
+    tabBarWidth: `${number}${"" | "em" | "rem" | "px"}` | "auto";
+    children: React.ReactNode[];
 }
 
 export function TabBar(props: TabBarProps) {
+    const tabBarWidth = props.tabBarWidth === "auto" ? undefined : props.tabBarWidth;
     return <div
         className={clsx(
             "bg-slate-400 flex flex-grow",
@@ -130,6 +150,8 @@ export function TabBar(props: TabBarProps) {
             paddingBottom: props.tabsDir === "col" ? props.tabsGap : undefined,
             paddingLeft: props.tabsDir === "row" ? props.tabsGap : undefined,
             paddingRight: props.tabsDir === "row" ? props.tabsGap : undefined,
+            width: props.tabsDir === "col" ? tabBarWidth : undefined,
+            height: props.tabsDir === "row" ? tabBarWidth : undefined,
         }}
     >
         {props.children}

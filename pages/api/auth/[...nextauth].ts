@@ -10,13 +10,6 @@ export default authHandler;
 
 export const authOptions = {
     providers: [
-        GitHubProvider({
-            clientId: process.env.GITHUB_ID!,
-            clientSecret: process.env.GITHUB_SECRET!,
-            client: {
-                //redirect_uris: ["http://chat.eriksik.com/api/auth"],
-            },
-        }),
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,

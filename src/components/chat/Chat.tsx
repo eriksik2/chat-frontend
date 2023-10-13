@@ -93,12 +93,13 @@ export default function ChatPage(props: ChatPageProps) {
 
     return <div className='absolute top-0 bottom-0 right-0 left-0'>
         {apiKey === null ?
-            <div className='backdrop-blur-lg flex flex-col items-center justify-center z-20'>
-                <div className='text-2xl'>Please enter your OpenAI API key to access chat.</div>
-                <div className='h-2' />
+            <div className='backdrop-blur-lg flex flex-col items-center justify-center z-20 h-full'>
+                <div className='text-2xl'>Please enter your OpenAI API key to access chat:</div>
+                <br />
                 <div className='flex gap-4'>
                     <input
-                        className='bg-slate-300 rounded p-2'
+                        className='bg-slate-300 rounded p-2 w-96'
+                        type='password'
                         value={apiKeyInput}
                         onChange={e => setApiKeyInput(e.target.value)}
                     />
@@ -106,6 +107,26 @@ export default function ChatPage(props: ChatPageProps) {
                         className='bg-slate-400 rounded p-2'
                         onClick={() => setApiKey(apiKeyInput)}
                     >Set</button>
+                </div>
+                <div className="flex flex-col items-center">
+                    <br />
+                    <br />
+                    <p>
+                        We use your OpenAI API key to generate responses to your messages.
+                    </p>
+                    <p>
+                        The key is stored in your browser's local storage. It is never sent to our server.
+                    </p>
+                    <br />
+                    <p>
+                        You can find your API key{" "}
+                        <a
+                            href="https://beta.openai.com/account/api-keys"
+                            className="text-blue-500 hover:underline visited:text-purple-600s"
+                        >
+                            here
+                        </a>.
+                    </p>
                 </div>
             </div>
             :
