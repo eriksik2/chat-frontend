@@ -18,7 +18,8 @@ export default async function handler(
     const session = await getSession({ req });
     if (!session || !session.user) {
         res.statusCode = 403;
-        return { notFound: true, };
+        res.end();
+        return;
     }
 
     const chats = await prisma.chat.findMany({
@@ -35,4 +36,5 @@ export default async function handler(
 
     res.statusCode = 200;
     res.json(chats);
+    res.end();
 }
