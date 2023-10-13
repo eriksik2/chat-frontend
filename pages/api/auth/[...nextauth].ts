@@ -12,6 +12,9 @@ export const authOptions = {
         GitHubProvider({
             clientId: process.env.GITHUB_ID!,
             clientSecret: process.env.GITHUB_SECRET!,
+            client: {
+                redirect_uris: ["http://chat.eriksik.com/api/auth"],
+            },
         }),
     ],
     adapter: PrismaAdapter(prisma),
