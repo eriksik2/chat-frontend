@@ -19,10 +19,6 @@ export default async function handler(
     res: NextApiResponse<ApibotsResponseData>
 ) {
     const session = await getSession({ req });
-    if (!session || !session.user) {
-        res.statusCode = 403;
-        res.end();
-    }
 
     const bots = await prisma.chatBot.findMany({
         where: {
