@@ -10,7 +10,7 @@ export default function BotsPage() {
 
 BotsPage.getLayout = function getLayout(page: ReactElement) {
     return <TabsLayout
-        tabsLocation="bottom"
+        tabsLocation="top"
         pages={[
             {
                 name: "Chatbots",

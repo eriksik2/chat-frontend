@@ -46,35 +46,33 @@ export default function ChatBotList(props: ChatBotListProps) {
         return keys;
     }).entries()), [bots]);
 
-    return <div className='h-full relative'>
-        <div className='flex flex-col items-stretch justify-start absolute top-0 left-0 right-0 bottom-0'>
-            <div className='w-full shadow-xl z-30'>
-                <div className='w-2/5 p-4 py-6'>
-                    <h1 className='text-5xl pb-2'>Chatbots</h1>
-                    <p>
-                        List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
+    return <div className='flex flex-col items-stretch justify-start absolute top-0 left-0 right-0 bottom-0'>
+        <div className='w-full shadow-xl z-30'>
+            <div className='w-2/5 p-4 py-6'>
+                <h1 className='text-5xl pb-2'>Chatbots</h1>
+                <p>
+                    List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
 
-                    </p>
-                    <br />
-                    <p>
-                        Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
-                    </p>
-                </div>
+                </p>
+                <br />
+                <p>
+                    Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
+                </p>
             </div>
-            <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
-                {(loading && bots === undefined) && <div>Loading...</div>}
-                {groupedBots.map(([category, bots]) => {
-                    return <ChatBotListCategory
-                        key={category}
-                        bots={bots}
-                        category={category}
-                    />;
-                })}
-                <button
-                    className="text-xl"
-                    onClick={() => { }}
-                ><FaCirclePlus /></button>
-            </div>
+        </div>
+        <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
+            {(loading && bots === undefined) && <div>Loading...</div>}
+            {groupedBots.map(([category, bots]) => {
+                return <ChatBotListCategory
+                    key={category}
+                    bots={bots}
+                    category={category}
+                />;
+            })}
+            <button
+                className="text-xl"
+                onClick={() => { }}
+            ><FaCirclePlus /></button>
         </div>
     </div>
 }

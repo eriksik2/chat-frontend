@@ -24,8 +24,8 @@ export default function ChatsList(props: ChatsListProps) {
         <div className="flex flex-col gap-2">
             {loading && <div>Loading...</div>}
             {(chats ?? []).map((chat) => {
-                preload(`/api/chat/${chat.id}`, url => fetch(url).then(res => res.json()));
-                return <Link key={chat.id} href={`/chat/${chat.id}`}>
+                preload(`/api/chats/${chat.id}`, url => fetch(url).then(res => res.json()));
+                return <Link key={chat.id} href={`/chats/${chat.id}`}>
                     <div className="bg-slate-400">
                         {chat.name}
                     </div>

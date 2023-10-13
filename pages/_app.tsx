@@ -5,6 +5,7 @@ import type { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
 import Link from 'next/link'
 import clsx from 'clsx'
+import RootLayout from '@/components/Layout/RootLayout'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +18,9 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         'relative h-screen w-screen'
     )}>
         <SessionProvider session={pageProps.session}>
-            {getLayout(<Component {...pageProps} />)}
+            <RootLayout>
+                {getLayout(<Component {...pageProps} />)}
+            </RootLayout>
         </SessionProvider>
     </div>
 }

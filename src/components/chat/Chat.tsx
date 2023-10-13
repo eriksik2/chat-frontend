@@ -1,19 +1,18 @@
 import { useState, useEffect, useRef } from "react";
-import { ApiChatGETResponse, ApiChatPOSTBody } from "../api/chat/[chat]";
 import { useRouter } from "next/router";
 import ChatMessageComponent from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
 import useSWR from 'swr';
+import { ApiChatGETResponse, ApiChatPOSTBody } from "../../../pages/api/chats/[chat]";
 
-type ChatPageProps = {};
+type ChatPageProps = {
+    id: string;
+};
 
 export default function ChatPage(props: ChatPageProps) {
-    const router = useRouter();
-    // TODO null handling
-    const request = router.query.chat !== undefined ? `/api/chat/${router.query.chat}` : null;
 
-    const data = useSWR<ApiChatGETResponse>(request, (url: string) => fetch(url).then(res => res.json()));
+    const data = useSWR<ApiChatGETResponse>(`/api/chats/${props.id}`, (url: string) => fetch(url).then(res => res.json()));
     const chat = data.data;
     const loading = data.isLoading;
 
@@ -38,7 +37,7 @@ export default function ChatPage(props: ChatPageProps) {
             }]
         };
         if (newChat !== null) data.mutate(newChat, false);
-        await fetch(`/api/chat/${router.query.chat}`, {
+        await fetch(`/api/chat/${props.id}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

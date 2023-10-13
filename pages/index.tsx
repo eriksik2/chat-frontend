@@ -6,7 +6,6 @@ import ChatBotList from '@/components/chatbot/ChatBotList';
 import { navPage } from '@/components/nav/NavController';
 import TabsNav from '@/components/nav/SideTabs/TabsNav';
 import App from '@/state/App'
-import ChatSession from '@/state/ChatSession';
 import { useReactive } from '@/lib/Reactive';
 import { useState } from 'react';
 import { FaGithub, FaRegComments, FaUsersGear } from 'react-icons/fa6';
