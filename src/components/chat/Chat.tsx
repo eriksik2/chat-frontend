@@ -115,7 +115,7 @@ export default function ChatPage(props: ChatPageProps) {
                         We use your OpenAI API key to generate responses to your messages.
                     </p>
                     <p>
-                        The key is stored in your browser's local storage. It is never sent to our server.
+                        The key is stored in your browser{"'"}s local storage. It is never sent to our server.
                     </p>
                     <br />
                     <p>
