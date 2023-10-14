@@ -16,6 +16,7 @@ export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
         author: {
             select: {
                 name: true,
+                email: true,
             },
         },
     }
@@ -94,6 +95,7 @@ async function getHandler(
             author: {
                 select: {
                     name: true,
+                    email: true,
                 },
             },
         }
