@@ -48,8 +48,13 @@ export default async function handler(
         res.end();
     }
 
-    res.statusCode = 200;
-    doRedirect && res.redirect(307, `/chats/${chatId?.id ?? ""}`);
-    res.json(chatId ?? null);
-    res.end();
+
+    if (doRedirect) {
+        res.redirect(307, `/chats/${chatId?.id ?? ""}`);
+    } else {
+        res.statusCode = 200;
+        res.json(chatId ?? null);
+        res.end();
+    }
+
 }
