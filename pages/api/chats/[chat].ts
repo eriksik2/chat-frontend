@@ -46,6 +46,7 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse<ApiChatGETResponse | ApiChatPOSTResponse | ApiChatDELETEResponse | string>
 ) {
+
     const session = await getServerSession(req, res, authOptions);
     if (session === null || session.user === undefined || session.user.email === undefined) {
         res.statusCode = 401;

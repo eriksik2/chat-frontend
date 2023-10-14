@@ -25,7 +25,7 @@ export function fetcherGET<T>(): (url: string) => Promise<T> {
 }
 
 export type ApiGETResponse<T> = {
-    data: T | null;
+    data: T | undefined;
     error: ApiError | null;
     reloading: boolean;
     mutate: KeyedMutator<T>;
@@ -41,7 +41,7 @@ export function useApiGET<T>(url: string, opts?: ApiGETOptions<T>): ApiGETRespon
     });
 
     return {
-        data: data ?? null,
+        data: data,
         error: error ?? null,
         reloading: isLoading,
         mutate,

@@ -72,6 +72,7 @@ model ChatBot {
     description String
     categories  String[] @default([])
     featured    Boolean  @default(false)
+    createdAt   DateTime @default(now()) @map(name: "created_at")
 
     model          String
     systemMessage  String?
@@ -88,9 +89,11 @@ model ChatBot {
 }
 
 model Chat {
-    id       String        @id @default(cuid())
-    name     String?
-    messages ChatMessage[]
+    id           String        @id @default(cuid())
+    name         String?
+    messages     ChatMessage[]
+    createdAt    DateTime      @default(now()) @map(name: "created_at")
+    linkSharedAt DateTime? // If not null, the chat can be viewed by anyone with the link
 
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int

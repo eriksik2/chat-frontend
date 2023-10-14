@@ -19,7 +19,7 @@ BotsPage.getLayout = function getLayout(page: ReactElement) {
             },
             {
                 name: "Chats",
-                route: "/chats",
+                route: "/api/chats/latest?redirect=true",
                 icon: <FaRegComments className="text-2xl" />,
             }
         ]}

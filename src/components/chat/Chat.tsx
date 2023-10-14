@@ -8,14 +8,14 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import Completion from "@/state/Completion";
 import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 
-type ChatPageProps = {
+type ChatProps = {
     id: string;
 };
 
-export default function ChatPage(props: ChatPageProps) {
+export default function Chat(props: ChatProps) {
 
     const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
-    const loading = data === null && reloading;
+    const loading = data === undefined && reloading;
     const chat = data;
 
     const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
@@ -42,7 +42,7 @@ export default function ChatPage(props: ChatPageProps) {
     }, [apiKey]);
 
     async function onUserSend(message: string) {
-        const newChat = chat === null ? null : {
+        const newChat = chat === undefined ? null : {
             messages: [...chat.messages, {
                 id: "",
                 author: "USER" as const,
@@ -57,7 +57,7 @@ export default function ChatPage(props: ChatPageProps) {
         });
 
         if (openai === null) return;
-        if (chat === null) return;
+        if (chat === undefined) return;
 
         const messages: Array<ChatCompletionMessageParam> = new Array();
         if (chat.chatbot.systemMessage !== null && chat.chatbot.systemMessage.trim() !== "") {
@@ -122,7 +122,7 @@ export default function ChatPage(props: ChatPageProps) {
                         You can find your API key{" "}
                         <a
                             href="https://beta.openai.com/account/api-keys"
-                            className="text-blue-500 hover:underline visited:text-purple-600s"
+                            className="text-blue-500 hover:underline visited:text-purple-600"
                         >
                             here
                         </a>.
@@ -161,7 +161,7 @@ export default function ChatPage(props: ChatPageProps) {
                                 completion={aiCompletion}
                                 onComplete={(message) => {
                                     setAiCompletion(null);
-                                    const newChat = chat === null ? null : {
+                                    const newChat = chat === undefined ? null : {
                                         messages: [...chat.messages, {
                                             id: "",
                                             author: "CHATBOT" as const,

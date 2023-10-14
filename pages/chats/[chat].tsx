@@ -40,6 +40,7 @@ function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNod
                     method: "DELETE",
                 });
                 swr.mutate("/api/chats");
+                router.replace("/api/chats/latest?redirect=true");
             }}
         >
             <FaTrash />
@@ -50,7 +51,7 @@ function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNod
 function ChatPageLayout(props: { page: ReactElement }) {
     const { data, error, reloading } = useApiGET<ApiChatsGETResponse>("/api/chats");
     const chats = data;
-    const loading = chats === null && reloading;
+    const loading = chats === undefined && reloading;
 
     // TODO better loading and null handling
     if (error !== null) return <div>
@@ -58,6 +59,8 @@ function ChatPageLayout(props: { page: ReactElement }) {
         <div>{error.status}</div>
         <div>{error.message}</div>
     </div>;
+
+    if ((chats ?? []).length === 0) return props.page;
 
     return <TabsLayout
         tabsLocation="right"
