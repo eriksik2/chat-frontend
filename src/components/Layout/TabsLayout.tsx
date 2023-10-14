@@ -14,6 +14,7 @@ export type TabsLayoutProps = {
         icon: React.ReactNode;
         name: string;
         route: string;
+        isActive?: (activeRoute: string, buttonRoute: string) => boolean;
     }[];
     showPageName?: boolean;
     tabsLocation?: "left" | "right" | "top" | "bottom";
@@ -22,7 +23,7 @@ export type TabsLayoutProps = {
     tabBarWidth?: `${number}${"" | "em" | "rem" | "px"}` | "auto";
     before?: React.ReactNode;
     after?: React.ReactNode;
-    buttonBuilder?: (params: { name: string, icon: React.ReactNode, route: string }) => React.ReactElement;
+    buttonBuilder?: (params: { name: string, icon: React.ReactNode, route: string, isActive?: (activeRoute: string, buttonRoute: string) => boolean }) => React.ReactElement;
 };
 
 
@@ -109,6 +110,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
                             name: page.name,
                             icon: page.icon,
                             route: page.route,
+                            isActive: page.isActive,
                         })}
                     </div>;
                 })}
@@ -158,13 +160,14 @@ export function TabBar(props: TabBarProps) {
     </div>
 }
 
-export function defaultButtonBuilderBuilder(showPageName: boolean): (params: { name: string, icon: React.ReactNode, route: string }) => React.ReactElement {
+export function defaultButtonBuilderBuilder(showPageName: boolean): (params: { name: string, icon: React.ReactNode, route: string, isActive?: (activeRoute: string, buttonRoute: string) => boolean }) => React.ReactElement {
     return function defaultButtonBuilder(params) {
         return <DefaultTabButton
             name={params.name}
             icon={params.icon}
             showPageName={showPageName}
             route={params.route}
+            isActive={params.isActive}
         />;
     };
 };
@@ -174,15 +177,16 @@ type DefaultTabButtonProps = {
     icon: React.ReactNode;
     showPageName: boolean;
     route: string;
+    isActive?: (activeRoute: string, buttonRoute: string) => boolean;
 };
 
 function DefaultTabButton(params: DefaultTabButtonProps) {
+    const checkIsActive = params.isActive ?? ((activeRoute, buttonRoute) => activeRoute.includes(buttonRoute));
     const router = useRouter();
-    const isActive = router.asPath.includes(params.route);
     return <Link href={params.route}>
         <div className={clsx(
             "p-2 px-4 w-24",
-            isActive && "rounded-full bg-slate-500 shadow-xl"
+            checkIsActive(router.asPath, params.route) && "rounded-full bg-slate-500 shadow-xl"
         )}>
             <div className="flex flex-col items-center">
                 {params.icon}

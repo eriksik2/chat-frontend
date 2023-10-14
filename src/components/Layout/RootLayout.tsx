@@ -23,7 +23,7 @@ export default function RootLayout(props: RootLayoutProps) {
             >
                 {tabsProps.pages.map((page) => {
                     return <div key={page.route}>
-                        {tabsProps.buttonBuilder({ name: page.name, icon: page.icon, route: page.route })}
+                        {tabsProps.buttonBuilder({ name: page.name, icon: page.icon, route: page.route, isActive: page.isActive })}
                     </div>;
                 })}
             </TabBar>;
