@@ -99,7 +99,8 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
             },
 
             a(props) {
-                return <a className='text-blue-500 hover:underline visited:text-purple-500' {...props} />;
+                const href = (props.href as string).replaceAll("&amp;", "&")
+                return <a className='text-blue-500 hover:underline visited:text-purple-500' {...props} href={href} />;
             },
         }}
     >
