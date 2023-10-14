@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import ChatMessageComponent, { ChatMessageStreamingComponent } from "@/components/chat/ChatMessageComponent";
+import ChatMessageComponent, { ChatMessageContent, ChatMessageStreamingComponent } from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
 import { useApiGET, useApiPOST } from "@/api/fetcher";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
-import Completion from "@/state/Completion";
+import Completion, { CompletionMessage } from "@/state/Completion";
 import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
 
 type ChatProps = {
@@ -17,6 +17,7 @@ export default function Chat(props: ChatProps) {
     const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
     const loading = data === undefined && reloading;
     const chat = data;
+    console.log(chat)
 
     const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
 
@@ -41,40 +42,48 @@ export default function Chat(props: ChatProps) {
         }
     }, [apiKey]);
 
-    async function onUserSend(message: string) {
+    async function onUserSend(cont: string) {
+        const message: CompletionMessage = {
+            role: "user",
+            content: [
+                {
+                    type: "md",
+                    content: cont,
+                },
+            ],
+        };
+
         const newChat = chat === undefined ? null : {
             messages: [...chat.messages, {
                 id: "",
                 author: "USER" as const,
-                content: message,
+                content: JSON.stringify(message.content),
             }],
             chatbot: chat.chatbot,
         };
         newChat && mutate(newChat, false);
         await postMessage({
             author: "USER",
-            content: message,
+            content: JSON.stringify(message.content),
         });
 
         if (openai === null) return;
         if (chat === undefined) return;
 
-        const messages: Array<ChatCompletionMessageParam> = new Array();
-        if (chat.chatbot.systemMessage !== null && chat.chatbot.systemMessage.trim() !== "") {
-            messages.push({
-                role: "system",
-                content: chat.chatbot.systemMessage,
-            });
-        }
-        messages.push(...chat.messages.map(message => ({
-            role: message.author === "USER" ? "user" as const : "assistant" as const,
-            content: message.content,
-        })), {
-            role: "user",
-            content: message,
-        });
-
-        const comp = new Completion(openai, chat.chatbot.model, chat.chatbot.temperature, chat.chatbot.frequency_bias, chat.chatbot.presence_bias, messages);
+        const comp = new Completion(
+            openai,
+            chat.chatbot.model,
+            chat.chatbot.temperature,
+            chat.chatbot.frequency_bias,
+            chat.chatbot.presence_bias,
+            chat.chatbot.systemMessage,
+            [...chat.messages.map(message => {
+                return {
+                    role: message.author === "USER" ? "user" as const : "assistant" as const,
+                    content: JSON.parse(message.content) as ChatMessageContent[],
+                };
+            }), message],
+        );
         setAiCompletion(comp);
     }
 
@@ -149,7 +158,7 @@ export default function Chat(props: ChatProps) {
                             return <div key={index} className='w-full'>
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
-                                    content={message.content}
+                                    content={JSON.parse(message.content) as ChatMessageContent[]}
                                     author={message.author === "USER" ? "You" : chat?.chatbot.name ?? "assistant"}
                                     streaming={false}
                                 />
@@ -161,18 +170,19 @@ export default function Chat(props: ChatProps) {
                                 completion={aiCompletion}
                                 onComplete={(message) => {
                                     setAiCompletion(null);
+                                    const json = JSON.stringify(message);
                                     const newChat = chat === undefined ? null : {
                                         messages: [...chat.messages, {
                                             id: "",
                                             author: "CHATBOT" as const,
-                                            content: message,
+                                            content: json,
                                         }],
                                         chatbot: chat.chatbot,
                                     };
                                     newChat && mutate(newChat, false);
                                     postMessage({
                                         author: "CHATBOT" as const,
-                                        content: message,
+                                        content: json,
                                     });
                                 }}
                             />

@@ -76,7 +76,8 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
             },
 
             img(props) {
-                return <img className='max-w-1/2 max-h-[40vh]' {...props} />;
+                const src = (props.src as string).replaceAll("&amp;", "&")
+                return <img className='max-w-1/2 max-h-[40vh]' {...props} src={src} />;
             },
 
             table(props) {
