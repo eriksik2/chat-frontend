@@ -25,8 +25,9 @@ function ChatButtonBuilder({ name, icon, route }: { name: string, icon: ReactNod
     const active = router.asPath.includes(route);
     preload(`${route}`, url => fetch(url).then(res => res.json()));
     return <Link href={route} className={clsx(
-        "flex flex-row justify-between items-center gap-2 p-2",
-        active ? "bg-slate-500" : "bg-slate-400",
+        "flex flex-row justify-between items-center gap-2 p-2 bg-gradient-to-br shadow-inner",
+        active ? "from-slate-500/50 via-slate-400 to-slate-500/75" : "from-slate-400/50 via-slate-300 to-slate-400/75",
+        "hover:bg-gradient-to-br hover:from-slate-500/50 hover:via-slate-400 hover:to-slate-500/75",
     )}>
         <span className="flex flex-row gap-2">
             <span>{icon}</span>
@@ -66,7 +67,7 @@ function ChatPageLayout(props: { page: ReactElement }) {
         tabsLocation="right"
         tabsGap="0"
         tabBarWidth="17rem"
-        before={<div className="p-2 my-2">
+        before={<div className="p-1 mt-12">
             <h2 className="text-2xl">Your chats</h2>
         </div>}
         pages={(chats ?? []).map(chat => {

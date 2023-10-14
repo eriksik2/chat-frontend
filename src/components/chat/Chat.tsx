@@ -7,6 +7,7 @@ import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import Completion, { CompletionMessage } from "@/state/Completion";
 import { ApiChatGETResponse, ApiChatPOSTBody, ApiChatPOSTResponse } from "../../../pages/api/chats/[chat]";
+import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
 
 type ChatProps = {
     id: string;
@@ -31,10 +32,11 @@ export default function Chat(props: ChatProps) {
         // get/set openai key from localstorage
         if (apiKey !== null) {
             localStorage.setItem('openai-key', apiKey);
-            setOpenai(new OpenAI({
+            setGlobalOpenAI(new OpenAI({
                 apiKey: apiKey,
                 dangerouslyAllowBrowser: true,
             }));
+            setOpenai(getGlobalOpenAI()!);
         }
         else {
             const key = localStorage.getItem('openai-key');
@@ -140,10 +142,10 @@ export default function Chat(props: ChatProps) {
             </div>
             :
             <div className='absolute top-0 bottom-0 right-0 left-0'>
-                <div className='overflow-auto scroll-smooth snap-y snap-proximity h-full'>
-                    <div className='px-4 pt-8 pb-20 flex flex-col items-center justify-start'>
+                <div className='overflow-auto scroll-smooth no-scrollbar snap-y snap-proximity h-full flex flex-col items-center'>
+                    <div className='px-4 pt-8 pb-20 flex flex-col items-stretch justify-start pr-28'>
                         <div className={clsx(
-                            'mt-8 w-1/3 rounded-xl',
+                            'mt-8 rounded-xl',
                             (chat?.messages ?? []).length === 0
                                 ? 'opacity-100 translate-y-0'
                                 : 'opacity-0 translate-y-[-2rem] h-0',
@@ -155,7 +157,7 @@ export default function Chat(props: ChatProps) {
                             </h2>
                         </div>
                         {(chat?.messages ?? []).map((message, index) => {
-                            return <div key={index} className='w-full'>
+                            return <div key={index}>
                                 {index > 0 && <div className='h-2' />}
                                 <ChatMessageComponent
                                     content={JSON.parse(message.content) as ChatMessageContent[]}
@@ -164,7 +166,7 @@ export default function Chat(props: ChatProps) {
                                 />
                             </div>;
                         })}
-                        {aiCompletion !== null && <div key={chat?.messages.length} className='w-full'>
+                        {aiCompletion !== null && <div key={chat?.messages.length}>
                             <ChatMessageStreamingComponent
                                 author={chat?.chatbot.name ?? ""}
                                 completion={aiCompletion}

@@ -2,6 +2,8 @@ import clsx from 'clsx';
 import ChatMarkdown from './ChatMarkdown';
 import Completion from '@/state/Completion';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { FaAngleDown, FaCircleNotch } from 'react-icons/fa6';
+import ChatFunctionCall from './ChatFunctionCall';
 
 
 export type ChatMessageContent = {
@@ -24,11 +26,11 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     return <div
         className={clsx(
             'overflow-hidden',
-            'flex flex-row flex-grow group/msg min-h-[4rem] rounded-xl border-2',
+            'flex flex-row flex-grow group/msg min-h-[4rem] rounded-xl',
         )}
     >
-        <div className='px-4 py-2 text-white bg-gray-500'>
-            <p>{props.author}</p>
+        <div className='px-2 my-4 w-[20%] text-black text-lg  border-r border-slate-400'>
+            <p className='text-end'>{props.author}</p>
         </div>
         <div className='p-4 pb-2 w-full'>
             {props.content.map((cont, index) => {
@@ -40,11 +42,12 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
                         />
                     </div>;
                 } else if (cont.type === "function") {
-                    return <div key={index}>
-                        <p className='text-gray-400'>
-                            {cont.name}({cont.arguments})
-                        </p>
-                    </div>;
+                    return <ChatFunctionCall
+                        key={index}
+                        name={cont.name}
+                        arguments={cont.arguments}
+                        result={cont.result}
+                    />;
                 }
             })}
         </div>

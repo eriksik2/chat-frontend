@@ -8,20 +8,39 @@ type ArgumentSpec = {
 
 export default class AIFunction {
     name: string;
+    display_name: string;
     description: string;
     args: ArgumentSpec[];
     run: (...args: any[]) => Promise<string>;
 
     constructor(
         name: string,
+        display_name: string,
         description: string,
-        args: ArgumentSpec[],
+        params: ArgumentSpec[],
         run: (...args: any[]) => Promise<string>,
     ) {
         this.name = name;
+        this.display_name = display_name;
         this.description = description;
-        this.args = args;
+        this.args = params;
         this.run = run;
+    }
+
+    static create({
+        name,
+        display_name,
+        description,
+        params,
+        run,
+    }: {
+        name: string;
+        display_name: string;
+        description: string;
+        params: ArgumentSpec[];
+        run: (...params: any[]) => Promise<string>;
+    }): AIFunction {
+        return new AIFunction(name, display_name, description, params, run);
     }
 
     toOpenAISpec(): OpenAI.Chat.Completions.ChatCompletionCreateParams.Function {

@@ -31,7 +31,7 @@ export default function RootLayout(props: RootLayoutProps) {
     }
 
     return <div className="h-full flex flex-col items-stretch justify-stretch">
-        <div className='flex items-center justify-start gap-2 bg-slate-400 relative'>
+        <div className='flex items-center justify-start gap-2 relative bg-gradient-to-br from-slate-400/50 via-slate-300 to-slate-400/75 shadow-inner'>
             <div className="py-4 px-3">
                 <h1 className='flex text-3xl gap-2'>
                     chat.eriksik

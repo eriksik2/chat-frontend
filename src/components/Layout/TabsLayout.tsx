@@ -105,14 +105,15 @@ export default function TabsLayout(_props: TabsLayoutProps) {
             >
                 {before}
                 {pages.map((page) => {
-                    return <div key={page.route}>
-                        {buttonBuilder({
-                            name: page.name,
-                            icon: page.icon,
-                            route: page.route,
-                            isActive: page.isActive,
-                        })}
-                    </div>;
+                    const elem = buttonBuilder({
+                        name: page.name,
+                        icon: page.icon,
+                        route: page.route,
+                        isActive: page.isActive,
+                    });
+                    return React.cloneElement(elem, {
+                        key: page.route,
+                    });
                 })}
                 {after}
             </TabBar>
@@ -137,7 +138,7 @@ export function TabBar(props: TabBarProps) {
     const tabBarWidth = props.tabBarWidth === "auto" ? undefined : props.tabBarWidth;
     return <div
         className={clsx(
-            "bg-slate-400 flex flex-grow",
+            "flex flex-grow",
             props.tabsDir === "col" ?
                 "flex-col h-full"
                 :
@@ -185,8 +186,9 @@ function DefaultTabButton(params: DefaultTabButtonProps) {
     const router = useRouter();
     return <Link href={params.route}>
         <div className={clsx(
-            "p-2 px-4 w-24",
-            checkIsActive(router.asPath, params.route) && "rounded-full bg-slate-500 shadow-xl"
+            "rounded-full p-2 px-4 w-24",
+            checkIsActive(router.asPath, params.route) && "bg-gradient-to-br from-slate-400/50  to-slate-400/75 shadow-inner",
+            "hover:bg-gradient-to-br hover:from-slate-500/50 hover:via-slate-400 hover:to-slate-500/75"
         )}>
             <div className="flex flex-col items-center">
                 {params.icon}

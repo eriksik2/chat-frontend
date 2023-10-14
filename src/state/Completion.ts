@@ -2,6 +2,7 @@ import { ChatMessageContent } from "@/components/chat/ChatMessageComponent";
 import OpenAI from "openai";
 import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import AIFunction from "./AIFunction";
+import { predefinedFunctions } from "./PredefinedFunctions";
 
 export type FunctionCall = {
     name: string;
@@ -91,34 +92,7 @@ export default class Completion {
             return;
         }
 
-        const fns = new Map<string, AIFunction>();
-        fns.set("generate_image", new AIFunction("generate_image", "Generates an image using the DALL-E 2 Diffusion model.", [
-            {
-                name: "prompt",
-                description: "A prompt describing the image to generate. A detailed, specific prompt will give the best result. The prompt should specify (if applicable): content, composition, actions and feeling.",
-                required: true,
-            },
-            {
-                name: "style",
-                description: "The style of the image to generate. The style can be anything, for example: 'hyperrealistic raytraced render', 'modern corporate vector art', '1950's color cartoon', or 'iphone camera selfie'.",
-                required: false,
-            },
-            {
-                name: "big_image",
-                description: "MUST be 'true' or 'false'. Only set this to true if you're generating a single detailed image with a complex prompt or style. For multiple images, set this to false.",
-                required: true,
-            },
-        ], async (prompt: string, style: string, big_image: "true" | "false") => {
-            const img = await this.openai.images.generate({
-                prompt: `${prompt}. ${style}`,
-                n: 1,
-                response_format: "url",
-                size: big_image === "true" ? "1024x1024" : "256x256",
-            });
-            const urlraw = img.data[0].url!;
-            return `![${prompt}](${urlraw})`;
-        }));
-
+        const fns = predefinedFunctions;
 
         this.didRun = true;
         var messages = [...this.getMessages()];
@@ -132,7 +106,7 @@ export default class Completion {
                 break;
             }
             do_continue = false;
-
+            console.log("Prompting AI with messages: ", messages);
             const fn_specs = [...fns.values()].map((fn) => fn.toOpenAISpec());
             const stream = await this.openai.chat.completions.create({
                 model: this.model,

@@ -15,7 +15,8 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
     return <div className={clsx(
         inter.className,
-        'relative h-screen w-screen'
+        'relative h-screen w-screen',
+        "bg-gradient-to-br from-slate-300/50 via-slate-100 to-slate-300/75 shadow-inner"
     )}>
         <SessionProvider session={pageProps.session}>
             <RootLayout>
