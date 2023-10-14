@@ -71,7 +71,14 @@ export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody
             setError(new ApiError(errdata, errdata, res.status));
             throw error;
         }
-        swr.mutate(url);
+
+        // Invalidate all pages above this one.
+        // This is an assumption that I try to hold true in the API design.
+        const route = url.split("/").slice(url.startsWith("/") ? 1 : 0);
+        for (let i = 0; i <= route.length; i++) {
+            swr.mutate("/" + route.slice(0, i).join("/"));
+        }
+
         return res.json() as Promise<Tresponse>;
     }
 

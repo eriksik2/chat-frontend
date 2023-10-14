@@ -49,19 +49,25 @@ export default async function handler(
         res.end();
         return;
     }
-    switch (req.method) {
-        case "GET":
-            await getHandler(session, req, res);
-            break;
-        case "POST":
-            await postHandler(session, req, res);
-            break;
-        case "DELETE":
-            await deleteHandler(session, req, res);
-            break;
-        default:
-            res.statusCode = 405;
-            res.end();
+    try {
+        switch (req.method) {
+            case "GET":
+                await getHandler(session, req, res);
+                break;
+            case "POST":
+                await postHandler(session, req, res);
+                break;
+            case "DELETE":
+                await deleteHandler(session, req, res);
+                break;
+            default:
+                res.statusCode = 405;
+                res.end();
+        }
+    } catch (e) {
+        res.statusCode = 500;
+        res.send("Failed to satisfy request: internal server error");
+        res.end();
     }
 }
 

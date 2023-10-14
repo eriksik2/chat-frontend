@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next"
 import { Session, getServerSession } from "next-auth";
-import { authOptions } from "./auth/[...nextauth]";
+import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 
@@ -41,17 +41,23 @@ export default async function handler(
 ) {
     const session = await getServerSession(req, res, authOptions);
 
-    switch (req.method) {
-        case "GET":
-            await getHandler(session, req, res);
-            break;
-        case "POST":
-            await postHandler(session, req, res);
-            break;
-        default:
-            res.statusCode = 405;
-            res.send(`Method ${req.method} not allowed`);
-            res.end();
+    try {
+        switch (req.method) {
+            case "GET":
+                await getHandler(session, req, res);
+                break;
+            case "POST":
+                await postHandler(session, req, res);
+                break;
+            default:
+                res.statusCode = 405;
+                res.send(`Method ${req.method} not allowed`);
+                res.end();
+        }
+    } catch (e) {
+        res.statusCode = 500;
+        res.send("Failed to satisfy request: internal server error");
+        res.end();
     }
 }
 

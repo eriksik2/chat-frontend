@@ -7,7 +7,7 @@ import { FaCirclePlus } from 'react-icons/fa6';
 import ChatBotListCategory from './ChatBotListCategory';
 import useSWR from 'swr';
 import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
-import ChatBotEdit from './ChatBotEdit';
+import ChatBotEditStatic from './ChatBotEdit';
 import { useApiPOST } from '@/api/fetcher';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
@@ -77,14 +77,11 @@ export default function ChatBotList(props: ChatBotListProps) {
         </div>
 
         {showAdd && <Modal onClose={() => setShowAdd(false)}>
-            <ChatBotEdit
+            <ChatBotEditStatic
                 onClose={() => setShowAdd(false)}
                 onSave={(bot) => {
                     setShowAdd(false);
-                    console.log(bot);
-                    postBot({
-                        ...bot,
-                    });
+                    postBot(bot);
                 }}
             />
         </Modal>}

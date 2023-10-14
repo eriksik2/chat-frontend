@@ -1,29 +1,16 @@
 "use client"
 
-import { FaX } from 'react-icons/fa6';
-import { Prisma } from '@prisma/client';
 import { useState } from 'react';
+import { useApiGET, useApiPOST } from '@/api/fetcher';
+import { ApiBotPOSTBody, ApiBotPOSTResponse, ApibotGETResponse } from '../../../pages/api/bots/[bot]';
 
-type ChatBot = Prisma.ChatBotGetPayload<{
-    select: {
-        name: true;
-        description: true;
-        model: true;
-        frequency_bias: true;
-        presence_bias: true;
-        temperature: true;
-        systemMessage: true;
-        categories: true;
-    }
-}>;
-
-type ChatBotEditProps = {
-    chatbot?: ChatBot;
+type ChatBotEditStaticProps = {
+    chatbot?: ApibotGETResponse;
     onClose: () => void;
-    onSave: (chatbot: ChatBot) => void;
+    onSave: (chatbot: ApibotGETResponse) => void;
 };
 
-export default function ChatBotEdit(props: ChatBotEditProps) {
+export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
 
     const [name, setName] = useState<string>(props.chatbot?.name ?? "");
     const [description, setDescription] = useState<string>(props.chatbot?.description ?? "");
@@ -33,8 +20,8 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
     const [temperature, setTemperature] = useState<number>(props.chatbot?.temperature ?? 0.7);
     const [systemMessage, setSystemMessage] = useState<string>(props.chatbot?.systemMessage ?? "");
 
-    return <div className='bg-slate-300 p-2'>
-        <div className='grid grid-cols-3 gap-6 align-middle p-3'>
+    return <div className='bg-slate-300 roundeds p-2'>
+        <div className='grid grid-cols-3 gap-6 align-middle p-2'>
             <div className='flex items-center h-full col-start-1 row-start-1'>
                 <p>Name</p>
             </div>
@@ -111,7 +98,7 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
                 onChange={(e) => setSystemMessage(e.target.value)}
             />
         </div>
-        <div className='flex flex-row justify-end gap-2'>
+        <div className='flex flex-row justify-end gap-2 p-2'>
             <button
                 className='bg-gray-500 rounded p-2'
                 onClick={() => {
@@ -135,4 +122,27 @@ export default function ChatBotEdit(props: ChatBotEditProps) {
             >Save</button>
         </div>
     </div>;
+}
+
+
+type ChatBotEditProps = {
+    id: string;
+    onClose: () => void;
+    onSave?: (chatbot: ApibotGETResponse) => void;
+};
+
+export function ChatBotEdit(props: ChatBotEditProps) {
+    const { data, error } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
+    const { post, error: postError } = useApiPOST<ApiBotPOSTBody, ApiBotPOSTResponse>(`/api/bots/${props.id}`);
+
+    if (data === null) return null;
+
+    return <ChatBotEditStatic
+        chatbot={data}
+        onClose={props.onClose}
+        onSave={(chatbot) => {
+            post(chatbot);
+            if (props.onSave) props.onSave(chatbot);
+        }}
+    />;
 }
