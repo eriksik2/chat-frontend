@@ -142,8 +142,8 @@ export default function Chat(props: ChatProps) {
             </div>
             :
             <div className='absolute top-0 bottom-0 right-0 left-0'>
-                <div className='overflow-auto scroll-smooth no-scrollbar snap-y snap-proximity h-full flex flex-col items-center'>
-                    <div className='px-4 pt-8 pb-20 flex flex-col items-stretch justify-start pr-28'>
+                <div className='overflow-auto scroll-smooth no-scrollbar h-full flex flex-col items-center'>
+                    <div className='px-4 pt-8 pb-20 flex flex-col items-stretch justify-start pr-32 w-5/6'>
                         <div className={clsx(
                             'mt-8 rounded-xl',
                             (chat?.messages ?? []).length === 0
