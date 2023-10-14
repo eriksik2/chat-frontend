@@ -77,7 +77,9 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
 
             img(props) {
                 const src = (props.src as string).replaceAll("&amp;", "&")
-                return <img className='max-w-1/2 max-h-[40vh]' {...props} src={src} />;
+                return <div className="flex justify-center">
+                    <img className='max-h-[70vh] rounded' {...props} src={src} />
+                </div>
             },
 
             table(props) {

@@ -41,6 +41,9 @@ export default class Completion {
         this.presence_penalty = presence_penalty;
         this.system_message = system_message;
         this.messages = messages;
+
+        const extra_system_message = "After calling a function, include the result in your next message in order for the user to see it.";
+        this.system_message = this.system_message === null ? extra_system_message : `${this.system_message}\n\n${extra_system_message}`;
     }
 
     private convertMessage(message: CompletionMessage): ChatCompletionMessageParam[] | ChatCompletionMessageParam {
@@ -65,21 +68,11 @@ export default class Completion {
                 }
             });
         }
-        return {
-            role: message.role,
-            content: message.content.map((content) => {
-                if (content.type === "md") {
-                    return content.content;
-                } else if (content.type === "function") {
-                    return ``;
-                } else return "";
-            }).join("\n\n"),
-        }
     }
 
     private getMessages(): ChatCompletionMessageParam[] {
         const msgs = new Array<ChatCompletionMessageParam>();
-        if (this.system_message !== null && this.system_message !== undefined && this.system_message.trim() !== "") {
+        if (this.system_message && this.system_message.trim() !== "") {
             msgs.push({
                 role: "system",
                 content: this.system_message,
@@ -110,12 +103,17 @@ export default class Completion {
                 description: "The style of the image to generate. The style can be anything, for example: 'hyperrealistic raytraced render', 'modern corporate vector art', '1950's color cartoon', or 'iphone camera selfie'.",
                 required: false,
             },
-        ], async (prompt: string, style: string) => {
+            {
+                name: "big_image",
+                description: "MUST be 'true' or 'false'. Only set this to true if you're generating a single detailed image with a complex prompt or style. For multiple images, set this to false.",
+                required: true,
+            },
+        ], async (prompt: string, style: string, big_image: "true" | "false") => {
             const img = await this.openai.images.generate({
                 prompt: `${prompt}. ${style}`,
                 n: 1,
                 response_format: "url",
-                size: "256x256",
+                size: big_image === "true" ? "1024x1024" : "256x256",
             });
             const urlraw = img.data[0].url!;
             return `![${prompt}](${urlraw})`;
