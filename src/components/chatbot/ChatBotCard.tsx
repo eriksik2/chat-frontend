@@ -7,12 +7,14 @@ import { useRouter } from 'next/router';
 import Modal from '../Modal';
 import { ChatBotEdit } from './ChatBotEdit';
 import { useState } from 'react';
+import { useSWRConfig } from 'swr';
 
 type ChatBotCardProps = {
     chatbot: ApibotsGETResponse[0];
 };
 
 export default function ChatBotCard(props: ChatBotCardProps) {
+    const swr = useSWRConfig();
     const router = useRouter();
     const { post, error } = useApiPOST<ApiChatsPOSTBody, ApiChatsPOSTResponse>(`/api/chats`);
 
@@ -52,6 +54,12 @@ export default function ChatBotCard(props: ChatBotCardProps) {
             </button>
             <button
                 className='bg-red-400 rounded p-1'
+                onClick={async () => {
+                    const response = await fetch(`/api/bots/${props.chatbot.id}`, {
+                        method: 'DELETE',
+                    });
+                    swr.mutate('/api/bots');
+                }}
             >
                 <FaTrash />
             </button>

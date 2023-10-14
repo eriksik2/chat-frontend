@@ -38,12 +38,16 @@ export type ApiChatPOSTBody = {
 export type ApiChatPOSTResponse = {
 };
 
+// DELETE: delete the chat
+export type ApiChatDELETEResponse = {
+};
+
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ApiChatGETResponse | ApiChatPOSTResponse | string>
+    res: NextApiResponse<ApiChatGETResponse | ApiChatPOSTResponse | ApiChatDELETEResponse | string>
 ) {
     const session = await getServerSession(req, res, authOptions);
-    if (session === null || session.user === undefined) {
+    if (session === null || session.user === undefined || session.user.email === undefined) {
         res.statusCode = 401;
         res.send("Not authenticated");
         res.end();
@@ -81,7 +85,7 @@ async function getHandler(
         where: {
             id: req.query.chat as string,
             author: {
-                email: session.user!.email,
+                email: session.user!.email!,
             },
         },
         select: {
@@ -159,12 +163,15 @@ async function postHandler(
 async function deleteHandler(
     session: Session,
     req: NextApiRequest,
-    res: NextApiResponse<string>
+    res: NextApiResponse<ApiChatDELETEResponse | string>
 ) {
     try {
         await prisma.chat.delete({
             where: {
                 id: req.query.chat as string,
+                author: {
+                    email: session.user!.email!,
+                }
             }
         });
     } catch (e) {

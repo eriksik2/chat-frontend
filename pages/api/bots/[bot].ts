@@ -36,9 +36,11 @@ export type ApiBotPOSTBody = Prisma.ChatBotGetPayload<{
 
 export type ApiBotPOSTResponse = {};
 
+export type ApiBotDELETEResponse = {};
+
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ApibotGETResponse | ApiBotPOSTResponse | string>
+    res: NextApiResponse<ApibotGETResponse | ApiBotPOSTResponse | ApiBotDELETEResponse | string>
 ) {
     const session = await getServerSession(req, res, authOptions);
     if (req.query.bot === undefined || typeof req.query.bot !== "string") {
@@ -56,7 +58,7 @@ export default async function handler(
                 await postHandler(session, req, res);
                 break;
             case "DELETE":
-                //await deleteHandler(session, req, res);
+                await deleteHandler(session, req, res);
                 break;
             default:
                 res.statusCode = 405;
@@ -135,7 +137,7 @@ async function postHandler(
     req: NextApiRequest,
     res: NextApiResponse<ApiBotPOSTResponse | string>
 ) {
-    if (session === null || session.user === undefined) {
+    if (session === null || session.user === undefined || session.user.email === undefined) {
         res.statusCode = 401;
         res.send("Not authenticated");
         res.end();
@@ -173,6 +175,45 @@ async function postHandler(
         } else {
             res.statusCode = 500;
             res.send("Failed to edit chatbot: error occurred");
+            res.end();
+            return;
+        }
+    }
+
+    res.statusCode = 200;
+    res.json({});
+    res.end();
+}
+
+async function deleteHandler(
+    session: Session | null,
+    req: NextApiRequest,
+    res: NextApiResponse<ApiBotDELETEResponse | string>
+) {
+    if (session === null || session.user === undefined || session.user.email === undefined) {
+        res.statusCode = 401;
+        res.send("Not authenticated");
+        res.end();
+        return;
+    }
+    try {
+        await prisma.chatBot.delete({
+            where: {
+                id: req.query.bot as string,
+                author: {
+                    email: session.user.email,
+                },
+            }
+        });
+    } catch (e) {
+        if (e instanceof PrismaClientKnownRequestError) {
+            res.statusCode = 500;
+            res.send(`Failed to delete chatbot: ${e.code}`);
+            res.end();
+            return;
+        } else {
+            res.statusCode = 500;
+            res.send("Failed to delete chatbot: error occurred");
             res.end();
             return;
         }
