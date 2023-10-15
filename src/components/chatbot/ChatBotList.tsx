@@ -41,7 +41,18 @@ export default function ChatBotList(props: ChatBotListProps) {
         temperature: [0, 2],
     });
 
-    const data = useSWR("/api/bots", (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>));
+    const query = useMemo(() => {
+        const q = new URLSearchParams();
+        filter.search.trim() !== "" && q.set("search", filter.search);
+        filter.searchDescription && q.set("searchByDesc", "1");
+        filter.searchSystemMessage && q.set("searchBySysm", "1");
+        q.set("models", filter.models.join(","));
+        q.set("maxTemp", filter.temperature[1].toString());
+        q.set("minTemp", filter.temperature[0].toString());
+        return q.toString();
+    }, [filter]);
+
+    const data = useSWR(`/api/bots?${query}`, (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>));
     const bots = data.data;
     const loading = data.isLoading;
 

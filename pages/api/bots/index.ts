@@ -6,6 +6,14 @@ import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 
+export type ApibotsGETQuery = {
+    search?: string;
+    searchByDesc?: "1";
+    searchBySysm?: "1"; // system message
+    maxTemp?: `${number}`;
+    minTemp?: `${number}`;
+    models?: string[];
+};
 
 export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
     select: {
@@ -68,6 +76,11 @@ async function getHandler(
     req: NextApiRequest,
     res: NextApiResponse<ApibotsGETResponse>
 ) {
+    const query = req.query as ApibotsGETQuery;
+    if (query.models !== undefined) {
+        query.models = (query.models as unknown as string).split(",");
+    }
+
     const bots = await prisma.chatBot.findMany({
         where: {
             OR: (() => {
@@ -86,6 +99,18 @@ async function getHandler(
                 });
                 return or;
             })(),
+
+            // TODO search by name & (description | system message | both)
+            // Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
+
+            temperature: {
+                gte: query.minTemp ? parseFloat(query.minTemp) : 0,
+                lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
+            },
+
+            model: {
+                in: query.models ?? [],
+            },
         },
         select: {
             id: true,
