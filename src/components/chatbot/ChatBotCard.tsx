@@ -21,7 +21,12 @@ export function ChatBotCard(props: ChatBotCardProps) {
     const { data, error, reloading } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
     const loading = data === undefined && reloading;
     if (loading) return <LoadingIcon />;
-    if (error !== null) return <div>{"{Error fetching bot data}"}</div>;
+    if (error !== null) return <div
+        className={clsx(
+            'bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs',
+            'relative overflow-hidden',
+        )}
+    >Deleted chatbot</div>;
     return <ChatBotCardStatic chatbot={data!} onEdit={() => { }} />;
 }
 
