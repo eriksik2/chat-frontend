@@ -26,7 +26,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
         }}
     >
         <div
-            className='w-full bg-slate-300 rounded px-2 flex flex-row items-center gap-2'
+            className='w-full bg-gradient-to-br from-slate-400/60 via-slate-300 to-slate-400/50 shadow-inner rounded px-2 flex flex-row items-center gap-2'
             onClick={() => !isFeatured && setOpen(!open)}
         >
             {!isFeatured && <FaAngleDown

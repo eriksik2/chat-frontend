@@ -33,7 +33,7 @@ export default function ChatBotCard(props: ChatBotCardProps) {
 
     return <div
         className={clsx(
-            'bg-gradient-to-br from-zinc-400/80 via-zinc-300 to-zinc-400/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs',
+            'bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs',
             'relative overflow-hidden',
         )}
         onMouseMove={e => {
@@ -70,7 +70,7 @@ export default function ChatBotCard(props: ChatBotCardProps) {
         </div>
         <div className='flex flex-row justify-end gap-2 pt-2'>
             <button
-                className='bg-green-100 rounded p-1 text-sm'
+                className='bg-blue-500 rounded shadow-inner p-1 text-sm'
                 onClick={async () => {
                     const response = await post({
                         chatName: `New chat with ${props.chatbot.name}`,

@@ -9,6 +9,8 @@ import useSWR from 'swr';
 import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
 import ChatBotEditStatic, { ChatBotEdit } from './ChatBotEdit';
 import { useApiPOST } from '@/api/fetcher';
+import clsx from 'clsx';
+import ChatBotFilters, { Filter } from './ChatBotFilters';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
     const map = new Map<string, T[]>();
@@ -31,6 +33,14 @@ type ChatBotListProps = {
 
 export default function ChatBotList(props: ChatBotListProps) {
 
+    const [filter, setFilter] = useState<Filter>({
+        search: "",
+        searchDescription: true,
+        searchSystemMessage: false,
+        models: ["gpt-4", "gpt-3.5-turbo"],
+        temperature: [0, 2],
+    });
+
     const data = useSWR("/api/bots", (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>));
     const bots = data.data;
     const loading = data.isLoading;
@@ -48,36 +58,45 @@ export default function ChatBotList(props: ChatBotListProps) {
         return keys;
     }).entries()), [bots]);
 
-    return <div className='flex flex-col items-stretch justify-start absolute top-0 left-0 right-0 bottom-0'>
-        <div className='w-full shadow-xl z-30'>
-            <div className='w-2/5 p-4 py-6'>
-                <h1 className='text-5xl pb-2'>Chatbots</h1>
-                <p>
-                    List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
-
-                </p>
-                <br />
-                <p>
-                    Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
-                </p>
+    return <div className='absolute top-0 left-0 right-0 bottom-0'>
+        <div className='overflow-auto no-scrollbar'>
+            <div className={clsx(
+                'flex flex-col lg:flex-row',
+                'px-4 py-6 gap-4'
+            )}>
+                <div className='lg:w-2/5'>
+                    <h1 className='text-5xl pb-2'>Chatbots</h1>
+                    <p>
+                        List of chatbots tagged by categories. You can select a pre-existing bot or add, edit, and remove chatbots as needed.
+                    </p>
+                    <br />
+                    <p>
+                        Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
+                    </p>
+                </div>
+                <div className="flex-grow flex flex-col items-center justify-center">
+                    <ChatBotFilters
+                        value={filter}
+                        onChange={setFilter}
+                    />
+                </div>
+            </div>
+            <div className=' flex flex-col gap-2 px-4 pt-4'>
+                {(loading && bots === undefined) && <div>Loading...</div>}
+                {groupedBots.map(([category, bots]) => {
+                    return <ChatBotListCategory
+                        key={category}
+                        bots={bots}
+                        category={category}
+                        onEdit={(id) => setEditId(id)}
+                    />;
+                })}
+                <button
+                    className="text-xl"
+                    onClick={() => setShowAdd(true)}
+                ><FaCirclePlus /></button>
             </div>
         </div>
-        <div className='overflow-auto no-scrollbar flex flex-col gap-2 px-4 pt-4'>
-            {(loading && bots === undefined) && <div>Loading...</div>}
-            {groupedBots.map(([category, bots]) => {
-                return <ChatBotListCategory
-                    key={category}
-                    bots={bots}
-                    category={category}
-                    onEdit={(id) => setEditId(id)}
-                />;
-            })}
-            <button
-                className="text-xl"
-                onClick={() => setShowAdd(true)}
-            ><FaCirclePlus /></button>
-        </div>
-
         {showAdd && <Modal onClose={() => setShowAdd(false)}>
             <ChatBotEditStatic
                 onClose={() => setShowAdd(false)}
@@ -94,5 +113,5 @@ export default function ChatBotList(props: ChatBotListProps) {
                 onSave={(bot) => setEditId(null)}
             />
         </Modal>}
-    </div>
+    </div>;
 }

@@ -6,6 +6,7 @@ import { authOptions } from "../auth/[...nextauth]";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 
+
 export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
     select: {
         id: true,
