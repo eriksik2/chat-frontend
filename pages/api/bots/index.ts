@@ -83,31 +83,66 @@ async function getHandler(
 
     const bots = await prisma.chatBot.findMany({
         where: {
-            OR: (() => {
-                const or: Prisma.ChatBotWhereInput[] = [];
-                if (session && session.user && session.user.email) {
-                    or.push({
-                        author: {
-                            email: session.user.email,
-                        },
-                    });
-                }
-                or.push({
-                    publishedAt: {
-                        lte: new Date(),
-                    }
-                });
-                return or;
-            })(),
+            AND: [
+                { // User is author or bot is published
+                    OR: (() => {
+                        const or: Prisma.ChatBotWhereInput[] = [];
+                        if (session && session.user && session.user.email) {
+                            or.push({
+                                author: {
+                                    email: session.user.email,
+                                },
+                            });
+                        }
+                        or.push({
+                            publishedAt: {
+                                lte: new Date(),
+                            }
+                        });
+                        return or;
+                    })(),
+                },
 
-            // TODO search by name & (description | system message | both)
-            // Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
+                // TODO Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
+                { // Search by name, description, or system message
+                    OR: (() => {
+                        const or: Prisma.ChatBotWhereInput[] = [];
+                        if (query.search) {
+                            or.push({
+                                name: {
+                                    contains: query.search,
+                                    mode: "insensitive",
+                                },
+                            });
+                            if (query.searchByDesc) {
+                                or.push({
+                                    description: {
+                                        contains: query.search,
+                                        mode: "insensitive",
+                                    },
+                                });
+                            }
+                            if (query.searchBySysm) {
+                                or.push({
+                                    systemMessage: {
+                                        contains: query.search,
+                                        mode: "insensitive",
+                                    },
+                                });
+                            }
+                        }
+                        return or;
+                    })(),
+                },
+            ],
 
+            // Filter by temperature
             temperature: {
                 gte: query.minTemp ? parseFloat(query.minTemp) : 0,
                 lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
             },
 
+            // Filter by model
             model: {
                 in: query.models ?? [],
             },
