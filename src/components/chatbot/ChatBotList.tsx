@@ -7,7 +7,7 @@ import { FaCirclePlus } from 'react-icons/fa6';
 import ChatBotListCategory from './ChatBotListCategory';
 import useSWR from 'swr';
 import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
-import ChatBotEditStatic from './ChatBotEdit';
+import ChatBotEditStatic, { ChatBotEdit } from './ChatBotEdit';
 import { useApiPOST } from '@/api/fetcher';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
@@ -38,6 +38,7 @@ export default function ChatBotList(props: ChatBotListProps) {
     const { post: postBot, error: postError } = useApiPOST<ApibotsPOSTBody, never>(`/api/bots`);
 
     const [showAdd, setShowAdd] = useState<boolean>(false);
+    const [editId, setEditId] = useState<string | null>(null);
 
     const groupedBots = useMemo(() => Array.from(groupByMulti(bots ?? [], bot => {
         const keys = new Array<string>();
@@ -68,6 +69,7 @@ export default function ChatBotList(props: ChatBotListProps) {
                     key={category}
                     bots={bots}
                     category={category}
+                    onEdit={(id) => setEditId(id)}
                 />;
             })}
             <button
@@ -83,6 +85,13 @@ export default function ChatBotList(props: ChatBotListProps) {
                     setShowAdd(false);
                     postBot(bot);
                 }}
+            />
+        </Modal>}
+        {editId !== null && <Modal onClose={() => setEditId(null)}>
+            <ChatBotEdit
+                id={editId}
+                onClose={() => setEditId(null)}
+                onSave={(bot) => setEditId(null)}
             />
         </Modal>}
     </div>

@@ -10,6 +10,7 @@ import { ApibotsGETResponse } from '../../../pages/api/bots';
 type ChatBotListCategoryProps = {
     bots: ApibotsGETResponse;
     category: string | null;
+    onEdit: (id: string) => void;
 };
 
 
@@ -45,7 +46,11 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
                 )}
             >
                 {props.bots.map((chatbot, i) => {
-                    return <ChatBotCard key={chatbot.id} chatbot={chatbot} />;
+                    return <ChatBotCard
+                        key={chatbot.id}
+                        chatbot={chatbot}
+                        onEdit={props.onEdit}
+                    />;
                 })}
             </div>
         </div>

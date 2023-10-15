@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useApiGET, useApiPOST } from '@/api/fetcher';
 import { ApiBotPOSTBody, ApiBotPOSTResponse, ApibotGETResponse } from '../../../pages/api/bots/[bot]';
+import LoadingIcon from '../util/LoadingIcon';
+import clsx from 'clsx';
+import Textbox from '../util/Textbox';
 
 type ChatBotEditStaticProps = {
     chatbot?: ApibotGETResponse;
@@ -20,23 +23,26 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
     const [temperature, setTemperature] = useState<number>(props.chatbot?.temperature ?? 0.7);
     const [systemMessage, setSystemMessage] = useState<string>(props.chatbot?.systemMessage ?? "");
 
-    return <div className='bg-slate-300 roundeds p-2'>
+    return <div className={clsx(
+        'rounded-md shadow-inner p-2',
+        'bg-gradient-to-br from-slate-400/70 via-slate-300 to-slate-400/60'
+    )}>
         <div className='grid grid-cols-3 gap-6 align-middle p-2'>
             <div className='flex items-center h-full col-start-1 row-start-1'>
                 <p>Name</p>
             </div>
-            <input
+            <Textbox
                 className='col-start-2 row-start-1'
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={value => setName(value)}
             />
             <div className='flex items-center h-full col-start-1 row-start-2'>
                 <p>Description</p>
             </div>
-            <textarea
-                className='h-36 col-start-2 row-start-2 resize-none'
+            <Textbox
+                className='h-36 col-start-2 row-start-2'
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={value => setDescription(value)}
             />
             <div className='col-start-3 row-start-1 row-span-2 flex flex-col gap-6'>
                 <div className='flex flex-row w-full gap-3 justify-stretch'>
@@ -92,10 +98,10 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
             <div className='flex items-center h-full col-start-1 row-start-3'>
                 <p>System message</p>
             </div>
-            <textarea
-                className='h-56 col-start-2 row-start-3 col-span-2 resize-none'
+            <Textbox
+                className='h-56 col-start-2 row-start-3 col-span-2'
                 value={systemMessage}
-                onChange={(e) => setSystemMessage(e.target.value)}
+                onChange={(value) => setSystemMessage(value)}
             />
         </div>
         <div className='flex flex-row justify-end gap-2 p-2'>
@@ -135,7 +141,7 @@ export function ChatBotEdit(props: ChatBotEditProps) {
     const { data, error } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
     const { post, error: postError } = useApiPOST<ApiBotPOSTBody, ApiBotPOSTResponse>(`/api/bots/${props.id}`);
 
-    if (data === null) return null;
+    if (data === undefined) return <LoadingIcon />;
 
     return <ChatBotEditStatic
         chatbot={data}

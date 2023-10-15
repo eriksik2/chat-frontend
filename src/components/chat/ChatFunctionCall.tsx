@@ -2,7 +2,8 @@ import AIFunction from "@/state/AIFunction";
 import { predefinedFunctions } from "@/state/PredefinedFunctions";
 import clsx from "clsx";
 import { useState } from "react";
-import { FaCircleNotch, FaAngleDown, FaCheck } from "react-icons/fa6";
+import { FaAngleDown, FaCheck } from "react-icons/fa6";
+import LoadingIcon from "../util/LoadingIcon";
 
 type ChatFunctionCallProps = {
     name: string;
@@ -30,7 +31,7 @@ export default function ChatFunctionCall(props: ChatFunctionCallProps) {
                 {inProgress ?
                     <span className='flex gap-2 items-center'>
                         <h3>Using {func.display_name}</h3>
-                        <FaCircleNotch className='animate-spin' />
+                        <LoadingIcon />
                     </span>
                     :
                     <span className='flex gap-2 items-center'>
