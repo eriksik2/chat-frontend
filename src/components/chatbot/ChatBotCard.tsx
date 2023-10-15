@@ -1,7 +1,7 @@
 import { FaPen, FaTrash } from 'react-icons/fa6';
 import clsx from 'clsx';
 import { ApibotsGETResponse } from '../../../pages/api/bots';
-import { useApiPOST } from '@/api/fetcher';
+import { useApiGET, useApiPOST } from '@/api/fetcher';
 import { ApiChatsPOSTBody, ApiChatsPOSTResponse } from '../../../pages/api/chats';
 import { useRouter } from 'next/router';
 import Modal from '../Modal';
@@ -9,8 +9,23 @@ import { ChatBotEdit } from './ChatBotEdit';
 import { useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { useSession } from 'next-auth/react';
+import LoadingIcon from '../util/LoadingIcon';
+import { ApibotGETResponse } from '../../../pages/api/bots/[bot]';
+
 
 type ChatBotCardProps = {
+    id: string;
+};
+
+export function ChatBotCard(props: ChatBotCardProps) {
+    const { data, error, reloading } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
+    const loading = data === undefined && reloading;
+    if (loading) return <LoadingIcon />;
+    if (error !== null) return <div>{"{Error fetching bot data}"}</div>;
+    return <ChatBotCardStatic chatbot={data!} onEdit={() => { }} />;
+}
+
+type ChatBotCardStaticProps = {
     chatbot: ApibotsGETResponse[0];
     onEdit: (id: string) => void;
 };
@@ -19,7 +34,7 @@ const tiltRotationFactor = 3;
 const tiltTranslationFactor = 2;
 const tiltZoomFactor = 1.2;
 
-export default function ChatBotCard(props: ChatBotCardProps) {
+export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
     const swr = useSWRConfig();
     const router = useRouter();
     const { post, error } = useApiPOST<ApiChatsPOSTBody, ApiChatsPOSTResponse>(`/api/chats`);

@@ -8,9 +8,17 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export type ApibotGETResponse = Prisma.ChatBotGetPayload<{
     select: {
+        id: true,
         name: true,
         description: true,
         categories: true,
+        featured: true,
+        author: {
+            select: {
+                name: true,
+                email: true,
+            },
+        },
 
         model: true,
         temperature: true,
@@ -95,9 +103,17 @@ async function getHandler(
                 ],
             },
             select: {
+                id: true,
                 name: true,
                 description: true,
                 categories: true,
+                featured: true,
+                author: {
+                    select: {
+                        name: true,
+                        email: true,
+                    },
+                },
 
                 model: true,
                 temperature: true,

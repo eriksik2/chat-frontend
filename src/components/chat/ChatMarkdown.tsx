@@ -8,6 +8,7 @@ import remarkMath from "remark-math";
 
 import ChatCode from "./ChatCode";
 import remarkGfm from "remark-gfm";
+import ChatBotCardStatic, { ChatBotCard } from "../chatbot/ChatBotCard";
 
 type ChatMarkdownProps = {
     content: string;
@@ -99,6 +100,13 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
             },
 
             a(props) {
+                const isBotCardTest = /https:\/\/(?:chat\.eriksik.com|localhost|localhost:3000)\/bots\/([-_0-9a-zA-Z]+)/.exec(props.href as string);
+                if (isBotCardTest) {
+                    const botId = isBotCardTest[1];
+                    return <div className="w-full flex justify-center p-2">
+                        <ChatBotCard id={botId} />
+                    </div>;
+                }
                 const href = (props.href as string).replaceAll("&amp;", "&")
                 return <a className='text-blue-500 hover:underline visited:text-purple-500' {...props} href={href} />;
             },

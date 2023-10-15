@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react';
-import ChatBotCard from './ChatBotCard';
+import ChatBotCardStatic from './ChatBotCard';
 
 import { FaAngleDown } from 'react-icons/fa6';
 import clsx from 'clsx';
@@ -18,7 +18,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
 
     const isFeatured = props.category === '⭐Featured';
 
-    const [open, setOpen] = useState(isFeatured ? true : false);
+    const [open, setOpen] = useState(isFeatured ? true : true);
 
     return <div
         style={{
@@ -46,7 +46,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
                 )}
             >
                 {props.bots.map((chatbot, i) => {
-                    return <ChatBotCard
+                    return <ChatBotCardStatic
                         key={chatbot.id}
                         chatbot={chatbot}
                         onEdit={props.onEdit}

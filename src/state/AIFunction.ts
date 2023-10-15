@@ -11,19 +11,22 @@ export default class AIFunction {
     display_name: string;
     description: string;
     args: ArgumentSpec[];
-    run: (...args: any[]) => Promise<string>;
+    extraSystemMessage: string | null = null;
+    run: (args: any) => Promise<string>;
 
     constructor(
         name: string,
         display_name: string,
         description: string,
         params: ArgumentSpec[],
-        run: (...args: any[]) => Promise<string>,
+        extraSystemMessage: string | null = null,
+        run: (args: any) => Promise<string>,
     ) {
         this.name = name;
         this.display_name = display_name;
         this.description = description;
         this.args = params;
+        this.extraSystemMessage = extraSystemMessage;
         this.run = run;
     }
 
@@ -32,15 +35,17 @@ export default class AIFunction {
         display_name,
         description,
         params,
+        extraSystemMessage,
         run,
     }: {
         name: string;
         display_name: string;
         description: string;
         params: ArgumentSpec[];
+        extraSystemMessage?: string;
         run: (...params: any[]) => Promise<string>;
     }): AIFunction {
-        return new AIFunction(name, display_name, description, params, run);
+        return new AIFunction(name, display_name, description, params, extraSystemMessage ?? null, run);
     }
 
     toOpenAISpec(): OpenAI.Chat.Completions.ChatCompletionCreateParams.Function {
@@ -61,7 +66,7 @@ export default class AIFunction {
         }
     }
 
-    async call(...args: any[]): Promise<string> {
-        return await this.run(...args);
+    async call(args: any): Promise<string> {
+        return await this.run(args);
     }
 }

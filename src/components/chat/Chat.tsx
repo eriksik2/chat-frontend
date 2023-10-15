@@ -18,7 +18,6 @@ export default function Chat(props: ChatProps) {
     const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(`/api/chats/${props.id}`);
     const loading = data === undefined && reloading;
     const chat = data;
-    console.log(chat)
 
     const { post: postMessage, error: postError } = useApiPOST<ApiChatPOSTBody, ApiChatPOSTResponse>(`/api/chats/${props.id}`);
 
@@ -85,6 +84,10 @@ export default function Chat(props: ChatProps) {
                     content: JSON.parse(message.content) as ChatMessageContent[],
                 };
             }), message],
+            [ // Available functions
+                "generate_image",
+                "create_new_chatbot",
+            ]
         );
         setAiCompletion(comp);
     }

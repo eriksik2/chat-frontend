@@ -24,6 +24,7 @@ export default class Completion {
     presence_penalty: number;
     system_message: string | null;
     messages: CompletionMessage[];
+    functions: AIFunction[];
     didRun: boolean = false;
 
     constructor(
@@ -34,6 +35,7 @@ export default class Completion {
         presence_penalty: number,
         system_message: string | null,
         messages: CompletionMessage[],
+        functions: string[] = [],
     ) {
         this.openai = openai;
         this.model = model;
@@ -42,9 +44,22 @@ export default class Completion {
         this.presence_penalty = presence_penalty;
         this.system_message = system_message;
         this.messages = messages;
+        this.functions = functions.map(fn => predefinedFunctions.get(fn)).filter(fn => fn !== undefined) as AIFunction[];
 
-        const extra_system_message = "After calling a function, include the result in your next message in order for the user to see it.";
-        this.system_message = this.system_message === null ? extra_system_message : `${this.system_message}\n\n${extra_system_message}`;
+        if (this.functions.length !== 0) {
+            const extra_system_message = "When calling functions: If you are unsure about what parameter values to use, ask the user. However, dont be afraid to get creative, if the user wants you to.";
+            this.system_message = this.system_message === null ? extra_system_message : `${this.system_message}\n\n${extra_system_message}`;
+        }
+
+        for (const fn of this.functions) {
+            if (fn === undefined) {
+                console.error("Invalid function name:", fn);
+                continue;
+            }
+            if (fn.extraSystemMessage !== null) {
+                this.system_message = this.system_message === null ? fn.extraSystemMessage : `${this.system_message}\n\nWhen calling '${fn.name}': ${fn.extraSystemMessage}`;
+            }
+        }
     }
 
     private convertMessage(message: CompletionMessage): ChatCompletionMessageParam[] | ChatCompletionMessageParam {
@@ -92,8 +107,6 @@ export default class Completion {
             return;
         }
 
-        const fns = predefinedFunctions;
-
         this.didRun = true;
         var messages = [...this.getMessages()];
         var do_continue = true;
@@ -107,7 +120,8 @@ export default class Completion {
             }
             do_continue = false;
             console.log("Prompting AI with messages: ", messages);
-            const fn_specs = [...fns.values()].map((fn) => fn.toOpenAISpec());
+            const fn_specs = this.functions.map((fn) => fn.toOpenAISpec());
+            const has_no_fn = fn_specs.length === 0;
             const stream = await this.openai.chat.completions.create({
                 model: this.model,
                 temperature: this.temperature,
@@ -116,8 +130,8 @@ export default class Completion {
                 stream: true,
                 n: 1,
                 messages: messages,
-                function_call: allow_fn ? "auto" : "none",
-                functions: fn_specs,
+                function_call: has_no_fn ? undefined : (allow_fn ? "auto" : "none"),
+                functions: has_no_fn ? undefined : fn_specs,
             });
             var function_name = "";
             var function_args = "";
@@ -139,7 +153,7 @@ export default class Completion {
             }
             const did_call_fn = function_name !== "";
             if (did_call_fn) {
-                const fn = fns.get(function_name);
+                const fn = predefinedFunctions.get(function_name);
                 if (fn === undefined) {
                     console.error("API returned invalid function name:", function_name);
                     break;
@@ -151,7 +165,7 @@ export default class Completion {
                     console.error("API returned invalid JSON for function arguments:", function_args);
                     break;
                 }
-                const fn_result = await fn.call(...Object.values(arguments_obj));
+                const fn_result = await fn.call(arguments_obj);
                 callback(null, null, null, fn_result);
                 messages.push({
                     role: "function",

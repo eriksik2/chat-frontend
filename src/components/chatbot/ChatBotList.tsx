@@ -10,7 +10,8 @@ import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
 import ChatBotEditStatic, { ChatBotEdit } from './ChatBotEdit';
 import { useApiPOST } from '@/api/fetcher';
 import clsx from 'clsx';
-import ChatBotFilters, { Filter } from './ChatBotFilters';
+import { ChatBotFiltersRealtime, Filter } from './ChatBotFilters';
+import LoadingIcon from '../util/LoadingIcon';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
     const map = new Map<string, T[]>();
@@ -52,7 +53,9 @@ export default function ChatBotList(props: ChatBotListProps) {
         return q.toString();
     }, [filter]);
 
-    const data = useSWR(`/api/bots?${query}`, (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>));
+    const data = useSWR(`/api/bots?${query}`, (url: string) => fetch(url).then(res => res.json() as Promise<ApibotsGETResponse>), {
+        keepPreviousData: true,
+    });
     const bots = data.data;
     const loading = data.isLoading;
 
@@ -86,14 +89,18 @@ export default function ChatBotList(props: ChatBotListProps) {
                     </p>
                 </div>
                 <div className="flex-grow flex flex-col items-center justify-center">
-                    <ChatBotFilters
+                    <ChatBotFiltersRealtime
                         value={filter}
                         onChange={setFilter}
                     />
                 </div>
             </div>
             <div className=' flex flex-col gap-2 px-4 pt-4'>
-                {(loading && bots === undefined) && <div>Loading...</div>}
+                <div className={clsx(
+                    loading ? 'visible' : 'invisible',
+                )}>
+                    <LoadingIcon />
+                </div>
                 {groupedBots.map(([category, bots]) => {
                     return <ChatBotListCategory
                         key={category}

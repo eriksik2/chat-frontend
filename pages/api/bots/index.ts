@@ -43,7 +43,9 @@ export type ApibotsPOSTBody = {
     presence_bias: number;
 };
 
-export type ApibotsPOSTResponse = {};
+export type ApibotsPOSTResponse = {
+    id: string;
+};
 
 export default async function handler(
     req: NextApiRequest,
@@ -172,23 +174,28 @@ async function postHandler(
     req: NextApiRequest,
     res: NextApiResponse<ApibotsPOSTResponse | string>
 ) {
+    const body = req.body as ApibotsPOSTBody;
+    var bot;
     try {
-        await prisma.chatBot.create({
+        bot = await prisma.chatBot.create({
             data: {
-                name: req.body.name,
-                description: req.body.description,
-                categories: req.body.categories,
-                model: req.body.model,
-                systemMessage: req.body.systemMessage,
-                temperature: req.body.temperature,
-                frequency_bias: req.body.frequency_bias,
-                presence_bias: req.body.presence_bias,
+                name: body.name,
+                description: body.description,
+                categories: body.categories,
+                model: body.model,
+                systemMessage: body.systemMessage,
+                temperature: body.temperature,
+                frequency_bias: body.frequency_bias,
+                presence_bias: body.presence_bias,
 
                 author: {
                     connect: {
                         email: session!.user!.email!,
                     },
                 }
+            },
+            select: {
+                id: true,
             },
         });
     } catch (e) {
@@ -199,13 +206,13 @@ async function postHandler(
             return;
         } else {
             res.statusCode = 500;
-            res.send("Failed to create chatbot: error occurred");
+            res.send("Failed to create chatbot: error occurred: " + e);
             res.end();
             return;
         }
     }
 
     res.statusCode = 200;
-    res.json({});
+    res.json(bot);
     res.end();
 }

@@ -115,6 +115,10 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
                 className='bg-blue-400 rounded p-2'
                 onClick={() => {
                     props.onSave({
+                        id: props.chatbot?.id ?? "",
+                        // TODO lol
+                        featured: props.chatbot?.featured ?? false,
+                        author: props.chatbot?.author ?? undefined as any,
                         name,
                         description,
                         model,
