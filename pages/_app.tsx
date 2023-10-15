@@ -3,9 +3,10 @@ import './globals.css'
 
 import type { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
-import Link from 'next/link'
 import clsx from 'clsx'
 import RootLayout from '@/components/Layout/RootLayout'
+
+import { Analytics } from '@vercel/analytics/react';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,5 +24,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
                 {getLayout(<Component {...pageProps} />)}
             </RootLayout>
         </SessionProvider>
+        <Analytics />
     </div>
 }
