@@ -120,7 +120,16 @@ export default function ChatBotList(props: ChatBotListProps) {
                 onClose={() => setShowAdd(false)}
                 onSave={(bot) => {
                     setShowAdd(false);
-                    postBot(bot);
+                    postBot({
+                        name: bot.name,
+                        description: bot.description,
+                        model: bot.model,
+                        frequency_bias: bot.frequency_bias,
+                        presence_bias: bot.presence_bias,
+                        temperature: bot.temperature,
+                        systemMessage: bot.systemMessage,
+                        categories: [],
+                    });
                 }}
             />
         </Modal>}
@@ -128,7 +137,7 @@ export default function ChatBotList(props: ChatBotListProps) {
             <ChatBotEdit
                 id={editId}
                 onClose={() => setEditId(null)}
-                onSave={(bot) => setEditId(null)}
+                onSave={() => setEditId(null)}
             />
         </Modal>}
     </div>;

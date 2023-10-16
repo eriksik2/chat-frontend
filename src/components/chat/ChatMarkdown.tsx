@@ -104,7 +104,9 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
                 if (isBotCardTest) {
                     const botId = isBotCardTest[1];
                     return <div className="w-full flex justify-center p-2">
-                        <ChatBotCard id={botId} />
+                        <ChatBotCard
+                            id={botId}
+                        />
                     </div>;
                 }
                 const href = (props.href as string).replaceAll("&amp;", "&")

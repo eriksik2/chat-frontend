@@ -7,10 +7,20 @@ import LoadingIcon from '../util/LoadingIcon';
 import clsx from 'clsx';
 import Textbox from '../util/Textbox';
 
+type ChatBotEditData = {
+    name: string;
+    description: string;
+    model: string;
+    frequency_bias: number;
+    presence_bias: number;
+    temperature: number;
+    systemMessage: string | null;
+}
+
 type ChatBotEditStaticProps = {
-    chatbot?: ApibotGETResponse;
+    chatbot?: ChatBotEditData;
     onClose: () => void;
-    onSave: (chatbot: ApibotGETResponse) => void;
+    onSave: (chatbot: ChatBotEditData) => void;
 };
 
 export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
@@ -115,10 +125,6 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
                 className='bg-blue-400 rounded p-2'
                 onClick={() => {
                     props.onSave({
-                        id: props.chatbot?.id ?? "",
-                        // TODO lol
-                        featured: props.chatbot?.featured ?? false,
-                        author: props.chatbot?.author ?? undefined as any,
                         name,
                         description,
                         model,
@@ -126,7 +132,6 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
                         presence_bias,
                         temperature,
                         systemMessage,
-                        categories: [],
                     });
                 }}
             >Save</button>
@@ -138,7 +143,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
 type ChatBotEditProps = {
     id: string;
     onClose: () => void;
-    onSave?: (chatbot: ApibotGETResponse) => void;
+    onSave?: () => void;
 };
 
 export function ChatBotEdit(props: ChatBotEditProps) {
@@ -148,11 +153,28 @@ export function ChatBotEdit(props: ChatBotEditProps) {
     if (data === undefined) return <LoadingIcon />;
 
     return <ChatBotEditStatic
-        chatbot={data}
+        chatbot={{
+            name: data.name,
+            description: data.description,
+            model: data.model,
+            frequency_bias: data.frequency_bias,
+            presence_bias: data.presence_bias,
+            temperature: data.temperature,
+            systemMessage: data.systemMessage,
+        }}
         onClose={props.onClose}
         onSave={(chatbot) => {
-            post(chatbot);
-            if (props.onSave) props.onSave(chatbot);
+            post({
+                name: chatbot.name,
+                description: chatbot.description,
+                model: chatbot.model,
+                frequency_bias: chatbot.frequency_bias,
+                presence_bias: chatbot.presence_bias,
+                temperature: chatbot.temperature,
+                systemMessage: chatbot.systemMessage,
+                categories: data.categories,
+            });
+            if (props.onSave) props.onSave();
         }}
     />;
 }
