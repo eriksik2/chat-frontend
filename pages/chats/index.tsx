@@ -70,6 +70,6 @@ function LogInPrompt(props: LogInPromptProps) {
         <p>You can <Link href="/api/auth/signin" className="text-blue-500 hover:underline visited:text-purple-600">click here</Link> to log in using Google.</p>
         <p>Or click the button on the top right.</p>
         <br />
-        <p>We will never send you an email and we won't have access to any of your personal data.</p>
+        <p>We will never send you an email and we won{"'"}t have access to any of your personal data.</p>
     </div>;
 }
