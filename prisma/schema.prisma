@@ -58,10 +58,11 @@ model User {
     createdAt     DateTime  @default(now()) @map(name: "created_at")
     updatedAt     DateTime  @updatedAt @map(name: "updated_at")
 
-    accounts Account[]
-    sessions Session[]
-    chatbots ChatBot[]
-    chats    Chat[]
+    accounts  Account[]
+    sessions  Session[]
+    chatbots  ChatBot[]
+    chats     Chat[]
+    favorites FavoriteChatBot[]
 
     @@map(name: "users")
 }
@@ -80,12 +81,30 @@ model ChatBot {
     frequency_bias Float   @default(0.0)
     presence_bias  Float   @default(0.0)
 
-    publishedAt DateTime?
+    published PublishedChatBot?
 
     chats Chat[]
 
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
+}
+
+model PublishedChatBot {
+    chatbot ChatBot @relation(fields: [id], references: [id], onDelete: Cascade)
+    id      String  @id
+
+    publishedAt DateTime @default(now()) @map(name: "published_at")
+
+    favorites FavoriteChatBot[]
+}
+
+model FavoriteChatBot {
+    user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    Int
+    chatbot   PublishedChatBot @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+    chatbotId String
+
+    @@unique([userId, chatbotId])
 }
 
 model Chat {

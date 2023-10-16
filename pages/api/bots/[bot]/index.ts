@@ -2,7 +2,7 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session, getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
+import { authOptions } from "../../auth/[...nextauth]";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 
@@ -17,6 +17,12 @@ export type ApibotGETResponse = Prisma.ChatBotGetPayload<{
             select: {
                 name: true,
                 email: true,
+            },
+        },
+
+        published: {
+            select: {
+                publishedAt: true,
             },
         },
 
@@ -96,8 +102,10 @@ async function getHandler(
                         },
                     },
                     {
-                        publishedAt: {
-                            lte: new Date(),
+                        published: {
+                            publishedAt: {
+                                lte: new Date(),
+                            }
                         }
                     }
                 ],
@@ -112,6 +120,11 @@ async function getHandler(
                     select: {
                         name: true,
                         email: true,
+                    },
+                },
+                published: {
+                    select: {
+                        publishedAt: true,
                     },
                 },
 

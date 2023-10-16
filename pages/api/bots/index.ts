@@ -18,16 +18,8 @@ export type ApibotsGETQuery = {
 export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
     select: {
         id: true,
-        name: true,
-        description: true,
         categories: true,
         featured: true,
-        author: {
-            select: {
-                name: true,
-                email: true,
-            },
-        },
     }
 }>[];
 
@@ -97,8 +89,10 @@ async function getHandler(
                             });
                         }
                         or.push({
-                            publishedAt: {
-                                lte: new Date(),
+                            published: {
+                                publishedAt: {
+                                    lte: new Date(),
+                                }
                             }
                         });
                         return or;
@@ -151,16 +145,8 @@ async function getHandler(
         },
         select: {
             id: true,
-            name: true,
-            description: true,
             categories: true,
             featured: true,
-            author: {
-                select: {
-                    name: true,
-                    email: true,
-                },
-            },
         }
     }) ?? [];
 

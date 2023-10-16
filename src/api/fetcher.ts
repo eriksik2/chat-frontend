@@ -87,3 +87,44 @@ export function useApiPOST<Tbody, Tresponse>(url: string): ApiPOSTResponse<Tbody
         error,
     };
 }
+
+
+export type ApiDELETEResponse<Tbody, Tresponse> = {
+    del: (body: Tbody) => Promise<Tresponse>;
+    error: ApiError | null;
+};
+
+
+export function useApiDELETE<Tbody, Tresponse>(url: string): ApiDELETEResponse<Tbody, Tresponse> {
+    const swr = useSWRConfig();
+    const [error, setError] = useState<ApiError | null>(null);
+
+    async function del(body: Tbody) {
+        const res = await fetch(url, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+            const errdata = await res.text();
+            setError(new ApiError(errdata, errdata, res.status));
+            throw error;
+        }
+
+        // Invalidate all pages above this one.
+        // This is an assumption that I try to hold true in the API design.
+        const route = url.split("/").slice(url.startsWith("/") ? 1 : 0);
+        for (let i = 0; i <= route.length; i++) {
+            swr.mutate("/" + route.slice(0, i).join("/"));
+        }
+
+        return res.json() as Promise<Tresponse>;
+    }
+
+    return {
+        del,
+        error,
+    };
+}

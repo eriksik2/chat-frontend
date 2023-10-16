@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from 'react';
-import ChatBotCardStatic from './ChatBotCard';
+import ChatBotCardStatic, { ChatBotCard } from './ChatBotCard';
 
 import { FaAngleDown } from 'react-icons/fa6';
 import clsx from 'clsx';
@@ -46,9 +46,9 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
                 )}
             >
                 {props.bots.map((chatbot, i) => {
-                    return <ChatBotCardStatic
+                    return <ChatBotCard
                         key={chatbot.id}
-                        chatbot={chatbot}
+                        id={chatbot.id}
                         onEdit={props.onEdit}
                     />;
                 })}
