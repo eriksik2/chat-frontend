@@ -1,4 +1,4 @@
-import { FaPen, FaTrash } from 'react-icons/fa6';
+import { FaPen, FaStar, FaTrash } from 'react-icons/fa6';
 import clsx from 'clsx';
 import { ApibotsGETResponse } from '../../../pages/api/bots';
 import { useApiDELETE, useApiGET, useApiPOST } from '@/api/fetcher';
@@ -12,6 +12,7 @@ import { useSession } from 'next-auth/react';
 import LoadingIcon from '../util/LoadingIcon';
 import { ApibotGETResponse } from '../../../pages/api/bots/[bot]';
 import { ApiBotPublishDELETEResponse, ApiBotPublishPOSTResponse } from '../../../pages/api/bots/[bot]/publish';
+import { ApiBotFavouriteDELETEResponse, ApiBotFavouriteGETResponse, ApiBotFavouritePOSTResponse } from '../../../pages/api/bots/[bot]/favourite';
 
 
 type ChatBotCardProps = {
@@ -20,20 +21,26 @@ type ChatBotCardProps = {
 };
 
 export function ChatBotCard(props: ChatBotCardProps) {
-    const { data, error, reloading } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
-    const loading = data === undefined && reloading;
+    const { data: chatbot, error: chatbotError, reloading: chatbotReloading } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
+    const { data: isFav, error: favError, reloading: favReloading } = useApiGET<ApiBotFavouriteGETResponse>(`/api/bots/${props.id}/favourite`);
+    const loading = chatbot === undefined && chatbotReloading;
     if (loading) return <LoadingIcon />;
-    if (error !== null) return <div
+    if (chatbotError !== null) return <div
         className={clsx(
             'bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs',
             'relative overflow-hidden',
         )}
-    >Deleted chatbot</div>;
-    return <ChatBotCardStatic chatbot={data!} onEdit={props.onEdit} />;
+    >Error while loading chatbot</div>;
+    return <ChatBotCardStatic
+        chatbot={chatbot!}
+        isFav={isFav?.favourite}
+        onEdit={props.onEdit}
+    />;
 }
 
 type ChatBotCardStaticProps = {
     chatbot: ApibotGETResponse;
+    isFav?: boolean;
     onEdit: (id: string) => void;
 };
 
@@ -49,7 +56,11 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
     const { post: publish, error: publishError } = useApiPOST<{}, ApiBotPublishPOSTResponse>(`/api/bots/${props.chatbot.id}/publish`);
     const { del: unpublish, error: unpublishError } = useApiDELETE<{}, ApiBotPublishDELETEResponse>(`/api/bots/${props.chatbot.id}/publish`);
 
+    const { post: favourite, error: favouriteError } = useApiPOST<{}, ApiBotFavouritePOSTResponse>(`/api/bots/${props.chatbot.id}/favourite`);
+    const { del: unfavourite, error: unfavouriteError } = useApiDELETE<{}, ApiBotFavouriteDELETEResponse>(`/api/bots/${props.chatbot.id}/favourite`);
+
     const isPublished = props.chatbot.published !== null;
+    const isFavourite = props.isFav ?? null;
 
     const { data: session } = useSession();
     const ownsBot = props.chatbot.author.email !== null && session?.user?.email === props.chatbot.author.email;
@@ -108,6 +119,18 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
             >
                 New Chat
             </button>
+            {isFavourite !== null && <button
+                className={clsx(
+                    'bg-slate-500 rounded p-1',
+                    ownsBot ? 'block' : 'hidden',
+                )}
+                onClick={async () => {
+                    if (isFavourite) await unfavourite({});
+                    else await favourite({});
+                }}
+            >
+                {isFavourite ? <FaStar className='text-yellow-300' /> : <FaStar className='text-gray-400' />}
+            </button>}
             <div className='flex-grow' />
             <button
                 className={clsx(

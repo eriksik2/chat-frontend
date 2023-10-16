@@ -7,8 +7,6 @@ import { authOptions } from "../../auth/[...nextauth]";
 
 
 
-export type ApiBotPublishPOSTBody = {};
-
 export type ApiBotPublishPOSTResponse = {};
 export type ApiBotPublishDELETEResponse = {};
 
