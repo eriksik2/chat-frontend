@@ -26,21 +26,20 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     return <div
         className={clsx(
             'overflow-hidden',
-            'flex flex-row flex-grow group/msg min-h-[4rem] rounded-xl',
+            'flex flex-row justify-stretch flex-grow min-h-[4rem]',
         )}
     >
-        <div className='px-2 my-4 w-[20%] text-black text-lg  border-r border-slate-400'>
+        <div className='px-2 my-4 w-[20%] text-black text-lg flex-none border-r border-slate-400'>
             <p className='text-end'>{props.author}</p>
         </div>
-        <div className='p-4 pb-2 w-full'>
+        <div className='p-4 pb-2 flex-shrink w-[80%]'>
             {props.content.map((cont, index) => {
                 if (cont.type === "md") {
-                    return <div key={index}>
-                        <ChatMarkdown
-                            content={cont.content}
-                            loading={props.streaming}
-                        />
-                    </div>;
+                    return <ChatMarkdown
+                        key={index}
+                        content={cont.content}
+                        loading={props.streaming}
+                    />;
                 } else if (cont.type === "function") {
                     return <ChatFunctionCall
                         key={index}
@@ -51,7 +50,7 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
                 }
             })}
         </div>
-    </div>
+    </div>;
 }
 
 type ChatMessageStreamingComponentProps = {

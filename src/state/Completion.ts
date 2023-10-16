@@ -47,7 +47,7 @@ export default class Completion {
         this.functions = functions.map(fn => predefinedFunctions.get(fn)).filter(fn => fn !== undefined) as AIFunction[];
 
         if (this.functions.length !== 0) {
-            const extra_system_message = "When calling functions: If you are unsure about what parameter values to use, ask the user. However, dont be afraid to get creative, if the user wants you to.";
+            const extra_system_message = "When calling functions: If you are unsure about what parameter values to use, ask the user. However, dont be afraid to get creative, if the user wants you to. Do not write out the function calls you intend to use and dont ask for permission before executing them. Just do it! Always provide the result of a function call to the user. Write the result in a user friendly way, using markdown syntax.";
             this.system_message = this.system_message === null ? extra_system_message : `${this.system_message}\n\n${extra_system_message}`;
         }
 

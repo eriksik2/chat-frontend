@@ -70,10 +70,10 @@ export default function ChatCode(props: ChatCodeProps) {
         }
     }
     function render({ rows, stylesheet, useInlineStyles }: rendererProps): React.ReactNode {
-        return <div className='rounded overflow-hidden bg-white' tabIndex={0} onBlur={() => {
+        return <div className='rounded bg-white' tabIndex={0} onBlur={() => {
             setHighlight(null);
         }}>
-            <div className='flex flex-col items-stretch '>
+            <div className='flex flex-col items-stretch overflow-x-auto'>
                 {rows.map((row, i) => <span key={i} className='px-2 border-y border-transparent hover:border-slate-400 '>
                     {innerRender(row, prism, i)}
                 </span>)}
@@ -110,7 +110,7 @@ export default function ChatCode(props: ChatCodeProps) {
         language={props.language}
         renderer={render}
         style={{}}
-        PreTag={"a"}
+        PreTag={"span"}
     >
         {props.content}
     </SyntaxHighlighter>;

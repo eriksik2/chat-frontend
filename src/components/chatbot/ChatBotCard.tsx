@@ -63,6 +63,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
     const isFavourite = props.isFav ?? null;
 
     const { data: session } = useSession();
+    const loggedIn = session !== null;
     const ownsBot = props.chatbot.author.email !== null && session?.user?.email === props.chatbot.author.email;
 
     const [doTilt, setDoTilt] = useState<boolean>(false);
@@ -108,6 +109,10 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
             <button
                 className='bg-blue-500 rounded shadow-inner p-1 text-sm'
                 onClick={async () => {
+                    if (!loggedIn) {
+                        router.push('/chats');
+                        return;
+                    }
                     const response = await postChat({
                         chatName: `New chat with ${props.chatbot.name}`,
                         chatbotId: props.chatbot.id,

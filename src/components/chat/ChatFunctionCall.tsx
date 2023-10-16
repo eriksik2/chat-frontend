@@ -25,7 +25,7 @@ export default function ChatFunctionCall(props: ChatFunctionCallProps) {
         }
     }
 
-    return <div className='rounded-xl overflow-hidden'>
+    return <div className='rounded-xl overflow-hidden m-1'>
         <div className='flex justify-between bg-gradient-to-br from-slate-400/50 via-slate-300 to-slate-400/75 shadow-inner'>
             <div className='p-2'>
                 {inProgress ?
