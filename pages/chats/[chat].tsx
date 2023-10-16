@@ -55,11 +55,10 @@ function ChatPageLayout(props: { page: ReactElement }) {
     const loading = chats === undefined && reloading;
 
     // TODO better loading and null handling
-    if (error !== null) return <div>
-        <h1 className="text-2xl">Error</h1>
-        <div>{error.status}</div>
-        <div>{error.message}</div>
-    </div>;
+    if (error !== null) {
+        console.error("Error while loading chats side bar: ", error.status, error.message);
+        return props.page;
+    }
 
     if ((chats ?? []).length === 0) return props.page;
 

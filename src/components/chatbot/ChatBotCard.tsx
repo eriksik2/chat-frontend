@@ -110,7 +110,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
                 className='bg-blue-500 rounded shadow-inner p-1 text-sm'
                 onClick={async () => {
                     if (!loggedIn) {
-                        router.push('/chats');
+                        router.push(`/chats?chatbot=${props.chatbot.id}`);
                         return;
                     }
                     const response = await postChat({

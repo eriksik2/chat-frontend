@@ -35,7 +35,7 @@ export type ApiGETOptions<T> = {
     refreshInterval?: number | ((data: T | undefined) => number);
 };
 
-export function useApiGET<T>(url: string, opts?: ApiGETOptions<T>): ApiGETResponse<T> {
+export function useApiGET<T>(url: string | null, opts?: ApiGETOptions<T>): ApiGETResponse<T> {
     const { data, error, isLoading, mutate } = useSWR<T, ApiError>(url, fetcherGET<T>(), {
         refreshInterval: opts?.refreshInterval,
     });
