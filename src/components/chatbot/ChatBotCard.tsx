@@ -17,7 +17,7 @@ import { ApiBotFavouriteDELETEResponse, ApiBotFavouriteGETResponse, ApiBotFavour
 
 type ChatBotCardProps = {
     id: string;
-    onEdit: (id: string) => void;
+    onEdit?: (id: string) => void;
 };
 
 export function ChatBotCard(props: ChatBotCardProps) {
@@ -41,7 +41,7 @@ export function ChatBotCard(props: ChatBotCardProps) {
 type ChatBotCardStaticProps = {
     chatbot: ApibotGETResponse;
     isFav?: boolean;
-    onEdit: (id: string) => void;
+    onEdit?: (id: string) => void;
 };
 
 const tiltRotationFactor = 3;
@@ -144,15 +144,15 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
             >
                 {isPublished ? 'Unpublish' : 'Publish'}
             </button>
-            <button
+            {props.onEdit && <button
                 className={clsx(
                     'bg-slate-500 rounded p-1',
                     ownsBot ? 'block' : 'hidden',
                 )}
-                onClick={() => props.onEdit(props.chatbot.id)}
+                onClick={() => props.onEdit?.(props.chatbot.id)}
             >
                 <FaPen />
-            </button>
+            </button>}
             <button
                 className={clsx(
                     'bg-red-400 rounded p-1',
