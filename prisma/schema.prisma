@@ -58,11 +58,12 @@ model User {
     createdAt     DateTime  @default(now()) @map(name: "created_at")
     updatedAt     DateTime  @updatedAt @map(name: "updated_at")
 
-    accounts  Account[]
-    sessions  Session[]
-    chatbots  ChatBot[]
-    chats     Chat[]
-    favorites FavoriteChatBot[]
+    accounts       Account[]
+    sessions       Session[]
+    chatbots       ChatBot[]
+    chats          Chat[]
+    favorites      FavoriteChatBot[]
+    ChatBotRatings ChatBotRating[]
 
     @@map(name: "users")
 }
@@ -85,6 +86,10 @@ model ChatBot {
 
     chats Chat[]
 
+    ChatBotRatings ChatBotRating[]
+    ratingsTotal   Int             @default(0)
+    ratingsCount   Int             @default(0)
+
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
 }
@@ -103,8 +108,20 @@ model FavoriteChatBot {
     userId    Int
     chatbot   PublishedChatBot @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
     chatbotId String
+    createdAt DateTime         @default(now()) @map(name: "created_at")
 
     @@id([userId, chatbotId])
+}
+
+model ChatBotRating {
+    chatbot   ChatBot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+    chatbotId String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId    Int
+    rating    Int
+    createdAt DateTime @default(now()) @map(name: "created_at")
+
+    @@id([chatbotId, userId])
 }
 
 model Chat {

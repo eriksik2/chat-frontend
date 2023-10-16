@@ -1,22 +1,29 @@
 import prisma from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { Session, getServerSession } from "next-auth";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { authOptions } from "../../auth/[...nextauth]";
 
 
-export type ApiBotFavouriteGETResponse = {
-    favourite: boolean;
+export type ApiBotRateGETResponse = {
+    yourRating: number | null;
+    average: {
+        ratingsTotal: number;
+        ratingsCount: number;
+    };
 };
 
-export type ApiBotFavouritePOSTResponse = {};
-export type ApiBotFavouriteDELETEResponse = {};
+export type ApiBotRatePOSTBody = {
+    rating: number;
+};
+
+export type ApiBotRatePOSTResponse = {};
+export type ApiBotRateDELETEResponse = {};
 
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse<ApiBotFavouriteGETResponse | ApiBotFavouritePOSTResponse | ApiBotFavouriteDELETEResponse | string>
+    res: NextApiResponse<ApiBotRateGETResponse | ApiBotRatePOSTResponse | ApiBotRateDELETEResponse | string>
 ) {
     const session = await getServerSession(req, res, authOptions);
 
@@ -52,15 +59,11 @@ export default async function handler(
 async function getHandler(
     session: Session | null,
     req: NextApiRequest,
-    res: NextApiResponse<ApiBotFavouriteGETResponse | string>
+    res: NextApiResponse<ApiBotRateGETResponse | string>
 ) {
-    if (session === null || session.user === undefined || !session.user.email) {
-        res.statusCode = 200;
-        res.json({ favourite: false, });
-        res.end();
-        return;
-    }
-    var bot;
+    var personal: {
+        rating: number;
+    } | null = null;
     try {
         // TODO
         // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
@@ -73,34 +76,63 @@ async function getHandler(
                 id: true,
             },
         });
-        bot = await prisma.favoriteChatBot.findUnique({
+        personal = await prisma.chatBotRating.findUnique({
             where: {
-                userId_chatbotId: {
+                chatbotId_userId: {
                     chatbotId: req.query.bot as string,
                     userId: userId!.id,
                 }
             },
             select: {
-                chatbotId: true,
+                rating: true,
+            }
+        });
+    } catch (e) {
+        // Failed to get user rating, thats fine
+    }
+
+    var average: {
+        ratingsTotal: number;
+        ratingsCount: number;
+    } | null = null;
+    try {
+        average = await prisma.chatBot.findUnique({
+            where: {
+                id: req.query.bot as string,
+            },
+            select: {
+                ratingsTotal: true,
+                ratingsCount: true,
             }
         });
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {
             res.statusCode = 500;
-            res.send(`Failed to get chatbot favourite status: ${e.code}`);
+            res.send(`Failed to get chatbot rating: ${e.code}`);
             res.end();
             return;
         } else {
             res.statusCode = 500;
-            res.send(`Failed to get chatbot favourite status: ${e}`);
+            res.send(`Failed to get chatbot rating: ${e}`);
             res.end();
             return;
         }
     }
 
+    if (average === null) {
+        res.statusCode = 404;
+        res.send("Chatbot not found");
+        res.end();
+        return;
+    }
+
     res.statusCode = 200;
     res.json({
-        favourite: bot !== null,
+        yourRating: personal?.rating ?? null,
+        average: {
+            ratingsTotal: average.ratingsTotal,
+            ratingsCount: average.ratingsCount,
+        },
     });
     res.end();
 }
@@ -108,7 +140,7 @@ async function getHandler(
 async function postHandler(
     session: Session | null,
     req: NextApiRequest,
-    res: NextApiResponse<ApiBotFavouritePOSTResponse | string>
+    res: NextApiResponse<ApiBotRatePOSTResponse | string>
 ) {
     if (session === null || session.user === undefined || !session.user.email) {
         res.statusCode = 401;
@@ -116,11 +148,19 @@ async function postHandler(
         res.end();
         return;
     }
-    //const body = req.body as ApiBotPublishPOSTBody;
+
+    const body = req.body as ApiBotRatePOSTBody;
+    if (![1, 2, 3, 4, 5].includes(body.rating)) {
+        res.statusCode = 400;
+        res.send("Bad request: rating must an integer between 1 and 5 inclusive");
+        res.end();
+        return;
+    }
 
     try {
-        await prisma.favoriteChatBot.create({
+        const data = await prisma.chatBotRating.create({
             data: {
+                rating: body.rating,
                 chatbot: {
                     connect: {
                         id: req.query.bot as string,
@@ -132,16 +172,37 @@ async function postHandler(
                     },
                 },
             },
+            select: {
+                rating: true,
+                chatbot: {
+                    select: {
+                        id: true,
+                    }
+                },
+            }
+        });
+        await prisma.chatBot.update({
+            where: {
+                id: data.chatbot.id,
+            },
+            data: {
+                ratingsTotal: {
+                    increment: data.rating,
+                },
+                ratingsCount: {
+                    increment: 1,
+                },
+            },
         });
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {
             res.statusCode = 500;
-            res.send(`Failed to favourite chatbot: ${e}`);
+            res.send(`Failed to rate chatbot: ${e}`);
             res.end();
             return;
         } else {
             res.statusCode = 500;
-            res.send("Failed to favourite chatbot: error occurred");
+            res.send("Failed to rate chatbot: error occurred");
             res.end();
             return;
         }
@@ -155,7 +216,7 @@ async function postHandler(
 async function deleteHandler(
     session: Session | null,
     req: NextApiRequest,
-    res: NextApiResponse<ApiBotFavouriteDELETEResponse | string>
+    res: NextApiResponse<ApiBotRateDELETEResponse | string>
 ) {
     if (session === null || session.user === undefined || !session.user.email) {
         res.statusCode = 401;
@@ -163,7 +224,6 @@ async function deleteHandler(
         res.end();
         return;
     }
-
     try {
         // TODO
         // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
@@ -176,13 +236,34 @@ async function deleteHandler(
                 id: true,
             },
         });
-        await prisma.favoriteChatBot.delete({
+        const data = await prisma.chatBotRating.delete({
             where: {
-                userId_chatbotId: {
+                chatbotId_userId: {
                     chatbotId: req.query.bot as string,
                     userId: userId!.id,
                 },
+            },
+            select: {
+                rating: true,
+                chatbot: {
+                    select: {
+                        id: true,
+                    }
+                },
             }
+        });
+        await prisma.chatBot.update({
+            where: {
+                id: data.chatbot.id,
+            },
+            data: {
+                ratingsTotal: {
+                    decrement: data.rating,
+                },
+                ratingsCount: {
+                    decrement: 1,
+                },
+            },
         });
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {

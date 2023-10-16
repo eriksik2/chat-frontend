@@ -13,6 +13,7 @@ import LoadingIcon from '../util/LoadingIcon';
 import { ApibotGETResponse } from '../../../pages/api/bots/[bot]';
 import { ApiBotPublishDELETEResponse, ApiBotPublishPOSTResponse } from '../../../pages/api/bots/[bot]/publish';
 import { ApiBotFavouriteDELETEResponse, ApiBotFavouriteGETResponse, ApiBotFavouritePOSTResponse } from '../../../pages/api/bots/[bot]/favourite';
+import ChatBotRating from './ChatBotRating';
 
 
 type ChatBotCardProps = {
@@ -137,6 +138,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
                 {isFavourite ? <FaStar className='text-yellow-300' /> : <FaStar className='text-gray-400' />}
             </button>}
             <div className='flex-grow' />
+            {!ownsBot && <ChatBotRating id={props.chatbot.id} />}
             <button
                 className={clsx(
                     'bg-slate-500 rounded p-1',
@@ -173,5 +175,6 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
                 <FaTrash />
             </button>
         </div>
+
     </div>;
 }
