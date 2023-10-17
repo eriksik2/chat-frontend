@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DualRangeSlider from "../util/DualRangeSlider";
-import { FaTemperatureHalf, FaCaretDown, FaCube, FaUserGear } from "react-icons/fa6";
+import { FaTemperatureHalf, FaCaretDown, FaUserGear } from "react-icons/fa6";
 import Textbox from "../util/Textbox";
 import MultiSelect from "../util/MultiSelect";
 import clsx from "clsx";

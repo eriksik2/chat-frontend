@@ -56,12 +56,11 @@ function LogInPrompt(props: LogInPromptProps) {
     return <div className="h-full flex flex-col justify-center items-center">
 
         {chatbot !== undefined && <div className="pb-24 flex flex-col items-center gap-4">
-            <p className="text-xl">Want to chat with {chatbot.name}?</p>
             <ChatBotCard
                 id={chatbot.id}
             />
             {chatbotStats !== undefined && <p>
-                {chatbotStats.chats} {chatbotStats.chats === 1 ? "person is" : "people are"} chatting with it right now.
+                {chatbotStats.chats} {chatbotStats.chats === 1 ? "person" : "people"} chatting right now.
             </p>}
         </div>}
 

@@ -109,7 +109,7 @@ async function getHandler(
             break;
     }
 
-    const take = query.show ? parseInt(query.show) : 10;
+    const take = query.show ? parseInt(query.show) : 20;
     const skip = query.page ? parseInt(query.page) * take : 0;
 
     const bots = await prisma.chatBot.findMany({

@@ -33,8 +33,6 @@ function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<stri
 type ChatBotListProps = {
 };
 
-const CATEGORIZE = false;
-
 export default function ChatBotList(props: ChatBotListProps) {
 
     const [filter, setFilter] = useState<Filter>({
@@ -116,17 +114,10 @@ export default function ChatBotList(props: ChatBotListProps) {
                 <LoadingIcon />
             </div>
             <div className={clsx(
-                'flex gap-2 pt-4',
-                CATEGORIZE ? "flex-col px-4" : "flex-row flex-wrap gap-8 items-stretch justify-between px-20",
+                'flex gap-2 pt-4 px-8',
+                "flex-row flex-wrap gap-8 items-stretch justify-between",
             )}>
-                {false ? groupedBots.map(([category, bots]) => {
-                    return <ChatBotListCategory
-                        key={category}
-                        bots={bots}
-                        category={category}
-                        onEdit={(id) => setEditId(id)}
-                    />;
-                }) : (bots ?? []).map(bot => {
+                {(bots ?? []).map(bot => {
                     return <ChatBotCard id={bot.id} key={bot.id} />;
                 })}
             </div>
