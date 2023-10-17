@@ -32,9 +32,14 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
 
 // POST: post a message to the chat
 export type ApiChatPOSTBody = {
+    type: "message";
     author: "USER" | "CHATBOT";
     content: string;
+} | {
+    type: "name";
+    name: string;
 };
+
 export type ApiChatPOSTResponse = {
 };
 
@@ -130,30 +135,60 @@ async function postHandler(
 ) {
     const body = req.body as ApiChatPOSTBody;
 
-    try {
-        await prisma.chatMessage.create({
-            data: {
-                author: body.author,
-                content: body.content,
-                chat: {
-                    connect: {
-                        id: req.query.chat as string,
+    if (body.type === "message") {
+        try {
+            await prisma.chatMessage.create({
+                data: {
+                    author: body.author,
+                    content: body.content,
+                    chat: {
+                        connect: {
+                            id: req.query.chat as string,
+                        },
                     },
                 },
-            },
-        });
-    } catch (e) {
-        if (e instanceof PrismaClientKnownRequestError) {
-            res.statusCode = 500;
-            res.send(`Failed to post message: ${e.code}`);
-            res.end();
-            return;
-        } else {
-            res.statusCode = 500;
-            res.send("Failed to post message: error occurred");
-            res.end();
-            return;
+            });
+        } catch (e) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                res.statusCode = 500;
+                res.send(`Failed to post message: ${e.code}`);
+                res.end();
+                return;
+            } else {
+                res.statusCode = 500;
+                res.send("Failed to post message: error occurred");
+                res.end();
+                return;
+            }
         }
+    } else if (body.type === "name") {
+        try {
+            await prisma.chat.update({
+                where: {
+                    id: req.query.chat as string,
+                },
+                data: {
+                    name: body.name,
+                },
+            });
+        } catch (e) {
+            if (e instanceof PrismaClientKnownRequestError) {
+                res.statusCode = 500;
+                res.send(`Failed to change chat name: ${e.code}`);
+                res.end();
+                return;
+            } else {
+                res.statusCode = 500;
+                res.send("Failed to change chat name: error occurred");
+                res.end();
+                return;
+            }
+        }
+    } else {
+        res.statusCode = 400;
+        res.send("Invalid request body");
+        res.end();
+        return;
     }
 
     res.statusCode = 200;

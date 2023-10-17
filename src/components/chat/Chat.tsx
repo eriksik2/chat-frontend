@@ -43,6 +43,49 @@ export default function Chat(props: ChatProps) {
         }
     }, [apiKey]);
 
+    const [hasBeenNamed, setHasBeenNamed] = useState<boolean>(false);
+    useEffect(() => {
+        if (hasBeenNamed) return;
+        if (chat?.messages.length === 2) {
+            const summaryContent = chat.messages
+                .map(msg => `${msg.author === "USER" ? "User" : chat.chatbot.name + " (assistant)"}: ${JSON.parse(msg.content)
+                    .map((cont: ChatMessageContent) => cont.type === "md" ? cont.content : "").join("")}`).join("\n\n");
+            const namer = new Completion(
+                openai!,
+                "gpt-4",
+                0.5,
+                0,
+                0,
+                "When the user sends a message containing a chat transcript you have to provide a short name for the chat. This name must be at most one sentence and at least 2 words long. The name has to capture the essence of the given chat. Your response MUST only contain the name of the chat, without quotes or other formatting. Be specific and concrete about what's happening in the chat, don't try to give it a fancy or clever name.",
+                [
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "md",
+                                content: summaryContent,
+                            }
+                        ],
+                    }
+                ],
+            );
+
+            namer.run(
+                () => { },
+                (msg) => {
+                    const content = msg.content.reduce<string>((acc, cont) => {
+                        return cont.type === "md" ? acc + cont.content : acc;
+                    }, "");
+                    postMessage({
+                        type: "name",
+                        name: content,
+                    });
+                },
+            );
+            setHasBeenNamed(true);
+        }
+    }, [chat]);
+
     async function onUserSend(cont: string) {
         const message: CompletionMessage = {
             role: "user",
@@ -64,6 +107,7 @@ export default function Chat(props: ChatProps) {
         };
         newChat && mutate(newChat, false);
         await postMessage({
+            type: "message",
             author: "USER",
             content: JSON.stringify(message.content),
         });
@@ -186,6 +230,7 @@ export default function Chat(props: ChatProps) {
                                     };
                                     newChat && mutate(newChat, false);
                                     postMessage({
+                                        type: "message",
                                         author: "CHATBOT" as const,
                                         content: json,
                                     });

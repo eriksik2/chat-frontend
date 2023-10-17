@@ -100,7 +100,7 @@ export default class Completion {
 
     async run(
         callback: (chunk: string | null, fn_name: string | null, fn_args: string | null, fn_res: string | null) => void,
-        onFinish: () => void
+        onFinish: (response: CompletionMessage) => void
     ): Promise<void> {
         if (this.didRun) {
             console.error("Completion.run() called twice");
@@ -112,6 +112,10 @@ export default class Completion {
         var do_continue = true;
         var allow_fn = true;
         var iteration = 0;
+        const response: CompletionMessage = {
+            role: "assistant",
+            content: [],
+        };
         while (do_continue) {
             iteration++;
             if (iteration > 10) {
@@ -135,6 +139,7 @@ export default class Completion {
             });
             var function_name = "";
             var function_args = "";
+            var text_content = "";
             for await (const chunk of stream) {
                 const delta = chunk.choices[0].delta;
                 const fin_reason = chunk.choices[0].finish_reason;
@@ -148,10 +153,14 @@ export default class Completion {
                 const fn_args = delta.function_call?.arguments;
                 function_name += fn_name ?? "";
                 function_args += fn_args ?? "";
+                text_content += delta.content ?? "";
 
                 callback(delta.content ?? null, fn_name ?? null, fn_args ?? null, null);
             }
             const did_call_fn = function_name !== "";
+
+
+
             if (did_call_fn) {
                 const fn = predefinedFunctions.get(function_name);
                 if (fn === undefined) {
@@ -172,8 +181,23 @@ export default class Completion {
                     content: fn_result,
                     name: function_name,
                 });
+                allow_fn = false; // Only one function call per response.
+
+                // Add result to response
+                response.content.push({
+                    type: "function",
+                    name: function_name,
+                    arguments: function_args,
+                    result: text_content,
+                });
+            } else {
+                // Add result to response
+                response.content.push({
+                    type: "md",
+                    content: text_content,
+                });
             }
         }
-        onFinish();
+        onFinish(response);
     }
 }
