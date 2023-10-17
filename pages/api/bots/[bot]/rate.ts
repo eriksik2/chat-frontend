@@ -199,10 +199,7 @@ async function postHandler(
             },
         });
     } catch (e) {
-        res.statusCode = 500;
-        res.send(`Failed to post rating`);
-        res.end();
-        return;
+        // Failed to delete old rating because it doesnt exist, thats fine
     }
 
     try {
