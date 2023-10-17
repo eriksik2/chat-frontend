@@ -128,10 +128,10 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
                 Sort:
                 <select
                     className="bg-slate-400 rounded px-2 py-1 min-w-[4rem]"
-                    value="newest"
-                    onChange={() => props.onChange({
+                    value={props.value.sortBy}
+                    onChange={(e) => props.onChange({
                         ...props.value,
-                        sortBy: "newest",
+                        sortBy: e.target.value as any,
                     })}
                 >
                     <option value="new">Newest</option>
