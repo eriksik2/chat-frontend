@@ -10,8 +10,9 @@ import { ApibotsGETResponse, ApibotsPOSTBody } from '../../../pages/api/bots';
 import ChatBotEditStatic, { ChatBotEdit } from './ChatBotEdit';
 import { useApiPOST } from '@/api/fetcher';
 import clsx from 'clsx';
-import { ChatBotFiltersRealtime, Filter } from './ChatBotFilters';
+import { ChatBotFilters, Filter } from './ChatBotFilters';
 import LoadingIcon from '../util/LoadingIcon';
+import { ChatBotCard } from './ChatBotCard';
 
 function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<string, T[]> {
     const map = new Map<string, T[]>();
@@ -32,6 +33,8 @@ function groupByMulti<T>(list: T[], keysGetter: (item: T) => string[]): Map<stri
 type ChatBotListProps = {
 };
 
+const CATEGORIZE = false;
+
 export default function ChatBotList(props: ChatBotListProps) {
 
     const [filter, setFilter] = useState<Filter>({
@@ -40,6 +43,7 @@ export default function ChatBotList(props: ChatBotListProps) {
         searchSystemMessage: false,
         models: ["gpt-4", "gpt-3.5-turbo"],
         temperature: [0, 2],
+        sortBy: "popular",
     });
 
     const query = useMemo(() => {
@@ -50,6 +54,7 @@ export default function ChatBotList(props: ChatBotListProps) {
         q.set("models", filter.models.join(","));
         q.set("maxTemp", filter.temperature[1].toString());
         q.set("minTemp", filter.temperature[0].toString());
+        q.set("sortBy", filter.sortBy);
         return q.toString();
     }, [filter]);
 
@@ -87,32 +92,43 @@ export default function ChatBotList(props: ChatBotListProps) {
                     <p>
                         Select a chatbot and press the New Chat button, then you can chat with it in the Chats tab.
                     </p>
+                    <br />
+                    <button
+                        className="text-lg"
+                        onClick={() => setShowAdd(true)}
+                    >
+                        <div className='p-2 rounded bg-blue-500 hover:bg-blue-600 flex items-center gap-2'>
+                            Create a chatbot
+                            <FaCirclePlus />
+                        </div>
+                    </button>
                 </div>
                 <div className="flex-grow flex flex-col items-center justify-center">
-                    <ChatBotFiltersRealtime
+                    <ChatBotFilters
                         value={filter}
                         onChange={setFilter}
                     />
                 </div>
             </div>
-            <div className=' flex flex-col gap-2 px-4 pt-4'>
-                <div className={clsx(
-                    loading ? 'visible' : 'invisible',
-                )}>
-                    <LoadingIcon />
-                </div>
-                {groupedBots.map(([category, bots]) => {
+            <div className={clsx(
+                loading ? 'visible' : 'invisible',
+            )}>
+                <LoadingIcon />
+            </div>
+            <div className={clsx(
+                'flex gap-2 pt-4',
+                CATEGORIZE ? "flex-col px-4" : "flex-row flex-wrap gap-8 items-stretch justify-between px-20",
+            )}>
+                {false ? groupedBots.map(([category, bots]) => {
                     return <ChatBotListCategory
                         key={category}
                         bots={bots}
                         category={category}
                         onEdit={(id) => setEditId(id)}
                     />;
+                }) : (bots ?? []).map(bot => {
+                    return <ChatBotCard id={bot.id} key={bot.id} />;
                 })}
-                <button
-                    className="text-xl"
-                    onClick={() => setShowAdd(true)}
-                ><FaCirclePlus /></button>
             </div>
         </div>
         {showAdd && <Modal onClose={() => setShowAdd(false)}>

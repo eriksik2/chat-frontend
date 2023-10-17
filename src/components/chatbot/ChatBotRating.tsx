@@ -4,26 +4,35 @@ import { ApiBotRateGETResponse, ApiBotRatePOSTBody, ApiBotRatePOSTResponse } fro
 import { FaStar, FaStarHalfStroke } from "react-icons/fa6";
 import { useState } from "react";
 import clsx from "clsx";
+import { useSession } from "next-auth/react";
 
 type ChatBotRatingProps = {
     id: string;
 };
 
 export default function ChatBotRating(props: ChatBotRatingProps) {
+    const { data: session } = useSession();
+
     const { data, error, reloading } = useApiGET<ApiBotRateGETResponse>(`/api/bots/${props.id}/rate`);
     const { post: setRating, error: setRatingError } = useApiPOST<ApiBotRatePOSTBody, ApiBotRatePOSTResponse>(`/api/bots/${props.id}/rate`);
     const rating = data?.yourRating ?? data ? data.average.ratingsTotal / data.average.ratingsCount : 0;
     const ratingType: "unrated" | "personal" | "average" | "unloaded" = data === undefined ? "unloaded" : data.yourRating ? "personal" : data.average.ratingsCount > 0 ? "average" : "unrated";
+    const isUnloaded = ratingType === "unloaded";
     const isUnrated = ratingType === "unrated";
     const isPersonal = ratingType === "personal";
 
     const [hoverRating, setHoverRating] = useState<number | null>(null);
+
+    const isUnauthorized = session === null || !session.user?.email;
+
+    if ((isUnauthorized && isUnrated) || isUnloaded) return null;
 
     return <div className="flex flex-col items-start justify-center">
         <div className="flex relative">
             <div
                 className="absolute top-0 bottom-0 left-0 right-0"
                 onMouseMove={(e) => {
+                    if (isUnauthorized) return;
                     const rect = e.currentTarget.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const rating = x / rect.width * 5;
@@ -34,6 +43,7 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
                 onMouseLeave={() => setHoverRating(null)}
                 onMouseOut={() => setHoverRating(null)}
                 onClick={async () => {
+                    if (isUnauthorized) return;
                     if (hoverRating !== null) {
                         await setRating({ rating: hoverRating });
                     }

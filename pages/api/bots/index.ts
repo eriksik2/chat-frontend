@@ -94,6 +94,7 @@ async function getHandler(
                 },
             };
             break;
+        case undefined:
         case "popular":
             orderBy = {
                 chats: {
@@ -101,7 +102,6 @@ async function getHandler(
                 },
             };
             break;
-        case undefined:
         case "name":
             orderBy = {
                 name: "asc",

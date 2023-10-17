@@ -125,7 +125,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
             >
                 New Chat
             </button>
-            {isPublished && isFavourite !== null && <button
+            {isFavourite !== null && <button
                 className={clsx(
                     'bg-slate-500 rounded p-1',
                     ownsBot ? 'block' : 'hidden',
