@@ -86,10 +86,6 @@ model ChatBot {
 
     chats Chat[]
 
-    ChatBotRatings ChatBotRating[]
-    ratingsTotal   Int             @default(0)
-    ratingsCount   Int             @default(0)
-
     author   User @relation(fields: [authorId], references: [id], onDelete: Cascade)
     authorId Int
 }
@@ -97,6 +93,11 @@ model ChatBot {
 model PublishedChatBot {
     chatbot ChatBot @relation(fields: [id], references: [id], onDelete: Cascade)
     id      String  @id
+
+    ChatBotRatings ChatBotRating[]
+    ratingsTotal   Int             @default(0)
+    ratingsCount   Int             @default(0)
+    rating         Float           @default(0.0)
 
     publishedAt DateTime @default(now()) @map(name: "published_at")
 
@@ -114,12 +115,12 @@ model FavoriteChatBot {
 }
 
 model ChatBotRating {
-    chatbot   ChatBot  @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
+    chatbot   PublishedChatBot @relation(fields: [chatbotId], references: [id], onDelete: Cascade)
     chatbotId String
-    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
     userId    Int
     rating    Int
-    createdAt DateTime @default(now()) @map(name: "created_at")
+    createdAt DateTime         @default(now()) @map(name: "created_at")
 
     @@id([chatbotId, userId])
 }

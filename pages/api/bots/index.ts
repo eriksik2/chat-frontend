@@ -13,6 +13,11 @@ export type ApibotsGETQuery = {
     maxTemp?: `${number}`;
     minTemp?: `${number}`;
     models?: string[];
+    category?: string;
+    sortBy?: "new" | "rating" | "popular" | "name";
+
+    show?: `${number}`;
+    page?: `${number}`;
 };
 
 export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
@@ -60,7 +65,7 @@ export default async function handler(
         }
     } catch (e) {
         res.statusCode = 500;
-        res.send("Failed to satisfy request: internal server error");
+        res.send("Failed to satisfy request: internal server error: " + e);
         res.end();
     }
 }
@@ -75,7 +80,42 @@ async function getHandler(
         query.models = (query.models as unknown as string).split(",");
     }
 
+    var orderBy: Prisma.ChatBotOrderByWithRelationInput;
+    switch (query.sortBy) {
+        case "new":
+            orderBy = {
+                createdAt: "desc",
+            };
+            break;
+        case "rating":
+            orderBy = {
+                published: {
+                    rating: "desc",
+                },
+            };
+            break;
+        case "popular":
+            orderBy = {
+                chats: {
+                    _count: "desc",
+                },
+            };
+            break;
+        case undefined:
+        case "name":
+            orderBy = {
+                name: "asc",
+            };
+            break;
+    }
+
+    const take = query.show ? parseInt(query.show) : 10;
+    const skip = query.page ? parseInt(query.page) * take : 0;
+
     const bots = await prisma.chatBot.findMany({
+        skip,
+        take,
+        orderBy,
         where: {
             AND: [
                 { // User is author or bot is published
@@ -131,6 +171,11 @@ async function getHandler(
                     })(),
                 },
             ],
+
+            // Filter by category
+            categories: query.category === undefined ? undefined : {
+                has: query.category,
+            },
 
             // Filter by temperature
             temperature: {

@@ -96,7 +96,7 @@ async function getHandler(
         ratingsCount: number;
     } | null = null;
     try {
-        average = await prisma.chatBot.findUnique({
+        average = await prisma.publishedChatBot.findUnique({
             where: {
                 id: req.query.bot as string,
             },
@@ -185,7 +185,7 @@ async function postHandler(
                 },
             }
         });
-        await prisma.chatBot.update({
+        await prisma.publishedChatBot.update({
             where: {
                 id: data.chatbot.id,
             },
@@ -196,7 +196,7 @@ async function postHandler(
                 ratingsCount: {
                     decrement: 1,
                 },
-            },
+            }
         });
     } catch (e) {
         // Failed to delete old rating because it doesnt exist, thats fine
@@ -226,7 +226,7 @@ async function postHandler(
                 },
             }
         });
-        await prisma.chatBot.update({
+        const ratingData = await prisma.publishedChatBot.update({
             where: {
                 id: data.chatbot.id,
             },
@@ -238,6 +238,18 @@ async function postHandler(
                     increment: 1,
                 },
             },
+            select: {
+                ratingsCount: true,
+                ratingsTotal: true,
+            },
+        });
+        await prisma.publishedChatBot.update({
+            where: {
+                id: data.chatbot.id,
+            },
+            data: {
+                rating: ratingData.ratingsTotal / ratingData.ratingsCount,
+            }
         });
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {
@@ -297,7 +309,7 @@ async function deleteHandler(
                 },
             }
         });
-        await prisma.chatBot.update({
+        const ratingData = await prisma.publishedChatBot.update({
             where: {
                 id: data.chatbot.id,
             },
@@ -309,6 +321,18 @@ async function deleteHandler(
                     decrement: 1,
                 },
             },
+            select: {
+                ratingsCount: true,
+                ratingsTotal: true,
+            },
+        });
+        await prisma.publishedChatBot.update({
+            where: {
+                id: data.chatbot.id,
+            },
+            data: {
+                rating: ratingData.ratingsCount === 0 ? 0 : ratingData.ratingsTotal / ratingData.ratingsCount,
+            }
         });
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {
