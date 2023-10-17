@@ -157,6 +157,54 @@ async function postHandler(
         return;
     }
 
+    try { // remove old rating if it exists
+        // TODO
+        // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
+        // So I have to fetch the user id first seperately.
+        const userId = await prisma.user.findUnique({
+            where: {
+                email: session?.user?.email as string,
+            },
+            select: {
+                id: true,
+            },
+        });
+        const data = await prisma.chatBotRating.delete({
+            where: {
+                chatbotId_userId: {
+                    chatbotId: req.query.bot as string,
+                    userId: userId!.id,
+                },
+            },
+            select: {
+                rating: true,
+                chatbot: {
+                    select: {
+                        id: true,
+                    }
+                },
+            }
+        });
+        await prisma.chatBot.update({
+            where: {
+                id: data.chatbot.id,
+            },
+            data: {
+                ratingsTotal: {
+                    decrement: data.rating,
+                },
+                ratingsCount: {
+                    decrement: 1,
+                },
+            },
+        });
+    } catch (e) {
+        res.statusCode = 500;
+        res.send(`Failed to post rating`);
+        res.end();
+        return;
+    }
+
     try {
         const data = await prisma.chatBotRating.create({
             data: {
@@ -197,12 +245,12 @@ async function postHandler(
     } catch (e) {
         if (e instanceof PrismaClientKnownRequestError) {
             res.statusCode = 500;
-            res.send(`Failed to rate chatbot: ${e}`);
+            res.send(`Failed to post rating: ${e}`);
             res.end();
             return;
         } else {
             res.statusCode = 500;
-            res.send("Failed to rate chatbot: error occurred");
+            res.send("Failed to post rating: error occurred");
             res.end();
             return;
         }
