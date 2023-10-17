@@ -16,23 +16,29 @@ export default async function handler(
     res: NextApiResponse<ApiChatLatestGETResponse | string>
 ) {
     const session = await getServerSession(req, res, authOptions);
-    if (session === null || session.user === undefined || session.user.email === undefined) {
+    const notAuthenticated = session === null || session.user === undefined || session.user.email === undefined;
+    const doRedirect =
+        req.query.redirect === "true" ||
+        req.query.redirect === "1";
+
+    if (notAuthenticated && doRedirect) {
+        res.redirect(307, `/chats`);
+        return;
+    }
+
+    if (notAuthenticated) {
         res.statusCode = 401;
         res.send("Not authenticated");
         res.end();
         return;
     }
 
-    const doRedirect =
-        req.query.redirect === "true" ||
-        req.query.redirect === "1";
-
     var chatId;
     try {
         chatId = await prisma.chat.findFirst({
             where: {
                 author: {
-                    email: session.user.email,
+                    email: session!.user!.email,
                 },
             },
             select: {

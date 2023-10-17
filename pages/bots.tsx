@@ -9,9 +9,7 @@ export default function BotsPage() {
     return <ChatBotList />;
 }
 
-function BotsPageLayout(props: { page: ReactElement }) {
-    const { data } = useSession();
-
+BotsPage.getLayout = function getLayout(page: ReactElement) {
     return <TabsLayout
         tabsLocation="top"
         pages={[
@@ -22,7 +20,7 @@ function BotsPageLayout(props: { page: ReactElement }) {
             },
             {
                 name: "Chats",
-                route: data === null ? "/chats" : "/api/chats/latest?redirect=true",
+                route: "/api/chats/latest?redirect=true",
                 isActive: (activeRoute, btnRoute) => {
                     return activeRoute.includes("/chats/");
                 },
@@ -30,10 +28,6 @@ function BotsPageLayout(props: { page: ReactElement }) {
             }
         ]}
     >
-        {props.page}
+        {page}
     </TabsLayout>;
-}
-
-BotsPage.getLayout = function getLayout(page: ReactElement) {
-    return <BotsPageLayout page={page} />;
 }
