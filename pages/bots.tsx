@@ -9,7 +9,7 @@ export default function BotsPage() {
     return <ChatBotList />;
 }
 
-BotsPage.getLayout = function getLayout(page: ReactElement) {
+function BotsPageLayout(props: { page: ReactElement }) {
     const { data } = useSession();
 
     return <TabsLayout
@@ -30,6 +30,10 @@ BotsPage.getLayout = function getLayout(page: ReactElement) {
             }
         ]}
     >
-        {page}
+        {props.page}
     </TabsLayout>;
+}
+
+BotsPage.getLayout = function getLayout(page: ReactElement) {
+    return <BotsPageLayout page={page} />;
 }
