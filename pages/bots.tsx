@@ -1,5 +1,6 @@
 import TabsLayout from "@/components/Layout/TabsLayout";
 import ChatBotList from "@/components/chatbot/ChatBotList";
+import { useSession } from "next-auth/react";
 import { ReactElement } from "react";
 import { FaRegComments, FaUsersGear } from "react-icons/fa6";
 
@@ -9,6 +10,8 @@ export default function BotsPage() {
 }
 
 BotsPage.getLayout = function getLayout(page: ReactElement) {
+    const { data } = useSession();
+
     return <TabsLayout
         tabsLocation="top"
         pages={[
@@ -19,9 +22,8 @@ BotsPage.getLayout = function getLayout(page: ReactElement) {
             },
             {
                 name: "Chats",
-                route: "/api/chats/latest?redirect=true",
+                route: data === null ? "/chats" : "/api/chats/latest?redirect=true",
                 isActive: (activeRoute, btnRoute) => {
-                    console.log(activeRoute, btnRoute);
                     return activeRoute.includes("/chats/");
                 },
                 icon: <FaRegComments className="text-2xl" />,
