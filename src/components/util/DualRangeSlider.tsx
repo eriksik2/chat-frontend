@@ -13,8 +13,8 @@ type DualRangeSliderProps = {
 
 export function defaultKnobBuilder(knob: "left" | "right", value: number) {
   return (
-    <div className="w-3 h-5 m-[2px] p-[1px] bg-slate-500 active:bg-slate-400">
-      <div className="bg-slate-400 active:bg-slate-500 w-full h-full overflow-hidden flex items-center">
+    <div className="m-[2px] h-5 w-3 bg-slate-500 p-[1px] active:bg-slate-400">
+      <div className="flex h-full w-full items-center overflow-hidden bg-slate-400 active:bg-slate-500">
         <FaAlignJustify className="text-slate-600" />
       </div>
     </div>
@@ -33,11 +33,11 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
   const [height, setHeight] = useState(4);
 
   return (
-    <div className="flex-grow flex items-center justify-stretch gap-2">
-      <div className="w-7 flex justify-center">
+    <div className="flex flex-grow items-center justify-stretch gap-2">
+      <div className="flex w-7 justify-center">
         {Math.round(props.value[0] * 100) / 100}
       </div>
-      <div className="bg-slate-400 overflow-hidden p-[1px] flex-grow">
+      <div className="flex-grow overflow-hidden bg-slate-400 p-[1px]">
         <div
           className="relative flex-grow bg-slate-300 shadow-inner"
           style={{
@@ -56,7 +56,7 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
             knobBuilder={knobBuilder}
           />
           <div
-            className="absolute top-0 left-0 h-full z-10 flex items-center justify-stretch"
+            className="absolute left-0 top-0 z-10 flex h-full items-center justify-stretch"
             style={{
               width: `${rightOffset - leftOffset}px`,
               transform: `translateX(${leftOffset}px)`,
@@ -77,7 +77,7 @@ export default function DualRangeSlider(props: DualRangeSliderProps) {
           />
         </div>
       </div>
-      <div className="w-7 flex justify-center">
+      <div className="flex w-7 justify-center">
         {Math.round(props.value[1] * 100) / 100}
       </div>
     </div>
@@ -159,7 +159,7 @@ function SliderHandle(props: SliderHandleProps) {
   return (
     <div
       ref={cbRef}
-      className="absolute top-0 left-0 flex pointer-events-none z-20"
+      className="pointer-events-none absolute left-0 top-0 z-20 flex"
       style={{
         transform: `translateX(${txFromVal(props.value)}px)`,
       }}

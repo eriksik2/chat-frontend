@@ -91,11 +91,11 @@ export default function ChatBotList(props: ChatBotListProps) {
   );
 
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0">
-      <div className="overflow-auto no-scrollbar">
-        <div className={clsx("flex flex-col lg:flex-row", "px-4 py-6 gap-4")}>
+    <div className="absolute bottom-0 left-0 right-0 top-0">
+      <div className="no-scrollbar overflow-auto">
+        <div className={clsx("flex flex-col lg:flex-row", "gap-4 px-4 py-6")}>
           <div className="lg:w-2/5">
-            <h1 className="text-5xl pb-2">Chatbots</h1>
+            <h1 className="pb-2 text-5xl">Chatbots</h1>
             <p>
               List of chatbots tagged by categories. You can select a
               pre-existing bot or add, edit, and remove chatbots as needed.
@@ -107,13 +107,13 @@ export default function ChatBotList(props: ChatBotListProps) {
             </p>
             <br />
             <button className="text-lg" onClick={() => setShowAdd(true)}>
-              <div className="p-2 rounded bg-blue-500 hover:bg-blue-600 flex items-center gap-2">
+              <div className="flex items-center gap-2 rounded bg-blue-500 p-2 hover:bg-blue-600">
                 Create a chatbot
                 <FaCirclePlus />
               </div>
             </button>
           </div>
-          <div className="flex-grow flex flex-col items-center justify-center">
+          <div className="flex flex-grow flex-col items-center justify-center">
             <ChatBotFilters value={filter} onChange={setFilter} />
           </div>
         </div>
@@ -122,8 +122,8 @@ export default function ChatBotList(props: ChatBotListProps) {
         </div>
         <div
           className={clsx(
-            "flex gap-2 pt-4 px-8",
-            "flex-row flex-wrap gap-8 items-stretch justify-center",
+            "flex gap-2 px-8 pt-4",
+            "flex-row flex-wrap items-stretch justify-center gap-8",
           )}
         >
           {(bots ?? []).map((bot) => {

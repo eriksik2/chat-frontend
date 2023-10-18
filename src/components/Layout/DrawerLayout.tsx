@@ -13,7 +13,7 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
   return (
     <div className="relative h-full w-full overflow-hidden">
       <div
-        className="flex flex-col items-stretch h-full"
+        className="flex h-full flex-col items-stretch"
         style={{
           transition: "all 0.2s ease-in-out",
           transformOrigin: "center",
@@ -27,14 +27,14 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
             <FaBars className="text-2xl" />
           </button>
         </div>
-        <div className="flex-grow relative">
-          <div className="absolute top-0 left-0 right-0 bottom-0 overflow-auto no-scrollbar">
+        <div className="relative flex-grow">
+          <div className="no-scrollbar absolute bottom-0 left-0 right-0 top-0 overflow-auto">
             {props.children}
           </div>
         </div>
       </div>
       <div
-        className="absolute top-0 bottom-0 left-0 right-0 z-40"
+        className="absolute bottom-0 left-0 right-0 top-0 z-40"
         style={{
           pointerEvents: open ? "auto" : "none",
           backgroundColor: open ? "rgba(0, 0, 0, 0.2)" : "rgba(0, 0, 0, 0)",
@@ -42,14 +42,14 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
         }}
       >
         <div
-          className="pl-28 w-full h-full"
+          className="h-full w-full pl-28"
           style={{
             transition: "all 0.2s ease-in-out",
             transform: open ? "translateX(0)" : "translateX(100%)",
           }}
           onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         >
-          <div className="bg-slate-300 w-full h-full flex flex-col">
+          <div className="flex h-full w-full flex-col bg-slate-300">
             <div className="flex items-center p-3 px-4">
               <div className="invisible">{props.headerContent}</div>
               <div className="flex-grow" />
@@ -57,7 +57,7 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
                 <FaX className="text-2xl" />
               </button>
             </div>
-            <div className="flex flex-col justify-center items-center flex-grow">
+            <div className="flex flex-grow flex-col items-center justify-center">
               {props.drawerContent}
             </div>
           </div>

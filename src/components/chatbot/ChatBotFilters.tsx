@@ -34,7 +34,7 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
   }
 
   return (
-    <div className="max-w-2xl flex flex-col gap-2">
+    <div className="flex max-w-2xl flex-col gap-2">
       <div>
         <Textbox
           className="w-full"
@@ -50,7 +50,7 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
         <div className="flex items-baseline justify-end gap-4 px-2 text-lg">
           <div className="place-self-start">
             <button
-              className=" px-2 rounded flex items-center gap-1"
+              className=" flex items-center gap-1 rounded px-2"
               onClick={() => setShowFilters(!showFilters)}
             >
               Filter
@@ -63,9 +63,9 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
             </button>
           </div>
           <div className="flex-grow" />
-          <div className="flex gap-y-0 gap-x-6 flex-col items-end md:flex-row">
+          <div className="flex flex-col items-end gap-x-6 gap-y-0 md:flex-row">
             <div className="flex items-baseline gap-2">
-              <p className="text-end whitespace-nowrap text-base sm:text-lg">
+              <p className="whitespace-nowrap text-end text-base sm:text-lg">
                 Search description
               </p>
               <input
@@ -80,7 +80,7 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
               />
             </div>
             <div className="flex items-baseline gap-2">
-              <p className="text-end whitespace-nowrap text-base sm:text-lg">
+              <p className="whitespace-nowrap text-end text-base sm:text-lg">
                 Search system message
               </p>
               <input
@@ -100,12 +100,12 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
 
       {showFilters && (
         <div className="flex flex-col gap-2 p-2">
-          <span className="flex items-baseline gap-4 flex-row">
-            <span className="flex items-baseline justify-end gap-1 w-32">
+          <span className="flex flex-row items-baseline gap-4">
+            <span className="flex w-32 items-baseline justify-end gap-1">
               <FaUserGear /> <span className="text-lg">Model</span>
             </span>
-            <div className="self-stretch w-[1px] bg-slate-800" />
-            <div className="flex-grow flex justify-center">
+            <div className="w-[1px] self-stretch bg-slate-800" />
+            <div className="flex flex-grow justify-center">
               <MultiSelect
                 options={[
                   { label: "GPT 4", value: "gpt-4" },
@@ -123,10 +123,10 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
           </span>
 
           <span className="flex items-baseline gap-4">
-            <span className="flex items-baseline justify-end gap-1 w-32">
+            <span className="flex w-32 items-baseline justify-end gap-1">
               <FaTemperatureHalf /> <span className="text-lg">Temperature</span>
             </span>
-            <div className="self-stretch w-[1px] bg-slate-800" />
+            <div className="w-[1px] self-stretch bg-slate-800" />
             <DualRangeSlider
               min={0}
               max={2}
@@ -143,10 +143,10 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
       )}
 
       <div className="flex justify-between gap-2">
-        <div className="flex gap-2 items-center">
+        <div className="flex items-center gap-2">
           Sort:
           <select
-            className="bg-slate-400 rounded px-2 py-1 min-w-[4rem]"
+            className="min-w-[4rem] rounded bg-slate-400 px-2 py-1"
             value={props.value.sortBy}
             onChange={(e) =>
               props.onChange({
@@ -164,7 +164,7 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
         <button
           className={clsx(
             "bg-slate-400",
-            "rounded px-2 py-1 min-w-[4rem]",
+            "min-w-[4rem] rounded px-2 py-1",
             "transition-all duration-300 ease-in-out",
           )}
           onClick={reset}

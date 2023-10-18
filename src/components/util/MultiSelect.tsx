@@ -12,8 +12,8 @@ type MultiSelectProps = {
 
 export default function MultiSelect(props: MultiSelectProps) {
   return (
-    <div className="flex gap-1 flex-col sm:flex-row">
-      <div className="flex gap-[2px] flex-row sm:flex-col">
+    <div className="flex flex-col gap-1 sm:flex-row">
+      <div className="flex flex-row gap-[2px] sm:flex-col">
         <MultiSelectButton
           value={props.options.every((option) =>
             props.value.includes(option.value),
@@ -43,7 +43,7 @@ export default function MultiSelect(props: MultiSelectProps) {
           None
         </MultiSelectButton>
       </div>
-      <div className="flex gap-1 flex-col sm:flex-row">
+      <div className="flex flex-col gap-1 sm:flex-row">
         {props.options.map((option, i) => {
           const selected = props.value.includes(option.value);
           return (
@@ -79,8 +79,8 @@ function MultiSelectButton(props: MultiSelectButtonProps) {
   return (
     <button
       className={clsx(
-        props.value ? "bg-blue-500" : "bg-slate-500 scale-90 text-gray-800",
-        "rounded px-2 py-1 min-w-[4rem]",
+        props.value ? "bg-blue-500" : "scale-90 bg-slate-500 text-gray-800",
+        "min-w-[4rem] rounded px-2 py-1",
         "transition-all duration-300 ease-in-out",
         props.className,
       )}

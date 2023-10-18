@@ -79,7 +79,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
         },
 
         code(props) {
-          return <code className="bg-gray-400 px-1 rounded" {...props} />;
+          return <code className="rounded bg-gray-400 px-1" {...props} />;
         },
 
         img(props) {
@@ -120,7 +120,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
           if (isBotCardTest) {
             const botId = isBotCardTest[1];
             return (
-              <div className="w-full flex justify-center p-2">
+              <div className="flex w-full justify-center p-2">
                 <ChatBotCard id={botId} />
               </div>
             );
@@ -128,7 +128,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
           const href = (props.href as string).replaceAll("&amp;", "&");
           return (
             <a
-              className="text-blue-500 hover:underline visited:text-purple-500"
+              className="text-blue-500 visited:text-purple-500 hover:underline"
               {...props}
               href={href}
             />

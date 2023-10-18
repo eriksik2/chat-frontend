@@ -189,22 +189,22 @@ export default function Chat(props: ChatProps) {
     );
 
   return (
-    <div className="absolute top-0 bottom-0 right-0 left-0">
+    <div className="absolute bottom-0 left-0 right-0 top-0">
       {apiKey === null ? (
-        <div className="backdrop-blur-lg flex flex-col items-center justify-center z-20 h-full">
+        <div className="z-20 flex h-full flex-col items-center justify-center backdrop-blur-lg">
           <div className="text-2xl">
             Please enter your OpenAI API key to access chat:
           </div>
           <br />
           <div className="flex gap-4">
             <input
-              className="bg-slate-300 rounded p-2 w-96"
+              className="w-96 rounded bg-slate-300 p-2"
               type="password"
               value={apiKeyInput}
               onChange={(e) => setApiKeyInput(e.target.value)}
             />
             <button
-              className="bg-slate-400 rounded p-2"
+              className="rounded bg-slate-400 p-2"
               onClick={() => setApiKey(apiKeyInput)}
             >
               Set
@@ -225,7 +225,7 @@ export default function Chat(props: ChatProps) {
               You can find your API key{" "}
               <a
                 href="https://beta.openai.com/account/api-keys"
-                className="text-blue-500 hover:underline visited:text-purple-600"
+                className="text-blue-500 visited:text-purple-600 hover:underline"
               >
                 here
               </a>
@@ -234,15 +234,15 @@ export default function Chat(props: ChatProps) {
           </div>
         </div>
       ) : (
-        <div className="absolute top-0 bottom-0 right-0 left-0">
-          <div className="overflow-auto scroll-smooth no-scrollbar h-full flex flex-col items-center">
-            <div className="px-4 pt-8 pb-20 flex flex-col items-stretch justify-start pr-32 w-5/6">
+        <div className="absolute bottom-0 left-0 right-0 top-0">
+          <div className="no-scrollbar flex h-full flex-col items-center overflow-auto scroll-smooth">
+            <div className="flex w-5/6 flex-col items-stretch justify-start px-4 pb-20 pr-32 pt-8">
               <div
                 className={clsx(
                   "mt-8 rounded-xl",
                   (chat?.messages ?? []).length === 0
-                    ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-[-2rem] h-0",
+                    ? "translate-y-0 opacity-100"
+                    : "h-0 translate-y-[-2rem] opacity-0",
                   "transition-all duration-1000 ease-in-out",
                   "flex flex-col items-center justify-center",
                 )}
@@ -306,7 +306,7 @@ export default function Chat(props: ChatProps) {
             <div ref={scrollDownRef} className="snap-end"></div>
           </div>
 
-          <div className="flex flex-col items-center absolute left-0 right-0 bottom-0 z-10">
+          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
             {false && (
               <>
                 <div>Waiting for response...</div>

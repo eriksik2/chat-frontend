@@ -33,14 +33,14 @@ export default function ChatsPage() {
 
   if (data === null) {
     return (
-      <div className="h-full flex flex-col justify-center items-center">
+      <div className="flex h-full flex-col items-center justify-center">
         <p className="text-2xl">You do not have any chats yet.</p>
         <br />
         <p>
           Go to{" "}
           <Link
             href="/bots"
-            className="text-blue-500 hover:underline visited:text-purple-600"
+            className="text-blue-500 visited:text-purple-600 hover:underline"
           >
             Chatbots
           </Link>{" "}
@@ -51,14 +51,14 @@ export default function ChatsPage() {
   }
 
   return (
-    <div className="h-full flex flex-col justify-center items-center">
+    <div className="flex h-full flex-col items-center justify-center">
       <p className="text-2xl">Select a chat from the sidebar.</p>
       <br />
       <p>
         Or go to{" "}
         <Link
           href="/bots"
-          className="text-blue-500 hover:underline visited:text-purple-600"
+          className="text-blue-500 visited:text-purple-600 hover:underline"
         >
           Chatbots
         </Link>{" "}
@@ -91,9 +91,9 @@ function LogInPrompt(props: LogInPromptProps) {
   );
 
   return (
-    <div className="h-full flex flex-col justify-center items-center text-center">
+    <div className="flex h-full flex-col items-center justify-center text-center">
       {chatbot !== undefined && (
-        <div className="pb-14 sm:pb-24 flex flex-col items-center gap-4 text-start">
+        <div className="flex flex-col items-center gap-4 pb-14 text-start sm:pb-24">
           <ChatBotCard id={chatbot.id} />
           {chatbotStats !== undefined && (
             <p>
@@ -111,7 +111,7 @@ function LogInPrompt(props: LogInPromptProps) {
         You can{" "}
         <Link
           href="/api/auth/signin"
-          className="text-blue-500 hover:underline visited:text-purple-600"
+          className="text-blue-500 visited:text-purple-600 hover:underline"
         >
           click here
         </Link>{" "}

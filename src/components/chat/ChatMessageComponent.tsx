@@ -28,13 +28,13 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
     <div
       className={clsx(
         "overflow-hidden",
-        "flex flex-row justify-stretch flex-grow min-h-[4rem]",
+        "flex min-h-[4rem] flex-grow flex-row justify-stretch",
       )}
     >
-      <div className="px-2 my-4 w-[20%] text-black text-lg flex-none border-r border-slate-400">
+      <div className="my-4 w-[20%] flex-none border-r border-slate-400 px-2 text-lg text-black">
         <p className="text-end">{props.author}</p>
       </div>
-      <div className="p-4 pb-2 flex-shrink w-[80%]">
+      <div className="w-[80%] flex-shrink p-4 pb-2">
         {props.content.map((cont, index) => {
           if (cont.type === "md") {
             return (

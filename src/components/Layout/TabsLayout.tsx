@@ -109,7 +109,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
   return (
     <div
       className={clsx(
-        "flex items-stretch justify-stretch h-full",
+        "flex h-full items-stretch justify-stretch",
         tabsDir === "row"
           ? tabsOrder === "first"
             ? "flex-col"
@@ -141,8 +141,8 @@ export default function TabsLayout(_props: TabsLayoutProps) {
           {after}
         </TabBar>
       </div>
-      <div className="flex-grow relative">
-        <div className="absolute top-0 left-0 right-0 bottom-0 overflow-auto no-scrollbar">
+      <div className="relative flex-grow">
+        <div className="no-scrollbar absolute bottom-0 left-0 right-0 top-0 overflow-auto">
           {children}
         </div>
       </div>
@@ -165,7 +165,7 @@ export function TabBar(props: TabBarProps) {
     <div
       className={clsx(
         "flex flex-grow items-center",
-        props.tabsDir === "col" ? "flex-col h-full" : "flex-row",
+        props.tabsDir === "col" ? "h-full flex-col" : "flex-row",
         props.tabsAlign === "center"
           ? "justify-center"
           : props.tabsAlign === "end"
@@ -225,7 +225,7 @@ function DefaultTabButton(params: DefaultTabButtonProps) {
     <Link href={params.route}>
       <div
         className={clsx(
-          "rounded-full p-2 px-4 w-24",
+          "w-24 rounded-full p-2 px-4",
           checkIsActive(router.asPath, params.route) &&
             "bg-gradient-to-br from-slate-400/50  to-slate-400/75 shadow-inner",
           "hover:bg-gradient-to-br hover:from-slate-500/50 hover:via-slate-400 hover:to-slate-500/75",

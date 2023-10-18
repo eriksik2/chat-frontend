@@ -25,13 +25,13 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
       }}
     >
       <div
-        className="w-full bg-gradient-to-br from-slate-400/60 via-slate-300 to-slate-400/50 shadow-inner rounded px-2 flex flex-row items-center gap-2"
+        className="flex w-full flex-row items-center gap-2 rounded bg-gradient-to-br from-slate-400/60 via-slate-300 to-slate-400/50 px-2 shadow-inner"
         onClick={() => !isFeatured && setOpen(!open)}
       >
         {!isFeatured && (
           <FaAngleDown
             className={clsx(
-              "transition-transform transform",
+              "transform transition-transform",
               open ? "rotate-0" : "-rotate-90",
             )}
           />
@@ -41,8 +41,8 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
       <div className="overflow-hidden">
         <div
           className={clsx(
-            "flex flex-row flex-wrap gap-4 items-stretch content-start justify-start px-4",
-            open ? "max-h-screen py-4" : "max-h-0 py-0 -translate-y-[10rem]",
+            "flex flex-row flex-wrap content-start items-stretch justify-start gap-4 px-4",
+            open ? "max-h-screen py-4" : "max-h-0 -translate-y-[10rem] py-0",
             "transition-height duration-300 ease-in-out",
           )}
         >

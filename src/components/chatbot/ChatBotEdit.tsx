@@ -49,12 +49,12 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
   return (
     <div
       className={clsx(
-        "rounded-md shadow-inner p-2",
+        "rounded-md p-2 shadow-inner",
         "bg-gradient-to-br from-slate-400/70 via-slate-300 to-slate-400/60",
       )}
     >
-      <div className="grid grid-cols-3 gap-6 align-middle p-2">
-        <div className="flex items-center h-full col-start-1 row-start-1">
+      <div className="grid grid-cols-3 gap-6 p-2 align-middle">
+        <div className="col-start-1 row-start-1 flex h-full items-center">
           <p>Name</p>
         </div>
         <Textbox
@@ -62,16 +62,16 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
           value={name}
           onChange={(value) => setName(value)}
         />
-        <div className="flex items-center h-full col-start-1 row-start-2">
+        <div className="col-start-1 row-start-2 flex h-full items-center">
           <p>Description</p>
         </div>
         <Textbox
-          className="h-36 col-start-2 row-start-2"
+          className="col-start-2 row-start-2 h-36"
           value={description}
           onChange={(value) => setDescription(value)}
         />
-        <div className="col-start-3 row-start-1 row-span-2 flex flex-col gap-6">
-          <div className="flex flex-row w-full gap-3 justify-stretch">
+        <div className="col-start-3 row-span-2 row-start-1 flex flex-col gap-6">
+          <div className="flex w-full flex-row justify-stretch gap-3">
             <p>Model</p>
             <select
               className="flex-grow"
@@ -87,7 +87,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
             </select>
           </div>
           <div>
-            <div className="flex flex-row w-full gap-3">
+            <div className="flex w-full flex-row gap-3">
               <p>Frequency penalty</p>
               <input
                 type="range"
@@ -102,7 +102,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
             {frequency_bias}
           </div>
           <div>
-            <div className="flex flex-row w-full gap-3">
+            <div className="flex w-full flex-row gap-3">
               <p>Presence penalty</p>
               <input
                 type="range"
@@ -117,7 +117,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
             {presence_bias}
           </div>
           <div>
-            <div className="flex flex-row w-full gap-3">
+            <div className="flex w-full flex-row gap-3">
               <p>Temperature</p>
               <input
                 type="range"
@@ -132,18 +132,18 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
             {temperature}
           </div>
         </div>
-        <div className="flex items-center h-full col-start-1 row-start-3">
+        <div className="col-start-1 row-start-3 flex h-full items-center">
           <p>System message</p>
         </div>
         <Textbox
-          className="h-56 col-start-2 row-start-3 col-span-2"
+          className="col-span-2 col-start-2 row-start-3 h-56"
           value={systemMessage}
           onChange={(value) => setSystemMessage(value)}
         />
       </div>
       <div className="flex flex-row justify-end gap-2 p-2">
         <button
-          className="bg-gray-500 rounded p-2"
+          className="rounded bg-gray-500 p-2"
           onClick={() => {
             props.onClose();
           }}
@@ -151,7 +151,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
           Cancel
         </button>
         <button
-          className="bg-blue-400 rounded p-2"
+          className="rounded bg-blue-400 p-2"
           onClick={() => {
             props.onSave({
               name,

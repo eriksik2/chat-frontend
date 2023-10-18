@@ -15,11 +15,11 @@ type RootLayoutProps = {
 export default function RootLayout(props: RootLayoutProps) {
   return (
     <div className="h-full w-full">
-      <div className="sm:hidden h-full w-full">
+      <div className="h-full w-full sm:hidden">
         <DrawerLayout
           headerContent={
             <Link href="/">
-              <h1 className="flex text-2xl gap-2">chat.eriksik</h1>
+              <h1 className="flex gap-2 text-2xl">chat.eriksik</h1>
             </Link>
           }
           drawerContent={
@@ -28,14 +28,14 @@ export default function RootLayout(props: RootLayoutProps) {
               <div className="flex flex-col gap-2">
                 <Link
                   href="/bots"
-                  className="w-full justify-center flex gap-4 text-2xl"
+                  className="flex w-full justify-center gap-4 text-2xl"
                 >
                   <FaUsersGear className="text-2xl" />
                   Chatbots
                 </Link>
                 <Link
                   href="/api/chats/latest?redirect=true"
-                  className="w-full justify-center flex gap-4 text-2xl"
+                  className="flex w-full justify-center gap-4 text-2xl"
                 >
                   <FaRegComments className="text-2xl" />
                   Chats
@@ -49,20 +49,20 @@ export default function RootLayout(props: RootLayoutProps) {
           {props.children}
         </DrawerLayout>
       </div>
-      <div className="hidden sm:flex h-full flex-col items-stretch justify-stretch">
+      <div className="hidden h-full flex-col items-stretch justify-stretch sm:flex">
         <TabsLayout
           tabsLocation="top"
           before={
-            <div className="py-4 px-3">
+            <div className="px-3 py-4">
               <Link href="/">
-                <h1 className="flex text-3xl gap-2">chat.eriksik</h1>
+                <h1 className="flex gap-2 text-3xl">chat.eriksik</h1>
               </Link>
             </div>
           }
           after={
             <>
               <div className="flex-grow" />
-              <div className="flex text-4xl items-center gap-4 px-4">
+              <div className="flex items-center gap-4 px-4 text-4xl">
                 <LogInButton />
                 <a href="https://github.com/eriksik2/chat-frontend">
                   <FaGithub />

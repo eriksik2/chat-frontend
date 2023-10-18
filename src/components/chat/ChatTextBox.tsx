@@ -33,9 +33,9 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
   }
 
   return (
-    <div className="flex flex-row items-center justify-center gap-4 h-full w-1/2">
+    <div className="flex h-full w-1/2 flex-row items-center justify-center gap-4">
       <button
-        className="px-4 py-2 text-white bg-blue-500 rounded-full drop-shadow-lg "
+        className="rounded-full bg-blue-500 px-4 py-2 text-white drop-shadow-lg "
         onClick={(event) => {
           event.preventDefault();
           setBigEditor(!bigEditor);
@@ -49,7 +49,7 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
           wrap={bigEditor ? "soft" : "off"}
           rows={1}
           cols={40}
-          className="px-3 py-2 text-black bg-white rounded-xl drop-shadow-lg resize-none no-scrollbar"
+          className="no-scrollbar resize-none rounded-xl bg-white px-3 py-2 text-black drop-shadow-lg"
           style={{
             height: !bigEditor ? `calc(1rem + ${1}lh)` : "65vh",
             width: !bigEditor ? `calc(1.5rem + ${60}ch)` : "50vw",
@@ -69,7 +69,7 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
         />
       </div>
       <button
-        className="px-4 py-2 text-white bg-blue-500 rounded-full drop-shadow-lg "
+        className="rounded-full bg-blue-500 px-4 py-2 text-white drop-shadow-lg "
         onClick={(event) => {
           event.preventDefault();
           onSubmit();

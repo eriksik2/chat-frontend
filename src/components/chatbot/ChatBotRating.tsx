@@ -48,9 +48,9 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
 
   return (
     <div className="flex flex-col items-start justify-center">
-      <div className="flex relative">
+      <div className="relative flex">
         <div
-          className="absolute top-0 bottom-0 left-0 right-0"
+          className="absolute bottom-0 left-0 right-0 top-0"
           onMouseMove={(e) => {
             if (isUnauthorized) return;
             const rect = e.currentTarget.getBoundingClientRect();

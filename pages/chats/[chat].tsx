@@ -36,7 +36,7 @@ function ChatButtonBuilder({
     <Link
       href={route}
       className={clsx(
-        "flex flex-row justify-between items-center gap-2 p-2 bg-gradient-to-br shadow-inner",
+        "flex flex-row items-center justify-between gap-2 bg-gradient-to-br p-2 shadow-inner",
         active
           ? "from-slate-500/50 via-slate-400 to-slate-500/75"
           : "from-slate-400/50 via-slate-300 to-slate-400/75",
@@ -88,7 +88,7 @@ function ChatPageLayout(props: { page: ReactElement }) {
       tabsGap="0"
       tabBarWidth="17rem"
       before={
-        <div className="p-1 mt-12">
+        <div className="mt-12 p-1">
           <h2 className="text-2xl">Your chats</h2>
         </div>
       }

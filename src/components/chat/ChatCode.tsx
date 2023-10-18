@@ -103,20 +103,20 @@ export default function ChatCode(props: ChatCodeProps) {
           {rows.map((row, i) => (
             <span
               key={i}
-              className="px-2 border-y border-transparent hover:border-slate-400 "
+              className="border-y border-transparent px-2 hover:border-slate-400 "
             >
               {innerRender(row, prism, i)}
             </span>
           ))}
         </div>
-        <div className="w-full bg-slate-400 text-slate-700 flex items-stretch justify-between">
-          <div className="flex items-center p-2 py-1 text-xs select-none">
+        <div className="flex w-full items-stretch justify-between bg-slate-400 text-slate-700">
+          <div className="flex select-none items-center p-2 py-1 text-xs">
             {props.language}
           </div>
           <div className="flex items-stretch">
             <p
               className={clsx(
-                "flex items-center text-xs px-1 select-none",
+                "flex select-none items-center px-1 text-xs",
                 showCopied ? "opacity-100" : "opacity-0",
                 "transition-all duration-200 ease-in-out",
               )}
@@ -124,7 +124,7 @@ export default function ChatCode(props: ChatCodeProps) {
               Copied to clipboard.
             </p>
             <button
-              className="flex items-center bg-slate-500 p-1 hover:bg-slate-600 text-slate-800"
+              className="flex items-center bg-slate-500 p-1 text-slate-800 hover:bg-slate-600"
               onClick={() => {
                 setShowCopied(true);
                 setTimeout(() => {

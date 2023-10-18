@@ -47,7 +47,7 @@ export function ChatBotCard(props: ChatBotCardProps) {
     return (
       <div
         className={clsx(
-          "bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs",
+          "flex max-w-xs flex-col justify-between rounded bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 p-2 shadow-inner",
           "relative overflow-hidden",
         )}
       >
@@ -114,7 +114,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   return (
     <div
       className={clsx(
-        "bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 rounded p-2 shadow-inner flex flex-col justify-between max-w-xs",
+        "flex max-w-xs flex-col justify-between rounded bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 p-2 shadow-inner",
         "relative overflow-hidden",
       )}
       onMouseMove={(e) => {
@@ -151,8 +151,8 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
     >
       <div className="px-2 pt-1">
         <div className="flex flex-row items-baseline gap-2">
-          <p className="text-xl flex-auto">{props.chatbot.name}</p>
-          <p className="text-sm flex-initial whitespace-nowrap">
+          <p className="flex-auto text-xl">{props.chatbot.name}</p>
+          <p className="flex-initial whitespace-nowrap text-sm">
             by {props.chatbot.author.name}
           </p>
         </div>
@@ -162,7 +162,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
       </div>
       <div className="flex flex-row justify-end gap-2 pt-2">
         <button
-          className="bg-blue-500 rounded shadow-inner p-1 text-sm"
+          className="rounded bg-blue-500 p-1 text-sm shadow-inner"
           onClick={async () => {
             if (!loggedIn) {
               router.push(`/chats?chatbot=${props.chatbot.id}`);
@@ -182,7 +182,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         {isFavourite !== null && (
           <button
             className={clsx(
-              "bg-slate-500 rounded p-1",
+              "rounded bg-slate-500 p-1",
               ownsBot ? "block" : "hidden",
             )}
             onClick={async () => {
@@ -201,7 +201,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         {!ownsBot && <ChatBotRating id={props.chatbot.id} />}
         <button
           className={clsx(
-            "bg-slate-500 rounded p-1",
+            "rounded bg-slate-500 p-1",
             ownsBot ? "block" : "hidden",
           )}
           onClick={async () => {
@@ -214,7 +214,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         {props.onEdit && (
           <button
             className={clsx(
-              "bg-slate-500 rounded p-1",
+              "rounded bg-slate-500 p-1",
               ownsBot ? "block" : "hidden",
             )}
             onClick={() => props.onEdit?.(props.chatbot.id)}
@@ -224,7 +224,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         )}
         <button
           className={clsx(
-            "bg-red-400 rounded p-1",
+            "rounded bg-red-400 p-1",
             ownsBot ? "block" : "hidden",
           )}
           onClick={async () => {

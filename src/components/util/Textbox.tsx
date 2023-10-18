@@ -27,7 +27,7 @@ export default function Textbox(props: TextboxProps) {
       className={clsx(
         "resize-none",
         "rounded shadow-inner",
-        !styleOverrides.padding && "py-1 px-2",
+        !styleOverrides.padding && "px-2 py-1",
         !styleOverrides.height && "h-[calc(0.5rem+1lh)]",
         !styleOverrides.bg &&
           "bg-gradient-to-tr from-gray-100 via-white to-gray-50",
