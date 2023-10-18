@@ -13,9 +13,11 @@ export default function RootLayout(props: RootLayoutProps) {
     return <div className="h-full w-full">
         <div className="sm:hidden h-full w-full">
             <DrawerLayout
-                headerContent={<h1 className='flex text-2xl gap-2'>
-                    chat.eriksik
-                </h1>}
+                headerContent={<Link href="/">
+                    <h1 className='flex text-2xl gap-2'>
+                        chat.eriksik
+                    </h1>
+                </Link>}
                 drawerContent={<>
                     <div className="h-36" />
                     <div className="flex flex-col gap-2">
@@ -39,9 +41,11 @@ export default function RootLayout(props: RootLayoutProps) {
             <TabsLayout
                 tabsLocation="top"
                 before={<div className="py-4 px-3">
-                    <h1 className='flex text-3xl gap-2'>
-                        chat.eriksik
-                    </h1>
+                    <Link href="/">
+                        <h1 className='flex text-3xl gap-2'>
+                            chat.eriksik
+                        </h1>
+                    </Link>
                 </div>}
                 after={<>
                     <div className="flex-grow" />
