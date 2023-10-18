@@ -138,7 +138,7 @@ export function TabBar(props: TabBarProps) {
     const tabBarWidth = props.tabBarWidth === "auto" ? undefined : props.tabBarWidth;
     return <div
         className={clsx(
-            "flex flex-grow",
+            "flex flex-grow items-center",
             props.tabsDir === "col" ?
                 "flex-col h-full"
                 :

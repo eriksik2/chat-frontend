@@ -83,5 +83,5 @@ function ChatPageLayout(props: { page: ReactElement }) {
 }
 
 ChatPage.getLayout = function getLayout(page: ReactElement) {
-    return BotsPage.getLayout(<ChatPageLayout page={page} />);
+    return <ChatPageLayout page={page} />;
 }
