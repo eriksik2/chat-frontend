@@ -4,63 +4,62 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 
-
 export type ApiChatLatestGETResponse = Prisma.ChatGetPayload<{
-    select: {
-        id: true,
-    },
+  select: {
+    id: true;
+  };
 }> | null;
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse<ApiChatLatestGETResponse | string>
+  req: NextApiRequest,
+  res: NextApiResponse<ApiChatLatestGETResponse | string>,
 ) {
-    const session = await getServerSession(req, res, authOptions);
-    const notAuthenticated = session === null || session.user === undefined || session.user.email === undefined;
-    const doRedirect =
-        req.query.redirect === "true" ||
-        req.query.redirect === "1";
+  const session = await getServerSession(req, res, authOptions);
+  const notAuthenticated =
+    session === null ||
+    session.user === undefined ||
+    session.user.email === undefined;
+  const doRedirect =
+    req.query.redirect === "true" || req.query.redirect === "1";
 
-    if (notAuthenticated && doRedirect) {
-        res.redirect(307, `/chats`);
-        return;
-    }
+  if (notAuthenticated && doRedirect) {
+    res.redirect(307, `/chats`);
+    return;
+  }
 
-    if (notAuthenticated) {
-        res.statusCode = 401;
-        res.send("Not authenticated");
-        res.end();
-        return;
-    }
+  if (notAuthenticated) {
+    res.statusCode = 401;
+    res.send("Not authenticated");
+    res.end();
+    return;
+  }
 
-    var chatId;
-    try {
-        chatId = await prisma.chat.findFirst({
-            where: {
-                author: {
-                    email: session!.user!.email,
-                },
-            },
-            select: {
-                id: true,
-            },
-            orderBy: {
-                createdAt: "desc",
-            }
-        });
-    } catch (e) {
-        res.statusCode = 500;
-        res.send("Failed to satisfy request: internal server error");
-        res.end();
-    }
+  var chatId;
+  try {
+    chatId = await prisma.chat.findFirst({
+      where: {
+        author: {
+          email: session!.user!.email,
+        },
+      },
+      select: {
+        id: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+  } catch (e) {
+    res.statusCode = 500;
+    res.send("Failed to satisfy request: internal server error");
+    res.end();
+  }
 
-
-    if (doRedirect) {
-        res.redirect(307, `/chats/${chatId?.id ?? ""}`);
-    } else {
-        res.statusCode = 200;
-        res.json(chatId ?? null);
-        res.end();
-    }
-
+  if (doRedirect) {
+    res.redirect(307, `/chats/${chatId?.id ?? ""}`);
+  } else {
+    res.statusCode = 200;
+    res.json(chatId ?? null);
+    res.end();
+  }
 }

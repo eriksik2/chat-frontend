@@ -9,66 +9,120 @@ import { ApiBotStatsGETResponse } from "../api/bots/[bot]/stats";
 import { ChatBotCard } from "@/components/chatbot/ChatBotCard";
 
 export type ChatsPageQuery = {
-    chatbot?: string;
-}
+  chatbot?: string;
+};
 
 export default function ChatsPage() {
-    const router = useRouter();
-    const { chatbot } = router.query as ChatsPageQuery;
-    const { data, error, reloading } = useApiGET<ApiChatLatestGETResponse>("/api/chats/latest");
+  const router = useRouter();
+  const { chatbot } = router.query as ChatsPageQuery;
+  const { data, error, reloading } =
+    useApiGET<ApiChatLatestGETResponse>("/api/chats/latest");
 
-    const loading = data === undefined && reloading;
-    if (loading) return null;
-    if (error !== null && error.status === 401) return <LogInPrompt chatbot={chatbot} />;
-    if (error !== null) return <div>
+  const loading = data === undefined && reloading;
+  if (loading) return null;
+  if (error !== null && error.status === 401)
+    return <LogInPrompt chatbot={chatbot} />;
+  if (error !== null)
+    return (
+      <div>
         <h1 className="text-2xl">Error</h1>
         <div>{error.status}</div>
         <div>{error.message}</div>
-    </div>;
+      </div>
+    );
 
-    if (data === null) {
-        return <div className="h-full flex flex-col justify-center items-center">
-            <p className="text-2xl">You do not have any chats yet.</p>
-            <br />
-            <p>Go to <Link href="/bots" className="text-blue-500 hover:underline visited:text-purple-600">Chatbots</Link> to create one.</p>
-        </div>;
-    }
-
-    return <div className="h-full flex flex-col justify-center items-center">
-        <p className="text-2xl">Select a chat from the sidebar.</p>
+  if (data === null) {
+    return (
+      <div className="h-full flex flex-col justify-center items-center">
+        <p className="text-2xl">You do not have any chats yet.</p>
         <br />
-        <p>Or go to <Link href="/bots" className="text-blue-500 hover:underline visited:text-purple-600">Chatbots</Link> page to create a new one.</p>
-    </div>;
+        <p>
+          Go to{" "}
+          <Link
+            href="/bots"
+            className="text-blue-500 hover:underline visited:text-purple-600"
+          >
+            Chatbots
+          </Link>{" "}
+          to create one.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-full flex flex-col justify-center items-center">
+      <p className="text-2xl">Select a chat from the sidebar.</p>
+      <br />
+      <p>
+        Or go to{" "}
+        <Link
+          href="/bots"
+          className="text-blue-500 hover:underline visited:text-purple-600"
+        >
+          Chatbots
+        </Link>{" "}
+        page to create a new one.
+      </p>
+    </div>
+  );
 }
 
 ChatsPage.getLayout = ChatPage.getLayout;
 
-
-
 type LogInPromptProps = {
-    chatbot?: string;
+  chatbot?: string;
 };
 
 function LogInPrompt(props: LogInPromptProps) {
-    const { data: chatbotStats, error: statsError, reloading: statsReloading } = useApiGET<ApiBotStatsGETResponse>(props.chatbot ? `/api/bots/${props.chatbot}/stats` : null);
-    const { data: chatbot, error, reloading } = useApiGET<ApibotGETResponse>(props.chatbot ? `/api/bots/${props.chatbot}` : null);
+  const {
+    data: chatbotStats,
+    error: statsError,
+    reloading: statsReloading,
+  } = useApiGET<ApiBotStatsGETResponse>(
+    props.chatbot ? `/api/bots/${props.chatbot}/stats` : null,
+  );
+  const {
+    data: chatbot,
+    error,
+    reloading,
+  } = useApiGET<ApibotGETResponse>(
+    props.chatbot ? `/api/bots/${props.chatbot}` : null,
+  );
 
-    return <div className="h-full flex flex-col justify-center items-center text-center">
+  return (
+    <div className="h-full flex flex-col justify-center items-center text-center">
+      {chatbot !== undefined && (
+        <div className="pb-14 sm:pb-24 flex flex-col items-center gap-4 text-start">
+          <ChatBotCard id={chatbot.id} />
+          {chatbotStats !== undefined && (
+            <p>
+              {chatbotStats.chats}{" "}
+              {chatbotStats.chats === 1 ? "person" : "people"} chatting right
+              now.
+            </p>
+          )}
+        </div>
+      )}
 
-        {chatbot !== undefined && <div className="pb-14 sm:pb-24 flex flex-col items-center gap-4 text-start">
-            <ChatBotCard
-                id={chatbot.id}
-            />
-            {chatbotStats !== undefined && <p>
-                {chatbotStats.chats} {chatbotStats.chats === 1 ? "person" : "people"} chatting right now.
-            </p>}
-        </div>}
-
-        <p className="text-4xl">Log in to access chat.</p>
-        <br />
-        <p>You can <Link href="/api/auth/signin" className="text-blue-500 hover:underline visited:text-purple-600">click here</Link> to log in using Google.</p>
-        <p>Or click the button on the top right.</p>
-        <br />
-        <p>We will never send you an email and we won{"'"}t use any of your personal data.</p>
-    </div>;
+      <p className="text-4xl">Log in to access chat.</p>
+      <br />
+      <p>
+        You can{" "}
+        <Link
+          href="/api/auth/signin"
+          className="text-blue-500 hover:underline visited:text-purple-600"
+        >
+          click here
+        </Link>{" "}
+        to log in using Google.
+      </p>
+      <p>Or click the button on the top right.</p>
+      <br />
+      <p>
+        We will never send you an email and we won{"'"}t use any of your
+        personal data.
+      </p>
+    </div>
+  );
 }

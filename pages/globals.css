@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer utilities {
-
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -17,7 +16,6 @@
     /* Firefox */
   }
 }
-
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -35,29 +33,31 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom,
+  background: linear-gradient(
+      to bottom,
       transparent,
-      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
 }
 
 .katex-html {
   display: none;
 }
 
-.markdown-body>* {
+.markdown-body > * {
   padding-top: 0.25em;
   padding-bottom: 0.5em;
 }
 
-
-.markdown-body>section.footnotes>h2 {
+.markdown-body > section.footnotes > h2 {
   width: 100%;
   border-bottom: 1px solid black;
   margin-bottom: 0.75rem;
   font-size: 1.25rem;
 }
 
-.markdown-body>section.footnotes>ol {
+.markdown-body > section.footnotes > ol {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
