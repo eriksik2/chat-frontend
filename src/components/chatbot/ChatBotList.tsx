@@ -115,7 +115,7 @@ export default function ChatBotList(props: ChatBotListProps) {
             </div>
             <div className={clsx(
                 'flex gap-2 pt-4 px-8',
-                "flex-row flex-wrap gap-8 items-stretch justify-between",
+                "flex-row flex-wrap gap-8 items-stretch justify-center",
             )}>
                 {(bots ?? []).map(bot => {
                     return <ChatBotCard id={bot.id} key={bot.id} />;

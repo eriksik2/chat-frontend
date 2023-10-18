@@ -61,49 +61,53 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
                     </button>
                 </div>
                 <div className="flex-grow" />
-                <div className="flex items-baseline gap-2">
-                    <p>Search description</p>
-                    <input
-                        type="checkbox"
-                        checked={props.value.searchDescription}
-                        onChange={(e) => props.onChange({
-                            ...props.value,
-                            searchDescription: e.target.checked,
-                        })}
-                    />
-                </div>
-                <div className="flex items-baseline gap-2">
-                    <p>Search system message</p>
-                    <input
-                        type="checkbox"
-                        checked={props.value.searchSystemMessage}
-                        onChange={(e) => props.onChange({
-                            ...props.value,
-                            searchSystemMessage: e.target.checked,
-                        })}
-                    />
+                <div className="flex gap-y-0 gap-x-6 flex-col items-end md:flex-row">
+                    <div className="flex items-baseline gap-2">
+                        <p className="text-end whitespace-nowrap text-base sm:text-lg">Search description</p>
+                        <input
+                            type="checkbox"
+                            checked={props.value.searchDescription}
+                            onChange={(e) => props.onChange({
+                                ...props.value,
+                                searchDescription: e.target.checked,
+                            })}
+                        />
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                        <p className="text-end whitespace-nowrap text-base sm:text-lg">Search system message</p>
+                        <input
+                            type="checkbox"
+                            checked={props.value.searchSystemMessage}
+                            onChange={(e) => props.onChange({
+                                ...props.value,
+                                searchSystemMessage: e.target.checked,
+                            })}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
 
 
         {showFilters && <div className="flex flex-col gap-2 p-2">
-            <span className="flex items-baseline gap-4">
+            <span className="flex items-baseline gap-4 flex-row">
                 <span className="flex items-baseline justify-end gap-1 w-32">
                     <FaUserGear /> <span className="text-lg">Model</span>
                 </span>
-                <div className="self-stretch w-[1px] bg-slate-800 mr-9" />
-                <MultiSelect
-                    options={[
-                        { label: "GPT 4", value: "gpt-4" },
-                        { label: "GPT 3.5", value: "gpt-3.5-turbo" },
-                    ]}
-                    value={props.value.models}
-                    onChange={(value) => props.onChange({
-                        ...props.value,
-                        models: value,
-                    })}
-                />
+                <div className="self-stretch w-[1px] bg-slate-800" />
+                <div className="flex-grow flex justify-center">
+                    <MultiSelect
+                        options={[
+                            { label: "GPT 4", value: "gpt-4" },
+                            { label: "GPT 3.5", value: "gpt-3.5-turbo" },
+                        ]}
+                        value={props.value.models}
+                        onChange={(value) => props.onChange({
+                            ...props.value,
+                            models: value,
+                        })}
+                    />
+                </div>
             </span>
 
             <span className="flex items-baseline gap-4">

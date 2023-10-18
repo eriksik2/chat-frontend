@@ -53,9 +53,9 @@ function LogInPrompt(props: LogInPromptProps) {
     const { data: chatbotStats, error: statsError, reloading: statsReloading } = useApiGET<ApiBotStatsGETResponse>(props.chatbot ? `/api/bots/${props.chatbot}/stats` : null);
     const { data: chatbot, error, reloading } = useApiGET<ApibotGETResponse>(props.chatbot ? `/api/bots/${props.chatbot}` : null);
 
-    return <div className="h-full flex flex-col justify-center items-center">
+    return <div className="h-full flex flex-col justify-center items-center text-center">
 
-        {chatbot !== undefined && <div className="pb-24 flex flex-col items-center gap-4">
+        {chatbot !== undefined && <div className="pb-14 sm:pb-24 flex flex-col items-center gap-4 text-start">
             <ChatBotCard
                 id={chatbot.id}
             />
