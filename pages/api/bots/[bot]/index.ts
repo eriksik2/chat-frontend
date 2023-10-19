@@ -30,6 +30,7 @@ export type ApibotGETResponse = Prisma.ChatBotGetPayload<{
     frequency_bias: true;
     presence_bias: true;
     systemMessage: true;
+    plugins: true;
   };
 }>;
 
@@ -134,6 +135,7 @@ async function getHandler(
         frequency_bias: true,
         presence_bias: true,
         systemMessage: true,
+        plugins: true,
       },
     });
   } catch (e) {

@@ -25,6 +25,7 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
         temperature: true;
         frequency_bias: true;
         presence_bias: true;
+        plugins: true;
       };
     };
   };
@@ -116,6 +117,7 @@ async function getHandler(
           temperature: true,
           frequency_bias: true,
           presence_bias: true,
+          plugins: true,
         },
       },
     },

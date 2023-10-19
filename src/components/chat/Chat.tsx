@@ -164,11 +164,7 @@ export default function Chat(props: ChatProps) {
         }),
         message,
       ],
-      [
-        // Available functions
-        "generate_image",
-        "create_new_chatbot",
-      ],
+      chat.chatbot.plugins,
     );
     setAiCompletion(comp);
   }
