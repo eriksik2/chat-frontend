@@ -78,26 +78,6 @@ const predefinedFunctionsList: AIFunction[] = [
       model: string;
       system_message: string;
     }): Promise<string> {
-      /* ApibotsPOSTBody = {
-                name: string;
-                description: string;
-                categories: string[];
-                model: string;
-                systemMessage: string | null;
-                temperature: number;
-                frequency_bias: number;
-                presence_bias: number;
-            }; */
-      console.log({
-        name: name,
-        description: description ?? "",
-        model: model,
-        systemMessage: system_message,
-        temperature: 0.8,
-        frequency_bias: 0.0,
-        presence_bias: 0.0,
-        categories: ["Created with AI"],
-      });
       const res = await fetch("/api/bots", {
         method: "POST",
         headers: {

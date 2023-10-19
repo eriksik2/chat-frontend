@@ -15,6 +15,7 @@ import {
   ApiChatPOSTResponse,
 } from "../../../pages/api/chats/[chat]";
 import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
+import ChatBotDetails from "../chatbot/ChatBotDetails";
 
 type ChatProps = {
   id: string;
@@ -235,86 +236,97 @@ export default function Chat(props: ChatProps) {
         </div>
       ) : (
         <div className="absolute bottom-0 left-0 right-0 top-0">
-          <div className="no-scrollbar flex h-full flex-col items-center overflow-auto scroll-smooth">
-            <div className="flex w-5/6 flex-col items-stretch justify-start px-4 pb-20 pr-32 pt-8">
-              <div
-                className={clsx(
-                  "mt-8 rounded-xl",
-                  (chat?.messages ?? []).length === 0
-                    ? "translate-y-0 opacity-100"
-                    : "h-0 translate-y-[-2rem] opacity-0",
-                  "transition-all duration-1000 ease-in-out",
-                  "flex flex-col items-center justify-center",
-                )}
-              >
-                <h2 className="text-2xl">
-                  What will you ask {chat?.chatbot.name}?
-                </h2>
-              </div>
-              {(chat?.messages ?? []).map((message, index) => {
-                return (
-                  <div key={index}>
-                    {index > 0 && <div className="h-2" />}
-                    <ChatMessageComponent
-                      content={
-                        JSON.parse(message.content) as ChatMessageContent[]
-                      }
-                      author={
-                        message.author === "USER"
-                          ? "You"
-                          : chat?.chatbot.name ?? "assistant"
-                      }
-                      streaming={false}
-                    />
-                  </div>
-                );
-              })}
-              {aiCompletion !== null && (
-                <div key={chat?.messages.length}>
-                  <ChatMessageStreamingComponent
-                    author={chat?.chatbot.name ?? ""}
-                    completion={aiCompletion}
-                    onComplete={(message) => {
-                      setAiCompletion(null);
-                      const json = JSON.stringify(message);
-                      const newChat =
-                        chat === undefined
-                          ? null
-                          : {
-                              messages: [
-                                ...chat.messages,
-                                {
-                                  id: "",
-                                  author: "CHATBOT" as const,
-                                  content: json,
-                                },
-                              ],
-                              chatbot: chat.chatbot,
-                            };
-                      newChat && mutate(newChat, false);
-                      postMessage({
-                        type: "message",
-                        author: "CHATBOT" as const,
-                        content: json,
-                      });
-                    }}
-                  />
+          <div className="flex h-full w-full flex-row items-stretch justify-stretch">
+            {chat && (
+              <div className="w-[17rem] flex-shrink-0">
+                <div className="flex justify-center p-1 pt-12">
+                  <h2 className="text-2xl">This chat</h2>
                 </div>
-              )}
-            </div>
-
-            <div ref={scrollDownRef} className="snap-end"></div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
-            {false && (
-              <>
-                <div>Waiting for response...</div>
-                <div className="h-2" />
-              </>
+                <ChatBotDetails id={chat.chatbot.id} />
+              </div>
             )}
-            <ChatTextBox onSend={onUserSend} canSend={true} />
-            <div className="h-4" />
+            <div className="relative flex-grow">
+              <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
+                <div className="flex w-5/6 flex-col items-stretch justify-start px-4 pb-20 pr-32 pt-8">
+                  <div
+                    className={clsx(
+                      "mt-8 rounded-xl",
+                      (chat?.messages ?? []).length === 0
+                        ? "translate-y-0 opacity-100"
+                        : "h-0 translate-y-[-2rem] opacity-0",
+                      "transition-all duration-1000 ease-in-out",
+                      "flex flex-col items-center justify-center",
+                    )}
+                  >
+                    <h2 className="text-2xl">
+                      What will you ask {chat?.chatbot.name}?
+                    </h2>
+                  </div>
+                  {(chat?.messages ?? []).map((message, index) => {
+                    return (
+                      <div key={index}>
+                        {index > 0 && <div className="h-2" />}
+                        <ChatMessageComponent
+                          content={
+                            JSON.parse(message.content) as ChatMessageContent[]
+                          }
+                          author={
+                            message.author === "USER"
+                              ? "You"
+                              : chat?.chatbot.name ?? "assistant"
+                          }
+                          streaming={false}
+                        />
+                      </div>
+                    );
+                  })}
+                  {aiCompletion !== null && (
+                    <div key={chat?.messages.length}>
+                      <ChatMessageStreamingComponent
+                        author={chat?.chatbot.name ?? ""}
+                        completion={aiCompletion}
+                        onComplete={(message) => {
+                          setAiCompletion(null);
+                          const json = JSON.stringify(message);
+                          const newChat =
+                            chat === undefined
+                              ? null
+                              : {
+                                  messages: [
+                                    ...chat.messages,
+                                    {
+                                      id: "",
+                                      author: "CHATBOT" as const,
+                                      content: json,
+                                    },
+                                  ],
+                                  chatbot: chat.chatbot,
+                                };
+                          newChat && mutate(newChat, false);
+                          postMessage({
+                            type: "message",
+                            author: "CHATBOT" as const,
+                            content: json,
+                          });
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div ref={scrollDownRef} className="snap-end"></div>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
+                {false && (
+                  <>
+                    <div>Waiting for response...</div>
+                    <div className="h-2" />
+                  </>
+                )}
+                <ChatTextBox onSend={onUserSend} canSend={true} />
+                <div className="h-4" />
+              </div>
+            </div>
           </div>
         </div>
       )}

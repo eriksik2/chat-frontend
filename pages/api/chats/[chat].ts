@@ -18,6 +18,7 @@ export type ApiChatGETResponse = Prisma.ChatGetPayload<{
     };
     chatbot: {
       select: {
+        id: true;
         name: true;
         model: true;
         systemMessage: true;
@@ -108,6 +109,7 @@ async function getHandler(
       },
       chatbot: {
         select: {
+          id: true,
           name: true,
           model: true,
           systemMessage: true,

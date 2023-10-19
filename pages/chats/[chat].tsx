@@ -88,7 +88,7 @@ function ChatPageLayout(props: { page: ReactElement }) {
       tabsGap="0"
       tabBarWidth="17rem"
       before={
-        <div className="mt-12 p-1">
+        <div className="p-1 pt-12">
           <h2 className="text-2xl">Your chats</h2>
         </div>
       }
