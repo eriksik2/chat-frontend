@@ -127,7 +127,13 @@ export default function ChatBotList(props: ChatBotListProps) {
           )}
         >
           {(bots ?? []).map((bot) => {
-            return <ChatBotCard id={bot.id} key={bot.id} />;
+            return (
+              <ChatBotCard
+                id={bot.id}
+                key={bot.id}
+                onEdit={() => setEditId(bot.id)}
+              />
+            );
           })}
         </div>
       </div>
