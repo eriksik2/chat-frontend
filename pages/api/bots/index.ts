@@ -122,10 +122,10 @@ async function getHandler(
             // User is author or bot is published
             OR: (() => {
               const or: Prisma.ChatBotWhereInput[] = [];
-              if (session && session.user && session.user.email) {
+              if (session && session.user) {
                 or.push({
                   author: {
-                    email: session.user.email,
+                    id: session.user.id,
                   },
                 });
               }
@@ -210,6 +210,13 @@ async function postHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApibotsPOSTResponse | string>,
 ) {
+  if (session === null || session.user === undefined) {
+    res.statusCode = 401;
+    res.send("Not authenticated");
+    res.end();
+    return;
+  }
+
   const body = req.body as ApibotsPOSTBody;
   var bot;
   try {
@@ -226,7 +233,7 @@ async function postHandler(
 
         author: {
           connect: {
-            email: session!.user!.email!,
+            id: session.user.id,
           },
         },
       },

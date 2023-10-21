@@ -68,28 +68,19 @@ async function getHandler(
     rating: number;
   } | null = null;
   try {
-    // TODO
-    // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
-    // So I have to fetch the user id first seperately.
-    const userId = await prisma.user.findUnique({
-      where: {
-        email: session!.user!.email as string,
-      },
-      select: {
-        id: true,
-      },
-    });
-    personal = await prisma.chatBotRating.findUnique({
-      where: {
-        chatbotId_userId: {
-          chatbotId: req.query.bot as string,
-          userId: userId!.id,
+    if (session?.user?.id) {
+      personal = await prisma.chatBotRating.findUnique({
+        where: {
+          chatbotId_userId: {
+            chatbotId: req.query.bot as string,
+            userId: session.user.id,
+          },
         },
-      },
-      select: {
-        rating: true,
-      },
-    });
+        select: {
+          rating: true,
+        },
+      });
+    }
   } catch (e) {
     // Failed to get user rating, thats fine
   }
@@ -145,7 +136,7 @@ async function postHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotRatePOSTResponse | string>,
 ) {
-  if (session === null || session.user === undefined || !session.user.email) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -162,22 +153,11 @@ async function postHandler(
 
   try {
     // remove old rating if it exists
-    // TODO
-    // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
-    // So I have to fetch the user id first seperately.
-    const userId = await prisma.user.findUnique({
-      where: {
-        email: session?.user?.email as string,
-      },
-      select: {
-        id: true,
-      },
-    });
     const data = await prisma.chatBotRating.delete({
       where: {
         chatbotId_userId: {
           chatbotId: req.query.bot as string,
-          userId: userId!.id,
+          userId: session.user.id,
         },
       },
       select: {
@@ -217,7 +197,7 @@ async function postHandler(
         },
         user: {
           connect: {
-            email: session?.user?.email as string,
+            id: session.user.id,
           },
         },
       },
@@ -279,29 +259,18 @@ async function deleteHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotRateDELETEResponse | string>,
 ) {
-  if (session === null || session.user === undefined || !session.user.email) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
     return;
   }
   try {
-    // TODO
-    // Thought I could just do delete where: { user: ..., chatbot: ... } but apparently not
-    // So I have to fetch the user id first seperately.
-    const userId = await prisma.user.findUnique({
-      where: {
-        email: session?.user?.email as string,
-      },
-      select: {
-        id: true,
-      },
-    });
     const data = await prisma.chatBotRating.delete({
       where: {
         chatbotId_userId: {
           chatbotId: req.query.bot as string,
-          userId: userId!.id,
+          userId: session.user.id,
         },
       },
       select: {

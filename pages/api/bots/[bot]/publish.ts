@@ -15,7 +15,7 @@ export default async function handler(
   >,
 ) {
   const session = await getServerSession(req, res, authOptions);
-  if (session === null || session.user === undefined || !session.user.email) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -24,28 +24,6 @@ export default async function handler(
   if (req.query.bot === undefined || typeof req.query.bot !== "string") {
     res.statusCode = 400;
     res.send("Bad request: bot id not specified correctly");
-    res.end();
-    return;
-  }
-
-  try {
-    // Query for the bot id AND author email === session email to ensure the user owns the bot.
-    const bot = await prisma.chatBot.findUnique({
-      where: {
-        id: req.query.bot as string,
-        author: {
-          email: session.user.email,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-  } catch (e) {
-    res.statusCode = 500;
-    res.send(
-      "Failed to change the publicity of chatbot: You must own the chatbot to do this",
-    );
     res.end();
     return;
   }
@@ -82,6 +60,9 @@ async function postHandler(
         chatbot: {
           connect: {
             id: req.query.bot as string,
+            author: {
+              id: session!.user!.id,
+            },
           },
         },
       },
@@ -114,6 +95,11 @@ async function deleteHandler(
     await prisma.publishedChatBot.delete({
       where: {
         id: req.query.bot as string,
+        chatbot: {
+          author: {
+            id: session!.user!.id,
+          },
+        },
       },
     });
   } catch (e) {

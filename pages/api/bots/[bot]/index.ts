@@ -98,11 +98,15 @@ async function getHandler(
       where: {
         id: req.query.bot as string,
         OR: [
-          {
-            author: {
-              email: session?.user?.email,
-            },
-          },
+          ...(session?.user
+            ? [
+                {
+                  author: {
+                    id: session.user.id,
+                  },
+                },
+              ]
+            : []),
           {
             published: {
               publishedAt: {
@@ -169,11 +173,7 @@ async function postHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotPOSTResponse | string>,
 ) {
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -187,7 +187,7 @@ async function postHandler(
       where: {
         id: req.query.bot as string,
         author: {
-          email: session.user.email,
+          id: session.user.id,
         },
       },
       data: {
@@ -226,11 +226,7 @@ async function deleteHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotDELETEResponse | string>,
 ) {
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -241,7 +237,7 @@ async function deleteHandler(
       where: {
         id: req.query.bot as string,
         author: {
-          email: session.user.email,
+          id: session.user.id,
         },
       },
     });

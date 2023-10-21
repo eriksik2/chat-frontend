@@ -25,7 +25,7 @@ export default async function handler(
   res: NextApiResponse<ApiChatsGETResponse | ApiChatsPOSTResponse | string>,
 ) {
   const session = await getServerSession(req, res, authOptions);
-  if (!session || !session.user || !session.user.email) {
+  if (!session || !session.user) {
     res.statusCode = 403;
     res.send("Not authenticated");
     res.end();
@@ -60,7 +60,7 @@ async function getHandler(
     (await prisma.chat.findMany({
       where: {
         author: {
-          email: session.user!.email,
+          id: session.user!.id,
         },
       },
       select: {
@@ -86,7 +86,7 @@ async function postHandler(
       name: body.chatName,
       author: {
         connect: {
-          email: session.user!.email!,
+          id: session.user!.id,
         },
       },
       chatbot: {

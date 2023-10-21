@@ -55,11 +55,7 @@ export default async function handler(
   >,
 ) {
   const session = await getServerSession(req, res, authOptions);
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -96,7 +92,7 @@ async function getHandler(
     where: {
       id: req.query.chat as string,
       author: {
-        email: session.user!.email!,
+        id: session.user!.id,
       },
     },
     select: {
@@ -213,7 +209,7 @@ async function deleteHandler(
       where: {
         id: req.query.chat as string,
         author: {
-          email: session.user!.email!,
+          id: session.user!.id,
         },
       },
     });
