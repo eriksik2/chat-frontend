@@ -1,5 +1,5 @@
 import { NextApiHandler } from "next";
-import NextAuth from "next-auth";
+import NextAuth, { AuthOptions } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
@@ -9,7 +9,15 @@ const authHandler: NextApiHandler = (req, res) =>
   NextAuth(req, res, authOptions);
 export default authHandler;
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
+  callbacks: {
+    session({ session, user }) {
+      if (session.user) {
+        session.user.id = parseInt(user.id);
+      }
+      return session;
+    },
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,

@@ -24,6 +24,7 @@ import {
   ApiBotFavouritePOSTResponse,
 } from "../../../pages/api/bots/[bot]/favourite";
 import ChatBotRating from "./ChatBotRating";
+import { trpc } from "@/util/trcp";
 
 type ChatBotCardProps = {
   id: string;
@@ -32,16 +33,20 @@ type ChatBotCardProps = {
 
 export function ChatBotCard(props: ChatBotCardProps) {
   const {
-    data: chatbot,
+    data,
+    isInitialLoading,
     error: chatbotError,
-    reloading: chatbotReloading,
-  } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
+  } = trpc.bots.get.useQuery({
+    id: props.id,
+  });
+  const chatbot = data?.bot ?? undefined;
+
   const {
     data: isFav,
     error: favError,
     reloading: favReloading,
   } = useApiGET<ApiBotFavouriteGETResponse>(`/api/bots/${props.id}/favourite`);
-  const loading = chatbot === undefined && chatbotReloading;
+  const loading = chatbot === undefined && isInitialLoading;
   if (loading) return <LoadingIcon />;
   if (chatbotError !== null)
     return (
@@ -64,7 +69,18 @@ export function ChatBotCard(props: ChatBotCardProps) {
 }
 
 type ChatBotCardStaticProps = {
-  chatbot: ApibotGETResponse;
+  chatbot: {
+    id: string;
+    name: string;
+    description: string;
+    author: {
+      id: number;
+      name: string | null;
+    };
+    published: {
+      publishedAt: string;
+    } | null;
+  };
   isFav?: boolean;
   onEdit?: (id: string) => void;
 };
@@ -105,8 +121,8 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   const { data: session } = useSession();
   const loggedIn = session !== null;
   const ownsBot =
-    props.chatbot.author.email !== null &&
-    session?.user?.email === props.chatbot.author.email;
+    props.chatbot.author.id !== null &&
+    session?.user?.id === props.chatbot.author.id;
 
   const [doTilt, setDoTilt] = useState<boolean>(false);
   const [tiltFactor, setTiltFactor] = useState<[number, number]>([0, 0]);
