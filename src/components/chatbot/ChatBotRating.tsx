@@ -25,9 +25,8 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
     ApiBotRatePOSTResponse
   >(`/api/bots/${props.id}/rate`);
   const rating =
-    data?.yourRating ?? data
-      ? data.average.ratingsTotal / data.average.ratingsCount
-      : 0;
+    data?.yourRating ??
+    (data ? data.average.ratingsTotal / data.average.ratingsCount : 0);
   const ratingType: "unrated" | "personal" | "average" | "unloaded" =
     data === undefined
       ? "unloaded"
@@ -62,7 +61,6 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
                 : rating > 4
                 ? Math.ceil(rating)
                 : Math.round(rating);
-            console.log(roundedRating);
             setHoverRating(roundedRating);
           }}
           onMouseLeave={() => setHoverRating(null)}
@@ -105,7 +103,7 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
       </div>
       {data && (
         <p className="text-sm text-gray-600">
-          Ratings: {data!.average.ratingsCount}
+          Ratings: {data.average.ratingsCount}
         </p>
       )}
     </div>

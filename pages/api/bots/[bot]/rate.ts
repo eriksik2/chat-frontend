@@ -169,17 +169,32 @@ async function postHandler(
         },
       },
     });
-    await prisma.publishedChatBot.update({
+    const ratingData = await prisma.publishedChatBot.update({
       where: {
         id: data.chatbot.id,
       },
       data: {
+        rating: {
+          increment: 0,
+        },
         ratingsTotal: {
           decrement: data.rating,
         },
         ratingsCount: {
           decrement: 1,
         },
+      },
+      select: {
+        ratingsCount: true,
+        ratingsTotal: true,
+      },
+    });
+    await prisma.publishedChatBot.update({
+      where: {
+        id: data.chatbot.id,
+      },
+      data: {
+        rating: ratingData.ratingsTotal / ratingData.ratingsCount,
       },
     });
   } catch (e) {
@@ -215,6 +230,9 @@ async function postHandler(
         id: data.chatbot.id,
       },
       data: {
+        rating: {
+          increment: 0,
+        },
         ratingsTotal: {
           increment: data.rating,
         },
@@ -243,7 +261,7 @@ async function postHandler(
       return;
     } else {
       res.statusCode = 500;
-      res.send("Failed to post rating: error occurred");
+      res.send("Failed to post rating: error occurred: " + e);
       res.end();
       return;
     }
@@ -313,12 +331,12 @@ async function deleteHandler(
   } catch (e) {
     if (e instanceof PrismaClientKnownRequestError) {
       res.statusCode = 500;
-      res.send(`Failed to unfavourite chatbot: ${e.code}`);
+      res.send(`Failed to unrate chatbot: ${e.code}`);
       res.end();
       return;
     } else {
       res.statusCode = 500;
-      res.send("Failed to unfavourite chatbot: error occurred");
+      res.send("Failed to unrate chatbot: error occurred");
       res.end();
       return;
     }
