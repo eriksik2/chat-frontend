@@ -64,9 +64,6 @@ export default function RootLayout(props: RootLayoutProps) {
               <div className="flex-grow" />
               <div className="flex items-center gap-4 px-4 text-4xl">
                 <LogInButton />
-                <a href="https://github.com/eriksik2/chat-frontend">
-                  <FaGithub />
-                </a>
               </div>
             </>
           }

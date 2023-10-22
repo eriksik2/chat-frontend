@@ -27,6 +27,7 @@ import ChatBotRating from "./ChatBotRating";
 
 type ChatBotCardProps = {
   id: string;
+  showTools?: boolean;
   onEdit?: (id: string) => void;
 };
 
@@ -57,6 +58,7 @@ export function ChatBotCard(props: ChatBotCardProps) {
   return (
     <ChatBotCardStatic
       chatbot={chatbot!}
+      showTools={props.showTools}
       isFav={isFav?.favourite}
       onEdit={props.onEdit}
     />
@@ -65,6 +67,7 @@ export function ChatBotCard(props: ChatBotCardProps) {
 
 type ChatBotCardStaticProps = {
   chatbot: ApibotGETResponse;
+  showTools?: boolean;
   isFav?: boolean;
   onEdit?: (id: string) => void;
 };
@@ -107,6 +110,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   const ownsBot =
     props.chatbot.author.email !== null &&
     session?.user?.email === props.chatbot.author.email;
+  const showTools = props.showTools ?? false;
 
   const [doTilt, setDoTilt] = useState<boolean>(false);
   const [tiltFactor, setTiltFactor] = useState<[number, number]>([0, 0]);
@@ -198,11 +202,11 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
           </button>
         )}
         <div className="flex-grow" />
-        {!ownsBot && <ChatBotRating id={props.chatbot.id} />}
+        {!(ownsBot && showTools) && <ChatBotRating id={props.chatbot.id} />}
         <button
           className={clsx(
             "rounded bg-slate-500 p-1",
-            ownsBot ? "block" : "hidden",
+            ownsBot && showTools ? "block" : "hidden",
           )}
           onClick={async () => {
             if (isPublished) await unpublish({});
@@ -215,7 +219,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
           <button
             className={clsx(
               "rounded bg-slate-500 p-1",
-              ownsBot ? "block" : "hidden",
+              ownsBot && showTools ? "block" : "hidden",
             )}
             onClick={() => props.onEdit?.(props.chatbot.id)}
           >
@@ -225,7 +229,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         <button
           className={clsx(
             "rounded bg-red-400 p-1",
-            ownsBot ? "block" : "hidden",
+            ownsBot && showTools ? "block" : "hidden",
           )}
           onClick={async () => {
             const response = await fetch(`/api/bots/${props.chatbot.id}`, {
