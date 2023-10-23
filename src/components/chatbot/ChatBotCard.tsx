@@ -28,6 +28,7 @@ import ChatBotRating from "./ChatBotRating";
 type ChatBotCardProps = {
   id: string;
   showTools?: boolean;
+  showLoading?: boolean;
   onEdit?: (id: string) => void;
 };
 
@@ -37,13 +38,18 @@ export function ChatBotCard(props: ChatBotCardProps) {
     error: chatbotError,
     reloading: chatbotReloading,
   } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
+
   const {
     data: isFav,
     error: favError,
     reloading: favReloading,
   } = useApiGET<ApiBotFavouriteGETResponse>(`/api/bots/${props.id}/favourite`);
+
+  const showLoading = props.showLoading ?? true;
   const loading = chatbot === undefined && chatbotReloading;
-  if (loading) return <LoadingIcon />;
+
+  if (loading) return showLoading ? <LoadingIcon /> : null;
+
   if (chatbotError !== null)
     return (
       <div
@@ -55,6 +61,7 @@ export function ChatBotCard(props: ChatBotCardProps) {
         Error while loading chatbot
       </div>
     );
+
   return (
     <ChatBotCardStatic
       chatbot={chatbot!}

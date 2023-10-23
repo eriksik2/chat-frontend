@@ -15,6 +15,9 @@ export type ApibotsGETQuery = {
   category?: string;
   sortBy?: "new" | "rating" | "popular" | "name";
 
+  user?: `${number}`;
+  published?: `${boolean}`;
+
   show?: `${number}`;
   page?: `${number}`;
 };
@@ -72,7 +75,7 @@ export default async function handler(
 async function getHandler(
   session: Session | null,
   req: NextApiRequest,
-  res: NextApiResponse<ApibotsGETResponse>,
+  res: NextApiResponse<ApibotsGETResponse | string>,
 ) {
   const query = req.query as ApibotsGETQuery;
   if (query.models !== undefined) {
@@ -108,6 +111,18 @@ async function getHandler(
       break;
   }
 
+  const userid = query.user ? parseInt(query.user) : undefined;
+  const userIsSelf = userid !== undefined && session?.user?.id === userid;
+
+  if (!userIsSelf && query.published === "false") {
+    res.statusCode = 200;
+    res.json([]);
+    res.end();
+    return;
+  }
+
+  const published = userIsSelf ? query.published : "true";
+
   const take = query.show ? parseInt(query.show) : 20;
   const skip = query.page ? parseInt(query.page) * take : 0;
 
@@ -120,23 +135,29 @@ async function getHandler(
         AND: [
           {
             // User is author or bot is published
-            OR: (() => {
-              const or: Prisma.ChatBotWhereInput[] = [];
-              if (session && session.user) {
-                or.push({
+            AND: (() => {
+              const and: Prisma.ChatBotWhereInput[] = [];
+              if (userid) {
+                and.push({
                   author: {
-                    id: session.user.id,
+                    id: userid,
                   },
                 });
               }
-              or.push({
-                published: {
-                  publishedAt: {
-                    lte: new Date(),
+              if (published === "true") {
+                and.push({
+                  published: {
+                    publishedAt: {
+                      lte: new Date(),
+                    },
                   },
-                },
-              });
-              return or;
+                });
+              } else if (published === "false") {
+                and.push({
+                  published: null,
+                });
+              }
+              return and;
             })(),
           },
 
