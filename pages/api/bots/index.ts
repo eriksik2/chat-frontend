@@ -18,17 +18,27 @@ export type ApibotsGETQuery = {
   user?: `${number}`;
   published?: `${boolean}`;
 
+  getCount?: "1";
   show?: `${number}`;
   page?: `${number}`;
 };
 
-export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
-  select: {
-    id: true;
-    categories: true;
-    featured: true;
-  };
-}>[];
+export type ApibotsGETResponse =
+  | {
+      type: "data";
+      data: Prisma.ChatBotGetPayload<{
+        select: {
+          id: true;
+          categories: true;
+          featured: true;
+        };
+      }>[];
+    }
+  | {
+      type: "count";
+      count: number;
+      pages: number;
+    };
 
 // POST: create a new chatbot
 export type ApibotsPOSTBody = {
@@ -116,7 +126,7 @@ async function getHandler(
 
   if (!userIsSelf && query.published === "false") {
     res.statusCode = 200;
-    res.json([]);
+    res.json({ type: "data", data: [] });
     res.end();
     return;
   }
@@ -126,104 +136,122 @@ async function getHandler(
   const take = query.show ? parseInt(query.show) : 20;
   const skip = query.page ? parseInt(query.page) * take : 0;
 
-  const bots =
-    (await prisma.chatBot.findMany({
-      skip,
-      take,
-      orderBy,
-      where: {
-        AND: [
-          {
-            // User is author or bot is published
-            AND: (() => {
-              const and: Prisma.ChatBotWhereInput[] = [];
-              if (userid) {
-                and.push({
-                  author: {
-                    id: userid,
-                  },
-                });
-              }
-              if (published === "true") {
-                and.push({
-                  published: {
-                    publishedAt: {
-                      lte: new Date(),
-                    },
-                  },
-                });
-              } else if (published === "false") {
-                and.push({
-                  published: null,
-                });
-              }
-              return and;
-            })(),
-          },
-
-          // TODO Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
-          {
-            // Search by name, description, or system message
-            OR: (() => {
-              const or: Prisma.ChatBotWhereInput[] = [];
-              if (query.search) {
-                or.push({
-                  name: {
-                    contains: query.search,
-                    mode: "insensitive",
-                  },
-                });
-                if (query.searchByDesc) {
-                  or.push({
-                    description: {
-                      contains: query.search,
-                      mode: "insensitive",
-                    },
-                  });
-                }
-                if (query.searchBySysm) {
-                  or.push({
-                    systemMessage: {
-                      contains: query.search,
-                      mode: "insensitive",
-                    },
-                  });
-                }
-              }
-              return or;
-            })(),
-          },
-        ],
-
-        // Filter by category
-        categories:
-          query.category === undefined
-            ? undefined
-            : {
-                has: query.category,
+  const prismaWhereQuery: Prisma.ChatBotWhereInput = {
+    AND: [
+      {
+        // User is author or bot is published
+        AND: (() => {
+          const and: Prisma.ChatBotWhereInput[] = [];
+          if (userid) {
+            and.push({
+              author: {
+                id: userid,
               },
-
-        // Filter by temperature
-        temperature: {
-          gte: query.minTemp ? parseFloat(query.minTemp) : 0,
-          lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
-        },
-
-        // Filter by model
-        model: {
-          in: query.models ?? [],
-        },
+            });
+          }
+          if (published === "true") {
+            and.push({
+              published: {
+                publishedAt: {
+                  lte: new Date(),
+                },
+              },
+            });
+          } else if (published === "false") {
+            and.push({
+              published: null,
+            });
+          }
+          return and;
+        })(),
       },
-      select: {
-        id: true,
-        categories: true,
-        featured: true,
-      },
-    })) ?? [];
 
-  res.statusCode = 200;
-  res.json(bots);
-  res.end();
+      // TODO Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
+      {
+        // Search by name, description, or system message
+        OR: (() => {
+          const or: Prisma.ChatBotWhereInput[] = [];
+          if (query.search) {
+            or.push({
+              name: {
+                contains: query.search,
+                mode: "insensitive",
+              },
+            });
+            if (query.searchByDesc) {
+              or.push({
+                description: {
+                  contains: query.search,
+                  mode: "insensitive",
+                },
+              });
+            }
+            if (query.searchBySysm) {
+              or.push({
+                systemMessage: {
+                  contains: query.search,
+                  mode: "insensitive",
+                },
+              });
+            }
+          }
+          return or;
+        })(),
+      },
+    ],
+
+    // Filter by category
+    categories:
+      query.category === undefined
+        ? undefined
+        : {
+            has: query.category,
+          },
+
+    // Filter by temperature
+    temperature: {
+      gte: query.minTemp ? parseFloat(query.minTemp) : 0,
+      lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
+    },
+
+    // Filter by model
+    model: {
+      in: query.models ?? [],
+    },
+  };
+
+  if (query.getCount !== "1") {
+    const bots =
+      (await prisma.chatBot.findMany({
+        skip,
+        take,
+        orderBy,
+        where: prismaWhereQuery,
+        select: {
+          id: true,
+          categories: true,
+          featured: true,
+        },
+      })) ?? [];
+
+    res.statusCode = 200;
+    res.json({
+      type: "data",
+      data: bots,
+    });
+    res.end();
+  } else {
+    const count = await prisma.chatBot.count({
+      where: prismaWhereQuery,
+    });
+    res.statusCode = 200;
+    res.json({
+      type: "count",
+      count: count,
+      pages: Math.ceil(count / take),
+    });
+    res.end();
+  }
 }
 
 async function postHandler(
