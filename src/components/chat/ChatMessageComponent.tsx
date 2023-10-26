@@ -31,7 +31,7 @@ export default function ChatMessageComponent(props: ChatMessageComponentProps) {
         "flex min-h-[4rem] flex-grow flex-row justify-stretch",
       )}
     >
-      <div className="my-4 w-[20%] flex-none border-r border-slate-400 px-2 text-lg text-black">
+      <div className="my-4 w-[10rem] flex-none border-r border-slate-400 px-2 text-lg text-black">
         <p className="text-end">{props.author}</p>
       </div>
       <div className="w-[80%] flex-shrink p-4 pb-2">

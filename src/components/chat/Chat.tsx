@@ -16,15 +16,18 @@ import {
 } from "../../../pages/api/chats/[chat]";
 import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
 import ChatBotDetails from "../chatbot/ChatBotDetails";
+import { useSession } from "next-auth/react";
 
 type ChatProps = {
   id: string;
 };
 
 export default function Chat(props: ChatProps) {
+  const { data: session } = useSession();
   const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(
     `/api/chats/${props.id}`,
   );
+  const unauthenticated = !session?.user;
   const loading = data === undefined && reloading;
   const chat = data;
 
@@ -40,6 +43,7 @@ export default function Chat(props: ChatProps) {
   const [openai, setOpenai] = useState<OpenAI | null>(null);
 
   useEffect(() => {
+    if (unauthenticated) return;
     // get/set openai key from localstorage
     if (apiKey !== null) {
       localStorage.setItem("openai-key", apiKey);
@@ -58,6 +62,7 @@ export default function Chat(props: ChatProps) {
 
   const [hasBeenNamed, setHasBeenNamed] = useState<boolean>(false);
   useEffect(() => {
+    if (unauthenticated) return;
     if (hasBeenNamed) return;
     if (chat?.messages.length === 2) {
       const summaryContent = chat.messages
@@ -111,6 +116,7 @@ export default function Chat(props: ChatProps) {
   }, [chat]);
 
   async function onUserSend(cont: string) {
+    if (unauthenticated) return;
     const message: CompletionMessage = {
       role: "user",
       content: [
@@ -125,6 +131,7 @@ export default function Chat(props: ChatProps) {
       chat === undefined
         ? null
         : {
+            author: chat.author,
             messages: [
               ...chat.messages,
               {
@@ -187,7 +194,7 @@ export default function Chat(props: ChatProps) {
 
   return (
     <div className="absolute bottom-0 left-0 right-0 top-0">
-      {apiKey === null ? (
+      {!unauthenticated && apiKey === null ? (
         <div className="z-20 flex h-full flex-col items-center justify-center backdrop-blur-lg">
           <div className="text-2xl">
             Please enter your OpenAI API key to access chat:
@@ -239,11 +246,16 @@ export default function Chat(props: ChatProps) {
                   <h2 className="text-2xl">This chat</h2>
                 </div>
                 <ChatBotDetails id={chat.chatbot.id} />
+                {unauthenticated && (
+                  <div className="flex w-full justify-center p-2">
+                    Shared by {chat.author.name}
+                  </div>
+                )}
               </div>
             )}
             <div className="relative flex-grow">
               <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
-                <div className="flex w-5/6 flex-col items-stretch justify-start px-4 pb-20 pr-32 pt-8">
+                <div className="flex flex-col items-stretch justify-start px-4 pb-20 pt-8">
                   <div
                     className={clsx(
                       "mt-8 rounded-xl",
@@ -288,6 +300,7 @@ export default function Chat(props: ChatProps) {
                             chat === undefined
                               ? null
                               : {
+                                  author: chat.author,
                                   messages: [
                                     ...chat.messages,
                                     {
@@ -312,16 +325,18 @@ export default function Chat(props: ChatProps) {
 
                 <div ref={scrollDownRef} className="snap-end"></div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
-                {false && (
-                  <>
-                    <div>Waiting for response...</div>
-                    <div className="h-2" />
-                  </>
-                )}
-                <ChatTextBox onSend={onUserSend} canSend={true} />
-                <div className="h-4" />
-              </div>
+              {!unauthenticated && (
+                <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
+                  {false && (
+                    <>
+                      <div>Waiting for response...</div>
+                      <div className="h-2" />
+                    </>
+                  )}
+                  <ChatTextBox onSend={onUserSend} canSend={true} />
+                  <div className="h-4" />
+                </div>
+              )}
             </div>
           </div>
         </div>
