@@ -20,6 +20,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
         inter.className,
         "relative h-screen w-screen",
         "bg-gradient-to-br from-slate-300/50 via-slate-100 to-slate-300/75 shadow-inner",
+        "dark:text-black",
       )}
     >
       <SessionProvider session={pageProps.session}>
