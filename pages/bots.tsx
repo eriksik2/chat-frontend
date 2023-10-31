@@ -6,12 +6,14 @@ import {
 import { useState } from "react";
 import clsx from "clsx";
 import ChatBotList from "@/components/chatbot/ChatBotList";
+import ChainEditor from "@/components/chain/ChainEditor";
 
 export default function BotsPage() {
   const [filter, setFilter] = useState<Filter>(defaultFilter);
 
   return (
     <div className="absolute bottom-0 left-0 right-0 top-0">
+      <ChainEditor />
       <div className="no-scrollbar overflow-auto">
         <div className="flex flex-col gap-4 px-4 py-6 lg:flex-row">
           <div className="lg:w-2/5">
