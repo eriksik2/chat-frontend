@@ -67,6 +67,9 @@ async function getHandler(
         id: true,
         name: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     })) ?? [];
 
   res.statusCode = 200;

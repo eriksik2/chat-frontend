@@ -87,11 +87,13 @@ function ChatPageLayout(props: { page: ReactElement }) {
       tabsLocation="right"
       tabsGap="0"
       tabBarWidth="17rem"
+      scrollable={true}
       before={
         <div className="p-1 pt-12">
           <h2 className="text-2xl">Your chats</h2>
         </div>
       }
+      after={<div className="p-1 pt-12"></div>}
       pages={(chats ?? []).map((chat) => {
         return {
           name: chat.name ?? "Chat",

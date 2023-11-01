@@ -255,7 +255,7 @@ export default function Chat(props: ChatProps) {
             )}
             <div className="relative flex-grow">
               <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
-                <div className="flex flex-col items-stretch justify-start px-4 pb-20 pt-8">
+                <div className="flex w-full flex-col items-stretch justify-start px-4 pb-20 pt-8">
                   <div
                     className={clsx(
                       "mt-8 rounded-xl",
