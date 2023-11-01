@@ -83,7 +83,7 @@ export default function Profile(props: ProfileProps) {
                 presence_bias: bot.presence_bias,
                 temperature: bot.temperature,
                 systemMessage: bot.systemMessage,
-                categories: [],
+                tags: [],
               });
             }}
           />
