@@ -10,7 +10,7 @@ export type ApibotGETResponse = Prisma.ChatBotGetPayload<{
     id: true;
     name: true;
     description: true;
-    categories: true;
+    tags: true;
     featured: true;
     author: {
       select: {
@@ -38,7 +38,7 @@ export type ApiBotPOSTBody = Prisma.ChatBotGetPayload<{
   select: {
     name: true;
     description: true;
-    categories: true;
+    tags: true;
 
     model: true;
     temperature: true;
@@ -120,7 +120,7 @@ async function getHandler(
         id: true,
         name: true,
         description: true,
-        categories: true,
+        tags: true,
         featured: true,
         author: {
           select: {
@@ -193,7 +193,7 @@ async function postHandler(
       data: {
         name: body.name,
         description: body.description,
-        categories: body.categories,
+        tags: body.tags,
 
         model: body.model,
         temperature: body.temperature,
