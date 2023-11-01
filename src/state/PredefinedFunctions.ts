@@ -91,7 +91,7 @@ const predefinedFunctionsList: AIFunction[] = [
           temperature: 0.8,
           frequency_bias: 0.0,
           presence_bias: 0.0,
-          categories: ["Created with AI"],
+          tags: [],
         } satisfies ApibotsPOSTBody),
       });
       const bot = (await res.json()) as ApibotsPOSTResponse;
