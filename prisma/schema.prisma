@@ -72,7 +72,7 @@ model ChatBot {
     id          String   @id @default(cuid())
     name        String
     description String
-    categories  String[] @default([])
+    tags        String[] @default([])
     featured    Boolean  @default(false)
     createdAt   DateTime @default(now()) @map(name: "created_at")
 

@@ -12,7 +12,7 @@ export type ApibotsGETQuery = {
   maxTemp?: `${number}`;
   minTemp?: `${number}`;
   models?: string[];
-  category?: string;
+  tags?: string[];
   sortBy?: "new" | "rating" | "popular" | "name";
 
   user?: `${number}`;
@@ -29,7 +29,7 @@ export type ApibotsGETResponse =
       data: Prisma.ChatBotGetPayload<{
         select: {
           id: true;
-          categories: true;
+          tags: true;
           featured: true;
         };
       }>[];
@@ -44,7 +44,7 @@ export type ApibotsGETResponse =
 export type ApibotsPOSTBody = {
   name: string;
   description: string;
-  categories: string[];
+  tags: string[];
   model: string;
   systemMessage: string | null;
   temperature: number;
@@ -55,6 +55,31 @@ export type ApibotsPOSTBody = {
 export type ApibotsPOSTResponse = {
   id: string;
 };
+
+function validateTags(tags: string[]): boolean {
+  const valid = [
+    "Famous person",
+    "Math",
+    "Science",
+    "History",
+    "Language",
+    "Creative",
+    "Entertainment",
+    "Politics",
+    "Religion",
+    "Philosophy",
+    "Psychology",
+    "Geography",
+    "Health",
+    "Business",
+  ];
+  for (const tag of tags) {
+    if (!valid.includes(tag)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -90,6 +115,15 @@ async function getHandler(
   const query = req.query as ApibotsGETQuery;
   if (query.models !== undefined) {
     query.models = (query.models as unknown as string).split(",");
+  }
+  if (query.tags !== undefined) {
+    query.tags = (query.tags as unknown as string).split(",");
+    if (!validateTags(query.tags)) {
+      res.statusCode = 400;
+      res.send("Invalid tags");
+      res.end();
+      return;
+    }
   }
 
   var orderBy: Prisma.ChatBotOrderByWithRelationInput;
@@ -201,11 +235,11 @@ async function getHandler(
     ],
 
     // Filter by category
-    categories:
-      query.category === undefined
+    tags:
+      query.tags === undefined
         ? undefined
         : {
-            has: query.category,
+            hasEvery: query.tags,
           },
 
     // Filter by temperature
@@ -229,7 +263,7 @@ async function getHandler(
         where: prismaWhereQuery,
         select: {
           id: true,
-          categories: true,
+          tags: true,
           featured: true,
         },
       })) ?? [];
@@ -267,13 +301,21 @@ async function postHandler(
   }
 
   const body = req.body as ApibotsPOSTBody;
+
+  if (!validateTags(body.tags)) {
+    res.statusCode = 400;
+    res.send("Invalid tags");
+    res.end();
+    return;
+  }
+
   var bot;
   try {
     bot = await prisma.chatBot.create({
       data: {
         name: body.name,
         description: body.description,
-        categories: body.categories,
+        tags: body.tags,
         model: body.model,
         systemMessage: body.systemMessage,
         temperature: body.temperature,
