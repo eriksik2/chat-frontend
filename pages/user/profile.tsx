@@ -1,21 +1,25 @@
 import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import Profile from "@/components/profile/Profile";
 
-type ProfileProps = {
+type ProfilePageProps = {
   user: Prisma.UserGetPayload<{
     select: {
+      id: true;
       name: true;
+      image: true;
     };
   }>;
 };
 
-export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({
+export const getServerSideProps: GetServerSideProps<ProfilePageProps> = async ({
   req,
   res,
 }) => {
-  const session = await getSession({ req });
+  const session = await getServerSession(req, res, authOptions);
   if (!session || !session.user) {
     res.statusCode = 403;
     return { notFound: true };
@@ -23,10 +27,12 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({
 
   const profile = await prisma.user.findUnique({
     where: {
-      email: session.user.email ?? undefined,
+      id: session.user.id,
     },
     select: {
+      id: true,
       name: true,
+      image: true,
     },
   });
 
@@ -42,11 +48,6 @@ export const getServerSideProps: GetServerSideProps<ProfileProps> = async ({
   };
 };
 
-export default function Profile(props: ProfileProps) {
-  return (
-    <div>
-      <h1>Profile</h1>
-      <p>{props.user.name}</p>
-    </div>
-  );
+export default function ProfilePage(props: ProfilePageProps) {
+  return <Profile user={props.user} />;
 }

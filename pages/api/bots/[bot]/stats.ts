@@ -22,40 +22,6 @@ export default async function handler(
   }
 
   try {
-    // Make sure the chatbot is published or the user owns the chatbot.
-    const OR: Prisma.ChatBotWhereInput[] = [];
-    if (session !== null && session.user !== undefined && session.user.email) {
-      OR.push({
-        author: {
-          email: session.user.email,
-        },
-      });
-    }
-    OR.push({
-      published: {
-        publishedAt: {
-          lte: new Date(),
-        },
-      },
-    });
-
-    const bot = await prisma.chatBot.findUnique({
-      where: {
-        id: req.query.bot as string,
-        OR: OR,
-      },
-      select: {
-        id: true,
-      },
-    });
-  } catch (e) {
-    res.statusCode = 500;
-    res.send("Failed to get chatbot stats: internal server error");
-    res.end();
-    return;
-  }
-
-  try {
     switch (req.method) {
       case "GET":
         await getHandler(session, req, res);
@@ -78,10 +44,28 @@ async function getHandler(
 ) {
   var count;
   try {
+    // Make sure the chatbot is published or the user owns the chatbot.
+    const OR: Prisma.ChatBotWhereInput[] = [
+      {
+        published: {
+          publishedAt: {
+            lte: new Date(),
+          },
+        },
+      },
+    ];
+    if (session !== null && session.user !== undefined) {
+      OR.push({
+        author: {
+          id: session.user.id,
+        },
+      });
+    }
     count = await prisma.chat.count({
       where: {
         chatbot: {
           id: req.query.bot as string,
+          OR: OR,
         },
       },
     });

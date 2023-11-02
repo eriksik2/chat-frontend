@@ -64,9 +64,6 @@ export default function RootLayout(props: RootLayoutProps) {
               <div className="flex-grow" />
               <div className="flex items-center gap-4 px-4 text-4xl">
                 <LogInButton />
-                <a href="https://github.com/eriksik2/chat-frontend">
-                  <FaGithub />
-                </a>
               </div>
             </>
           }
@@ -74,13 +71,16 @@ export default function RootLayout(props: RootLayoutProps) {
             {
               name: "Chatbots",
               route: "/bots",
+              isActive: (activeRoute, btnRoute) => {
+                return activeRoute.startsWith("/bots");
+              },
               icon: <FaUsersGear className="text-2xl" />,
             },
             {
               name: "Chats",
               route: "/api/chats/latest?redirect=true",
               isActive: (activeRoute, btnRoute) => {
-                return activeRoute.includes("/chats/");
+                return activeRoute.startsWith("/chats");
               },
               icon: <FaRegComments className="text-2xl" />,
             },

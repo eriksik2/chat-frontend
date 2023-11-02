@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import ChatBotCardStatic, { ChatBotCard } from "./ChatBotCard";
+import { ChatBotCard } from "./ChatBotCard";
 
 import { FaAngleDown } from "react-icons/fa6";
 import clsx from "clsx";
 import { ApibotsGETResponse } from "../../../pages/api/bots";
 
 type ChatBotListCategoryProps = {
-  bots: ApibotsGETResponse;
+  bots: ApibotsGETResponse & { type: "data" };
   category: string | null;
   onEdit: (id: string) => void;
 };
@@ -46,7 +46,7 @@ export default function ChatBotListCategory(props: ChatBotListCategoryProps) {
             "transition-height duration-300 ease-in-out",
           )}
         >
-          {props.bots.map((chatbot, i) => {
+          {props.bots.data.map((chatbot, i) => {
             return (
               <ChatBotCard
                 key={chatbot.id}

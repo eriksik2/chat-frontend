@@ -10,7 +10,7 @@ export type ApibotGETResponse = Prisma.ChatBotGetPayload<{
     id: true;
     name: true;
     description: true;
-    categories: true;
+    tags: true;
     featured: true;
     author: {
       select: {
@@ -38,7 +38,7 @@ export type ApiBotPOSTBody = Prisma.ChatBotGetPayload<{
   select: {
     name: true;
     description: true;
-    categories: true;
+    tags: true;
 
     model: true;
     temperature: true;
@@ -98,11 +98,15 @@ async function getHandler(
       where: {
         id: req.query.bot as string,
         OR: [
-          {
-            author: {
-              email: session?.user?.email,
-            },
-          },
+          ...(session?.user
+            ? [
+                {
+                  author: {
+                    id: session.user.id,
+                  },
+                },
+              ]
+            : []),
           {
             published: {
               publishedAt: {
@@ -116,7 +120,7 @@ async function getHandler(
         id: true,
         name: true,
         description: true,
-        categories: true,
+        tags: true,
         featured: true,
         author: {
           select: {
@@ -169,11 +173,7 @@ async function postHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotPOSTResponse | string>,
 ) {
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -187,13 +187,13 @@ async function postHandler(
       where: {
         id: req.query.bot as string,
         author: {
-          email: session.user.email,
+          id: session.user.id,
         },
       },
       data: {
         name: body.name,
         description: body.description,
-        categories: body.categories,
+        tags: body.tags,
 
         model: body.model,
         temperature: body.temperature,
@@ -226,11 +226,7 @@ async function deleteHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApiBotDELETEResponse | string>,
 ) {
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
+  if (session === null || session.user === undefined) {
     res.statusCode = 401;
     res.send("Not authenticated");
     res.end();
@@ -241,7 +237,7 @@ async function deleteHandler(
       where: {
         id: req.query.bot as string,
         author: {
-          email: session.user.email,
+          id: session.user.id,
         },
       },
     });

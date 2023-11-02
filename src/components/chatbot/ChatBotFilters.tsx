@@ -14,6 +14,15 @@ export type Filter = {
   sortBy: "newest" | "rating" | "popular" | "name";
 };
 
+export const defaultFilter: Filter = {
+  search: "",
+  searchDescription: true,
+  searchSystemMessage: false,
+  models: ["gpt-4", "gpt-3.5-turbo"],
+  temperature: [0, 2],
+  sortBy: "popular",
+};
+
 type ChatBotFiltersProps = {
   value: Filter;
   onChange: (value: Filter) => void;

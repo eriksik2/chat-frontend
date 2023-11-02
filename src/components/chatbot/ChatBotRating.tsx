@@ -1,50 +1,29 @@
-import { useApiGET, useApiPOST } from "@/api/fetcher";
-import {
-  ApiBotRateGETResponse,
-  ApiBotRatePOSTBody,
-  ApiBotRatePOSTResponse,
-} from "../../../pages/api/bots/[bot]/rate";
-
 import { FaStar, FaStarHalfStroke } from "react-icons/fa6";
 import { useState } from "react";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 
 type ChatBotRatingProps = {
-  id: string;
+  ratingsCount?: number;
+  rating?: number;
+  yourRating?: number;
+  onRate?: (rating: number) => void;
 };
 
 export default function ChatBotRating(props: ChatBotRatingProps) {
   const { data: session } = useSession();
 
-  const { data, error, reloading } = useApiGET<ApiBotRateGETResponse>(
-    `/api/bots/${props.id}/rate`,
-  );
-  const { post: setRating, error: setRatingError } = useApiPOST<
-    ApiBotRatePOSTBody,
-    ApiBotRatePOSTResponse
-  >(`/api/bots/${props.id}/rate`);
-  const rating =
-    data?.yourRating ?? data
-      ? data.average.ratingsTotal / data.average.ratingsCount
-      : 0;
+  const rating = props.yourRating ?? props.rating ?? 0;
   const ratingType: "unrated" | "personal" | "average" | "unloaded" =
-    data === undefined
-      ? "unloaded"
-      : data.yourRating
-      ? "personal"
-      : data.average.ratingsCount > 0
-      ? "average"
-      : "unrated";
-  const isUnloaded = ratingType === "unloaded";
+    props.yourRating ? "personal" : props.rating ? "average" : "unrated";
   const isUnrated = ratingType === "unrated";
   const isPersonal = ratingType === "personal";
 
   const [hoverRating, setHoverRating] = useState<number | null>(null);
 
-  const isUnauthorized = session === null || !session.user?.email;
+  const isUnauthorized = !session || !session.user;
 
-  if ((isUnauthorized && isUnrated) || isUnloaded) return null;
+  if (isUnauthorized && isUnrated) return null;
 
   return (
     <div className="flex flex-col items-start justify-center">
@@ -62,7 +41,6 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
                 : rating > 4
                 ? Math.ceil(rating)
                 : Math.round(rating);
-            console.log(roundedRating);
             setHoverRating(roundedRating);
           }}
           onMouseLeave={() => setHoverRating(null)}
@@ -70,7 +48,7 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
           onClick={async () => {
             if (isUnauthorized) return;
             if (hoverRating !== null) {
-              await setRating({ rating: hoverRating });
+              props.onRate?.(hoverRating);
             }
           }}
         />
@@ -103,10 +81,8 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
             );
           })}
       </div>
-      {data && (
-        <p className="text-sm text-gray-600">
-          Ratings: {data!.average.ratingsCount}
-        </p>
+      {props.ratingsCount !== undefined && (
+        <p className="text-sm text-gray-600">Ratings: {props.ratingsCount}</p>
       )}
     </div>
   );

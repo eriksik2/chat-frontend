@@ -13,6 +13,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../../pages/api/auth/[...nextauth]";
 import prisma from "@/lib/prisma";
 
+// @ts-ignore
+import superjson from "superjson";
+
 export const createContext = async (
   opts: trpcNext.CreateNextContextOptions,
 ) => {
@@ -23,7 +26,9 @@ export const createContext = async (
   };
 };
 
-const t = initTRPC.context<typeof createContext>().create();
+const t = initTRPC.context<typeof createContext>().create({
+  transformer: superjson,
+});
 
 /**
  * Routers

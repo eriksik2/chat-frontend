@@ -207,7 +207,7 @@ export function ChatBotEdit(props: ChatBotEditProps) {
           presence_bias: chatbot.presence_bias,
           temperature: chatbot.temperature,
           systemMessage: chatbot.systemMessage,
-          categories: data.categories,
+          tags: data.tags,
         });
         if (props.onSave) props.onSave();
       }}

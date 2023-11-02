@@ -16,17 +16,23 @@ import {
 } from "../../../pages/api/chats/[chat]";
 import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
 import ChatBotDetails from "../chatbot/ChatBotDetails";
+import { useSession } from "next-auth/react";
+import { trpc } from "@/util/trcp";
 
 type ChatProps = {
   id: string;
 };
 
 export default function Chat(props: ChatProps) {
-  const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(
-    `/api/chats/${props.id}`,
-  );
-  const loading = data === undefined && reloading;
-  const chat = data;
+  const { data: session } = useSession();
+
+  const trpcUtils = trpc.useUtils();
+  const { data, isInitialLoading, error } = trpc.chats.get.useQuery({
+    id: props.id,
+  });
+  const unauthenticated = !session?.user;
+  const loading = isInitialLoading;
+  const chat = data?.chat;
 
   const { post: postMessage, error: postError } = useApiPOST<
     ApiChatPOSTBody,
@@ -40,6 +46,7 @@ export default function Chat(props: ChatProps) {
   const [openai, setOpenai] = useState<OpenAI | null>(null);
 
   useEffect(() => {
+    if (unauthenticated) return;
     // get/set openai key from localstorage
     if (apiKey !== null) {
       localStorage.setItem("openai-key", apiKey);
@@ -58,6 +65,7 @@ export default function Chat(props: ChatProps) {
 
   const [hasBeenNamed, setHasBeenNamed] = useState<boolean>(false);
   useEffect(() => {
+    if (unauthenticated) return;
     if (hasBeenNamed) return;
     if (chat?.messages.length === 2) {
       const summaryContent = chat.messages
@@ -111,6 +119,7 @@ export default function Chat(props: ChatProps) {
   }, [chat]);
 
   async function onUserSend(cont: string) {
+    if (unauthenticated) return;
     const message: CompletionMessage = {
       role: "user",
       content: [
@@ -121,21 +130,22 @@ export default function Chat(props: ChatProps) {
       ],
     };
 
-    const newChat =
-      chat === undefined
-        ? null
-        : {
-            messages: [
-              ...chat.messages,
-              {
-                id: "",
-                author: "USER" as const,
-                content: JSON.stringify(message.content),
-              },
-            ],
-            chatbot: chat.chatbot,
-          };
-    newChat && mutate(newChat, false);
+    trpcUtils.chats.get.setData({ id: props.id }, (oldData) => {
+      return {
+        chat: {
+          ...oldData!.chat,
+          messages: [
+            ...oldData!.chat.messages,
+            {
+              id: "",
+              author: "USER" as const,
+              createdAt: new Date(),
+              content: JSON.stringify(message.content),
+            },
+          ],
+        },
+      };
+    });
     await postMessage({
       type: "message",
       author: "USER",
@@ -180,14 +190,13 @@ export default function Chat(props: ChatProps) {
     return (
       <div>
         <h1 className="text-2xl">Error</h1>
-        <div>{error.status}</div>
         <div>{error.message}</div>
       </div>
     );
 
   return (
     <div className="absolute bottom-0 left-0 right-0 top-0">
-      {apiKey === null ? (
+      {!unauthenticated && apiKey === null ? (
         <div className="z-20 flex h-full flex-col items-center justify-center backdrop-blur-lg">
           <div className="text-2xl">
             Please enter your OpenAI API key to access chat:
@@ -239,11 +248,16 @@ export default function Chat(props: ChatProps) {
                   <h2 className="text-2xl">This chat</h2>
                 </div>
                 <ChatBotDetails id={chat.chatbot.id} />
+                {unauthenticated && (
+                  <div className="flex w-full justify-center p-2">
+                    Shared by {chat.author.name}
+                  </div>
+                )}
               </div>
             )}
             <div className="relative flex-grow">
               <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
-                <div className="flex w-5/6 flex-col items-stretch justify-start px-4 pb-20 pr-32 pt-8">
+                <div className="flex w-full flex-col items-stretch justify-start px-4 pb-20 pt-8">
                   <div
                     className={clsx(
                       "mt-8 rounded-xl",
@@ -284,21 +298,25 @@ export default function Chat(props: ChatProps) {
                         onComplete={(message) => {
                           setAiCompletion(null);
                           const json = JSON.stringify(message);
-                          const newChat =
-                            chat === undefined
-                              ? null
-                              : {
+                          trpcUtils.chats.get.setData(
+                            { id: props.id },
+                            (oldData) => {
+                              return {
+                                chat: {
+                                  ...oldData!.chat,
                                   messages: [
-                                    ...chat.messages,
+                                    ...oldData!.chat.messages,
                                     {
                                       id: "",
                                       author: "CHATBOT" as const,
                                       content: json,
+                                      createdAt: new Date(),
                                     },
                                   ],
-                                  chatbot: chat.chatbot,
-                                };
-                          newChat && mutate(newChat, false);
+                                },
+                              };
+                            },
+                          );
                           postMessage({
                             type: "message",
                             author: "CHATBOT" as const,
@@ -312,16 +330,18 @@ export default function Chat(props: ChatProps) {
 
                 <div ref={scrollDownRef} className="snap-end"></div>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
-                {false && (
-                  <>
-                    <div>Waiting for response...</div>
-                    <div className="h-2" />
-                  </>
-                )}
-                <ChatTextBox onSend={onUserSend} canSend={true} />
-                <div className="h-4" />
-              </div>
+              {!unauthenticated && (
+                <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
+                  {false && (
+                    <>
+                      <div>Waiting for response...</div>
+                      <div className="h-2" />
+                    </>
+                  )}
+                  <ChatTextBox onSend={onUserSend} canSend={true} />
+                  <div className="h-4" />
+                </div>
+              )}
             </div>
           </div>
         </div>

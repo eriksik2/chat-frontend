@@ -22,6 +22,7 @@ export type TabsLayoutProps = {
   tabBarWidth?: `${number}${"" | "em" | "rem" | "px"}` | "auto";
   before?: React.ReactNode;
   after?: React.ReactNode;
+  scrollable?: boolean;
   buttonBuilder?: (params: {
     name: string;
     icon: React.ReactNode;
@@ -51,6 +52,7 @@ export const TabsLayoutDefaultProps: OnlyOptional<
   tabBarWidth: () => "auto",
   before: () => <></>,
   after: () => <></>,
+  scrollable: () => false,
   buttonBuilder: ({ showPageName }) =>
     defaultButtonBuilderBuilder(showPageName),
 } as const;
@@ -69,6 +71,7 @@ export function getTabsLayoutProps(
     props.tabBarWidth ?? TabsLayoutDefaultProps.tabBarWidth({});
   const before = props.before ?? TabsLayoutDefaultProps.before({});
   const after = props.after ?? TabsLayoutDefaultProps.after({});
+  const scrollable = props.scrollable ?? TabsLayoutDefaultProps.scrollable({});
   const buttonBuilder =
     props.buttonBuilder ??
     TabsLayoutDefaultProps.buttonBuilder({ showPageName });
@@ -81,6 +84,7 @@ export function getTabsLayoutProps(
     tabBarWidth,
     before,
     after,
+    scrollable,
     buttonBuilder,
     children: props.children,
     pages: props.pages,
@@ -96,6 +100,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
     tabBarWidth,
     before,
     after,
+    scrollable,
     buttonBuilder,
     children,
     pages,
@@ -125,6 +130,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
           tabsAlign={tabsAlign}
           tabsGap={tabsGap}
           tabBarWidth={tabBarWidth}
+          scrollable={scrollable}
         >
           {before}
           {pages.map((page) => {
@@ -156,15 +162,18 @@ type TabBarProps = {
   tabsGap: `${number}${"" | "em" | "rem" | "px"}`;
   tabBarWidth: `${number}${"" | "em" | "rem" | "px"}` | "auto";
   children: React.ReactNode[];
+  scrollable?: boolean;
 };
 
 export function TabBar(props: TabBarProps) {
+  const scrollable = props.scrollable ?? false;
   const tabBarWidth =
     props.tabBarWidth === "auto" ? undefined : props.tabBarWidth;
   return (
     <div
       className={clsx(
         "flex flex-grow items-center",
+        scrollable && "no-scrollbar overflow-scroll",
         props.tabsDir === "col" ? "h-full flex-col" : "flex-row",
         props.tabsAlign === "center"
           ? "justify-center"

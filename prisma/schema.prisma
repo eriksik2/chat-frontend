@@ -51,8 +51,8 @@ model VerificationToken {
 
 model User {
     id            Int       @id @default(autoincrement())
-    name          String?
-    email         String?   @unique
+    name          String
+    email         String    @unique
     image         String?
     emailVerified DateTime? @map(name: "emailVerified")
     createdAt     DateTime  @default(now()) @map(name: "created_at")
@@ -72,7 +72,7 @@ model ChatBot {
     id          String   @id @default(cuid())
     name        String
     description String
-    categories  String[] @default([])
+    tags        String[] @default([])
     featured    Boolean  @default(false)
     createdAt   DateTime @default(now()) @map(name: "created_at")
 
@@ -99,7 +99,7 @@ model PublishedChatBot {
     ChatBotRatings ChatBotRating[]
     ratingsTotal   Int             @default(0)
     ratingsCount   Int             @default(0)
-    rating         Float           @default(0.0)
+    rating         Float?
 
     publishedAt DateTime @default(now()) @map(name: "published_at")
 }

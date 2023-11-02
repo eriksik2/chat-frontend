@@ -12,26 +12,39 @@ export type ApibotsGETQuery = {
   maxTemp?: `${number}`;
   minTemp?: `${number}`;
   models?: string[];
-  category?: string;
+  tags?: string[];
   sortBy?: "new" | "rating" | "popular" | "name";
 
+  user?: `${number}`;
+  published?: `${boolean}`;
+
+  getCount?: "1";
   show?: `${number}`;
   page?: `${number}`;
 };
 
-export type ApibotsGETResponse = Prisma.ChatBotGetPayload<{
-  select: {
-    id: true;
-    categories: true;
-    featured: true;
-  };
-}>[];
+export type ApibotsGETResponse =
+  | {
+      type: "data";
+      data: Prisma.ChatBotGetPayload<{
+        select: {
+          id: true;
+          tags: true;
+          featured: true;
+        };
+      }>[];
+    }
+  | {
+      type: "count";
+      count: number;
+      pages: number;
+    };
 
 // POST: create a new chatbot
 export type ApibotsPOSTBody = {
   name: string;
   description: string;
-  categories: string[];
+  tags: string[];
   model: string;
   systemMessage: string | null;
   temperature: number;
@@ -42,6 +55,31 @@ export type ApibotsPOSTBody = {
 export type ApibotsPOSTResponse = {
   id: string;
 };
+
+function validateTags(tags: string[]): boolean {
+  const valid = [
+    "Famous person",
+    "Math",
+    "Science",
+    "History",
+    "Language",
+    "Creative",
+    "Entertainment",
+    "Politics",
+    "Religion",
+    "Philosophy",
+    "Psychology",
+    "Geography",
+    "Health",
+    "Business",
+  ];
+  for (const tag of tags) {
+    if (!valid.includes(tag)) {
+      return false;
+    }
+  }
+  return true;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -72,11 +110,20 @@ export default async function handler(
 async function getHandler(
   session: Session | null,
   req: NextApiRequest,
-  res: NextApiResponse<ApibotsGETResponse>,
+  res: NextApiResponse<ApibotsGETResponse | string>,
 ) {
   const query = req.query as ApibotsGETQuery;
   if (query.models !== undefined) {
     query.models = (query.models as unknown as string).split(",");
+  }
+  if (query.tags !== undefined) {
+    query.tags = (query.tags as unknown as string).split(",");
+    if (!validateTags(query.tags)) {
+      res.statusCode = 400;
+      res.send("Invalid tags");
+      res.end();
+      return;
+    }
   }
 
   var orderBy: Prisma.ChatBotOrderByWithRelationInput;
@@ -108,101 +155,137 @@ async function getHandler(
       break;
   }
 
+  const userid = query.user ? parseInt(query.user) : undefined;
+  const userIsSelf = userid !== undefined && session?.user?.id === userid;
+
+  if (!userIsSelf && query.published === "false") {
+    res.statusCode = 200;
+    res.json({ type: "data", data: [] });
+    res.end();
+    return;
+  }
+
+  const published = userIsSelf ? query.published : "true";
+
   const take = query.show ? parseInt(query.show) : 20;
   const skip = query.page ? parseInt(query.page) * take : 0;
 
-  const bots =
-    (await prisma.chatBot.findMany({
-      skip,
-      take,
-      orderBy,
-      where: {
-        AND: [
-          {
-            // User is author or bot is published
-            OR: (() => {
-              const or: Prisma.ChatBotWhereInput[] = [];
-              if (session && session.user && session.user.email) {
-                or.push({
-                  author: {
-                    email: session.user.email,
-                  },
-                });
-              }
+  const prismaWhereQuery: Prisma.ChatBotWhereInput = {
+    AND: [
+      {
+        // User is author or bot is published
+        AND: (() => {
+          const and: Prisma.ChatBotWhereInput[] = [];
+          if (userid) {
+            and.push({
+              author: {
+                id: userid,
+              },
+            });
+          }
+          if (published === "true") {
+            and.push({
+              published: {
+                publishedAt: {
+                  lte: new Date(),
+                },
+              },
+            });
+          } else if (published === "false") {
+            and.push({
+              published: null,
+            });
+          }
+          return and;
+        })(),
+      },
+
+      // TODO Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
+      {
+        // Search by name, description, or system message
+        OR: (() => {
+          const or: Prisma.ChatBotWhereInput[] = [];
+          if (query.search) {
+            or.push({
+              name: {
+                contains: query.search,
+                mode: "insensitive",
+              },
+            });
+            if (query.searchByDesc) {
               or.push({
-                published: {
-                  publishedAt: {
-                    lte: new Date(),
-                  },
+                description: {
+                  contains: query.search,
+                  mode: "insensitive",
                 },
               });
-              return or;
-            })(),
+            }
+            if (query.searchBySysm) {
+              or.push({
+                systemMessage: {
+                  contains: query.search,
+                  mode: "insensitive",
+                },
+              });
+            }
+          }
+          return or;
+        })(),
+      },
+    ],
+
+    // Filter by category
+    tags:
+      query.tags === undefined
+        ? undefined
+        : {
+            hasEvery: query.tags,
           },
 
-          // TODO Apparently Prisma doesnt support full text search properly. https://github.com/prisma/prisma/issues/8950
-          {
-            // Search by name, description, or system message
-            OR: (() => {
-              const or: Prisma.ChatBotWhereInput[] = [];
-              if (query.search) {
-                or.push({
-                  name: {
-                    contains: query.search,
-                    mode: "insensitive",
-                  },
-                });
-                if (query.searchByDesc) {
-                  or.push({
-                    description: {
-                      contains: query.search,
-                      mode: "insensitive",
-                    },
-                  });
-                }
-                if (query.searchBySysm) {
-                  or.push({
-                    systemMessage: {
-                      contains: query.search,
-                      mode: "insensitive",
-                    },
-                  });
-                }
-              }
-              return or;
-            })(),
-          },
-        ],
+    // Filter by temperature
+    temperature: {
+      gte: query.minTemp ? parseFloat(query.minTemp) : 0,
+      lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
+    },
 
-        // Filter by category
-        categories:
-          query.category === undefined
-            ? undefined
-            : {
-                has: query.category,
-              },
+    // Filter by model
+    model: {
+      in: query.models ?? [],
+    },
+  };
 
-        // Filter by temperature
-        temperature: {
-          gte: query.minTemp ? parseFloat(query.minTemp) : 0,
-          lte: query.maxTemp ? parseFloat(query.maxTemp) : 2,
+  if (query.getCount !== "1") {
+    const bots =
+      (await prisma.chatBot.findMany({
+        skip,
+        take,
+        orderBy,
+        where: prismaWhereQuery,
+        select: {
+          id: true,
+          tags: true,
+          featured: true,
         },
+      })) ?? [];
 
-        // Filter by model
-        model: {
-          in: query.models ?? [],
-        },
-      },
-      select: {
-        id: true,
-        categories: true,
-        featured: true,
-      },
-    })) ?? [];
-
-  res.statusCode = 200;
-  res.json(bots);
-  res.end();
+    res.statusCode = 200;
+    res.json({
+      type: "data",
+      data: bots,
+    });
+    res.end();
+  } else {
+    const count = await prisma.chatBot.count({
+      where: prismaWhereQuery,
+    });
+    res.statusCode = 200;
+    res.json({
+      type: "count",
+      count: count,
+      pages: Math.ceil(count / take),
+    });
+    res.end();
+  }
 }
 
 async function postHandler(
@@ -210,14 +293,29 @@ async function postHandler(
   req: NextApiRequest,
   res: NextApiResponse<ApibotsPOSTResponse | string>,
 ) {
+  if (session === null || session.user === undefined) {
+    res.statusCode = 401;
+    res.send("Not authenticated");
+    res.end();
+    return;
+  }
+
   const body = req.body as ApibotsPOSTBody;
+
+  if (!validateTags(body.tags)) {
+    res.statusCode = 400;
+    res.send("Invalid tags");
+    res.end();
+    return;
+  }
+
   var bot;
   try {
     bot = await prisma.chatBot.create({
       data: {
         name: body.name,
         description: body.description,
-        categories: body.categories,
+        tags: body.tags,
         model: body.model,
         systemMessage: body.systemMessage,
         temperature: body.temperature,
@@ -226,7 +324,7 @@ async function postHandler(
 
         author: {
           connect: {
-            email: session!.user!.email!,
+            id: session.user.id,
           },
         },
       },

@@ -8,6 +8,11 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 // GET: get the chat and its messages
 export type ApiChatGETResponse = Prisma.ChatGetPayload<{
   select: {
+    author: {
+      select: {
+        name: true;
+      };
+    };
     messages: {
       select: {
         id: true;
@@ -55,16 +60,7 @@ export default async function handler(
   >,
 ) {
   const session = await getServerSession(req, res, authOptions);
-  if (
-    session === null ||
-    session.user === undefined ||
-    session.user.email === undefined
-  ) {
-    res.statusCode = 401;
-    res.send("Not authenticated");
-    res.end();
-    return;
-  }
+
   try {
     switch (req.method) {
       case "GET":
@@ -88,18 +84,36 @@ export default async function handler(
 }
 
 async function getHandler(
-  session: Session,
+  session: Session | null,
   req: NextApiRequest,
   res: NextApiResponse<ApiChatGETResponse | string>,
 ) {
   const chat = await prisma.chat.findUnique({
     where: {
       id: req.query.chat as string,
-      author: {
-        email: session.user!.email!,
-      },
+      OR: [
+        ...(session?.user
+          ? [
+              {
+                author: {
+                  id: session.user.id,
+                },
+              },
+            ]
+          : []),
+        {
+          linkSharedAt: {
+            lte: new Date(),
+          },
+        },
+      ],
     },
     select: {
+      author: {
+        select: {
+          name: true,
+        },
+      },
       messages: {
         select: {
           id: true,
@@ -136,10 +150,17 @@ async function getHandler(
 }
 
 async function postHandler(
-  session: Session,
+  session: Session | null,
   req: NextApiRequest,
   res: NextApiResponse<ApiChatPOSTResponse | string>,
 ) {
+  if (session === null || session.user === undefined) {
+    res.statusCode = 401;
+    res.send("Not authenticated");
+    res.end();
+    return;
+  }
+
   const body = req.body as ApiChatPOSTBody;
 
   if (body.type === "message") {
@@ -204,16 +225,23 @@ async function postHandler(
 }
 
 async function deleteHandler(
-  session: Session,
+  session: Session | null,
   req: NextApiRequest,
   res: NextApiResponse<ApiChatDELETEResponse | string>,
 ) {
+  if (session === null || session.user === undefined) {
+    res.statusCode = 401;
+    res.send("Not authenticated");
+    res.end();
+    return;
+  }
+
   try {
     await prisma.chat.delete({
       where: {
         id: req.query.chat as string,
         author: {
-          email: session.user!.email!,
+          id: session.user!.id,
         },
       },
     });

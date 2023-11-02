@@ -36,7 +36,7 @@ function ChatButtonBuilder({
     <Link
       href={route}
       className={clsx(
-        "flex flex-row items-center justify-between gap-2 bg-gradient-to-br p-2 shadow-inner",
+        "flex w-full flex-row items-center justify-between gap-2 bg-gradient-to-br p-2 shadow-inner",
         active
           ? "from-slate-500/50 via-slate-400 to-slate-500/75"
           : "from-slate-400/50 via-slate-300 to-slate-400/75",
@@ -87,11 +87,13 @@ function ChatPageLayout(props: { page: ReactElement }) {
       tabsLocation="right"
       tabsGap="0"
       tabBarWidth="17rem"
+      scrollable={true}
       before={
         <div className="p-1 pt-12">
           <h2 className="text-2xl">Your chats</h2>
         </div>
       }
+      after={<div className="p-1 pt-12"></div>}
       pages={(chats ?? []).map((chat) => {
         return {
           name: chat.name ?? "Chat",
