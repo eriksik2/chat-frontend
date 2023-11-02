@@ -34,10 +34,11 @@ export default function Chat(props: ChatProps) {
   const loading = isInitialLoading;
   const chat = data?.chat;
 
-  const { post: postMessage, error: postError } = useApiPOST<
-    ApiChatPOSTBody,
-    ApiChatPOSTResponse
-  >(`/api/chats/${props.id}`);
+  const { mutate: postMessage, error: postError } =
+    trpc.chats.postMessage.useMutation();
+
+  const { mutate: postName, error: nameError } =
+    trpc.chats.rename.useMutation();
 
   const [aiCompletion, setAiCompletion] = useState<Completion | null>(null);
 
@@ -108,8 +109,8 @@ export default function Chat(props: ChatProps) {
           const content = msg.content.reduce<string>((acc, cont) => {
             return cont.type === "md" ? acc + cont.content : acc;
           }, "");
-          postMessage({
-            type: "name",
+          postName({
+            id: props.id,
             name: content,
           });
         },
@@ -147,7 +148,7 @@ export default function Chat(props: ChatProps) {
       };
     });
     await postMessage({
-      type: "message",
+      id: props.id,
       author: "USER",
       content: JSON.stringify(message.content),
     });
@@ -318,7 +319,7 @@ export default function Chat(props: ChatProps) {
                             },
                           );
                           postMessage({
-                            type: "message",
+                            id: props.id,
                             author: "CHATBOT" as const,
                             content: json,
                           });

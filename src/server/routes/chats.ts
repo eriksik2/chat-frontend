@@ -71,4 +71,72 @@ export const chatsRouter = router({
         chat,
       };
     }),
+
+  all: authorizedProcedure.query(async ({ input, ctx }) => {
+    const chats = await ctx.prisma.chat.findMany({
+      where: {
+        author: {
+          id: ctx.uid,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+
+    if (!chats) {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+      });
+    }
+
+    return {
+      chats,
+    };
+  }),
+
+  // Post a message to a chat
+  postMessage: authorizedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        author: z.union([z.literal("USER"), z.literal("CHATBOT")]),
+        content: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.chatMessage.create({
+        data: {
+          author: input.author,
+          content: input.content,
+          chat: {
+            connect: {
+              authorId: ctx.uid,
+              id: input.id,
+            },
+          },
+        },
+      });
+    }),
+
+  // Rename a chat
+  rename: authorizedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.chat.update({
+        where: {
+          id: input.id,
+          authorId: ctx.uid,
+        },
+        data: {
+          name: input.name,
+        },
+      });
+    }),
 });

@@ -9,6 +9,7 @@ import { useApiGET } from "@/api/fetcher";
 import Link from "next/link";
 import { FaTrash } from "react-icons/fa6";
 import { preload, useSWRConfig } from "swr";
+import { trpc } from "@/util/trcp";
 
 type ChatPageProps = {};
 
@@ -65,18 +66,13 @@ function ChatButtonBuilder({
 }
 
 function ChatPageLayout(props: { page: ReactElement }) {
-  const { data, error, reloading } =
-    useApiGET<ApiChatsGETResponse>("/api/chats");
-  const chats = data;
-  const loading = chats === undefined && reloading;
+  const { data, isInitialLoading, error } = trpc.chats.all.useQuery();
+  const chats = data?.chats;
+  const loading = isInitialLoading;
 
   // TODO better loading and null handling
   if (error !== null) {
-    console.error(
-      "Error while loading chats side bar: ",
-      error.status,
-      error.message,
-    );
+    console.error("Error while loading chats side bar: ", error.message);
     return props.page;
   }
 
