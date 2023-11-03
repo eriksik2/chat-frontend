@@ -11,7 +11,7 @@ export type Filter = {
   searchSystemMessage: boolean;
   models: string[];
   temperature: [number, number];
-  sortBy: "newest" | "rating" | "popular" | "name";
+  sortBy: "new" | "rating" | "popular" | "name";
 };
 
 export const defaultFilter: Filter = {

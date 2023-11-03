@@ -1,101 +1,60 @@
 import { z } from "zod";
-import { authorizedProcedure, publicProcedure, router } from "../trpc";
-import { TRPCError } from "@trpc/server";
+import { authorizedProcedure, router } from "../../trpc";
 
-export const botsRouter = router({
-  // Get a single bot
-  get: publicProcedure
+export const botMutationsRouter = router({
+  // Create a new bot
+  create: authorizedProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().optional(), // When updating existing bot
+        name: z.string().min(1).max(100),
+        description: z.string().min(1).max(1000),
+        tags: z.array(z.string()),
+        model: z.string(),
+        systemMessage: z.string().min(1).max(1000).nullable(),
+        temperature: z.number().min(0).max(2),
+        frequency_bias: z.number().min(-2).max(2),
+        presence_bias: z.number().min(-2).max(2),
       }),
     )
-    .query(async ({ input, ctx }) => {
-      const bot = await ctx.prisma.chatBot.findUnique({
+    .mutation(async ({ input, ctx }) => {
+      const bot = await ctx.prisma.chatBot.upsert({
         where: {
-          id: input.id,
+          id: input.id ?? "-1",
+          authorId: ctx.uid,
+        },
+        create: {
+          name: input.name,
+          description: input.description,
+          tags: input.tags,
+          model: input.model,
+          systemMessage: input.systemMessage,
+          temperature: input.temperature,
+          frequency_bias: input.frequency_bias,
+          presence_bias: input.presence_bias,
+
+          author: {
+            connect: {
+              id: ctx.uid,
+            },
+          },
+        },
+        update: {
+          name: input.name,
+          description: input.description,
+          tags: input.tags,
+          model: input.model,
+          systemMessage: input.systemMessage,
+          temperature: input.temperature,
+          frequency_bias: input.frequency_bias,
+          presence_bias: input.presence_bias,
         },
         select: {
           id: true,
-          name: true,
-          description: true,
-          author: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-          published: {
-            select: {
-              publishedAt: true,
-              rating: true,
-              ratingsCount: true,
-              ChatBotRatings: !ctx.uid
-                ? undefined
-                : {
-                    where: {
-                      userId: ctx.uid,
-                    },
-                    select: {
-                      rating: true,
-                    },
-                  },
-            },
-          },
-          model: true,
-          systemMessage: true,
-          temperature: true,
-          frequency_bias: true,
-          presence_bias: true,
-
-          favorites: !ctx.uid
-            ? undefined
-            : {
-                select: {
-                  createdAt: true,
-                },
-                where: {
-                  userId: ctx.uid,
-                },
-              },
         },
       });
-
-      if (!bot) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-        });
-      }
-
-      if (bot.published === null && bot.author.id !== ctx.uid) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-        });
-      }
-
-      const { favorites, ...botWithoutFavorites } = bot;
-
       return {
-        bot: {
-          ...botWithoutFavorites,
-          published:
-            bot.published === null
-              ? null
-              : {
-                  ratingsCount: bot.published.ratingsCount,
-                  rating: bot.published.rating,
-                  yourRating:
-                    bot.published.ChatBotRatings &&
-                    bot.published.ChatBotRatings.length !== 0
-                      ? bot.published.ChatBotRatings[0].rating
-                      : null,
-                  publishedAt: bot.published.publishedAt,
-                },
-          favoritedAt:
-            !bot.favorites || bot.favorites.length === 0
-              ? null
-              : bot.favorites[0].createdAt,
-        },
+        id: bot.id,
       };
     }),
 

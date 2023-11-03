@@ -1,28 +1,10 @@
 import { FaPen, FaStar, FaTrash } from "react-icons/fa6";
 import clsx from "clsx";
-import { ApibotsGETResponse } from "../../../pages/api/bots";
-import { useApiDELETE, useApiGET, useApiPOST } from "@/api/fetcher";
-import {
-  ApiChatsPOSTBody,
-  ApiChatsPOSTResponse,
-} from "../../../pages/api/chats";
 import { useRouter } from "next/router";
-import Modal from "../Modal";
-import { ChatBotEdit } from "./ChatBotEdit";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { useSession } from "next-auth/react";
 import LoadingIcon from "../util/LoadingIcon";
-import { ApibotGETResponse } from "../../../pages/api/bots/[bot]";
-import {
-  ApiBotPublishDELETEResponse,
-  ApiBotPublishPOSTResponse,
-} from "../../../pages/api/bots/[bot]/publish";
-import {
-  ApiBotFavouriteDELETEResponse,
-  ApiBotFavouriteGETResponse,
-  ApiBotFavouritePOSTResponse,
-} from "../../../pages/api/bots/[bot]/favourite";
 import ChatBotRating from "./ChatBotRating";
 import { trpc } from "@/util/trcp";
 
@@ -98,10 +80,9 @@ const tiltZoomFactor = 1.2;
 export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   const swr = useSWRConfig();
   const router = useRouter();
-  const { post: postChat, error: postChatError } = useApiPOST<
-    ApiChatsPOSTBody,
-    ApiChatsPOSTResponse
-  >(`/api/chats`);
+
+  const { mutateAsync: postChat, error: postChatError } =
+    trpc.chats.create.useMutation();
 
   const trpcUtils = trpc.useUtils();
 
@@ -225,11 +206,11 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
               return;
             }
             const response = await postChat({
-              chatName: `New chat with ${props.chatbot.name}`,
+              name: `New chat with ${props.chatbot.name}`,
               chatbotId: props.chatbot.id,
             });
-            if (response.chatId !== null) {
-              router.push(`/chats/${response.chatId}`);
+            if (response.id !== null) {
+              router.push(`/chats/${response.id}`);
             }
           }}
         >

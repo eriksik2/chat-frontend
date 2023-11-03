@@ -1,15 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useApiGET, useApiPOST } from "@/api/fetcher";
-import {
-  ApiBotPOSTBody,
-  ApiBotPOSTResponse,
-  ApibotGETResponse,
-} from "../../../pages/api/bots/[bot]";
 import LoadingIcon from "../util/LoadingIcon";
 import clsx from "clsx";
 import Textbox from "../util/Textbox";
+import { trpc } from "@/util/trcp";
 
 type ChatBotEditData = {
   name: string;
@@ -178,28 +173,31 @@ type ChatBotEditProps = {
 };
 
 export function ChatBotEdit(props: ChatBotEditProps) {
-  const { data, error } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
-  const { post, error: postError } = useApiPOST<
-    ApiBotPOSTBody,
-    ApiBotPOSTResponse
-  >(`/api/bots/${props.id}`);
+  const { data, error, isInitialLoading } = trpc.bots.get.useQuery({
+    id: props.id,
+  });
+
+  const { mutate: updateBot, error: updateError } =
+    trpc.bots.create.useMutation();
 
   if (data === undefined) return <LoadingIcon />;
+  const bot = data.bot;
 
   return (
     <ChatBotEditStatic
       chatbot={{
-        name: data.name,
-        description: data.description,
-        model: data.model,
-        frequency_bias: data.frequency_bias,
-        presence_bias: data.presence_bias,
-        temperature: data.temperature,
-        systemMessage: data.systemMessage,
+        name: bot.name,
+        description: bot.description,
+        model: bot.model,
+        frequency_bias: bot.frequency_bias,
+        presence_bias: bot.presence_bias,
+        temperature: bot.temperature,
+        systemMessage: bot.systemMessage,
       }}
       onClose={props.onClose}
       onSave={(chatbot) => {
-        post({
+        updateBot({
+          id: props.id,
           name: chatbot.name,
           description: chatbot.description,
           model: chatbot.model,
@@ -207,7 +205,7 @@ export function ChatBotEdit(props: ChatBotEditProps) {
           presence_bias: chatbot.presence_bias,
           temperature: chatbot.temperature,
           systemMessage: chatbot.systemMessage,
-          tags: data.tags,
+          tags: bot.tags,
         });
         if (props.onSave) props.onSave();
       }}

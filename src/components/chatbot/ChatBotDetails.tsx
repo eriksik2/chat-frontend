@@ -1,35 +1,35 @@
-import { useApiGET } from "@/api/fetcher";
-import { ApibotGETResponse } from "../../../pages/api/bots/[bot]";
 import LoadingIcon from "../util/LoadingIcon";
 import { predefinedFunctions } from "@/state/PredefinedFunctions";
 import AIFunction from "@/state/AIFunction";
+import { trpc } from "@/util/trcp";
 
 type ChatBotDetailsProps = {
   id: string;
 };
 
 export default function ChatBotDetails(props: ChatBotDetailsProps) {
-  const { data, error, reloading } = useApiGET<ApibotGETResponse>(
-    `/api/bots/${props.id}`,
-  );
+  const { data, error, isInitialLoading } = trpc.bots.get.useQuery({
+    id: props.id,
+  });
 
-  if (reloading) return <LoadingIcon />;
+  if (isInitialLoading) return <LoadingIcon />;
   if (data === undefined) return null;
+  const bot = data.bot;
 
-  const plugins = data.plugins
+  const plugins = bot.plugins
     .map((name) => predefinedFunctions.get(name))
     .filter((f) => f !== undefined) as AIFunction[];
 
   return (
     <div className="flex flex-col gap-2 bg-gradient-to-br from-slate-400/50 via-slate-300 to-slate-400/75 p-2 shadow-inner">
       <div className="text-xl">
-        <h2>{data.name}</h2>
-        <p className="text-sm">{data.description}</p>
+        <h2>{bot.name}</h2>
+        <p className="text-sm">{bot.description}</p>
       </div>
       <div className="text-base">
         <div className="flex gap-4">
           <p>Model:</p>
-          <p>{data.model}</p>
+          <p>{bot.model}</p>
         </div>
         <div className="flex gap-4">
           <p>Plugins:</p>

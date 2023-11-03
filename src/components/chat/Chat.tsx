@@ -5,15 +5,8 @@ import ChatMessageComponent, {
 } from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import { useApiGET, useApiPOST } from "@/api/fetcher";
 import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import Completion, { CompletionMessage } from "@/state/Completion";
-import {
-  ApiChatGETResponse,
-  ApiChatPOSTBody,
-  ApiChatPOSTResponse,
-} from "../../../pages/api/chats/[chat]";
 import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
 import ChatBotDetails from "../chatbot/ChatBotDetails";
 import { useSession } from "next-auth/react";
@@ -257,7 +250,7 @@ export default function Chat(props: ChatProps) {
               </div>
             )}
             <div className="relative flex-grow">
-              <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
+              <div className="no-scrollbar absolute bottom-0 left-0 right-0 top-0 flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
                 <div className="flex w-full flex-col items-stretch justify-start px-4 pb-20 pt-8">
                   <div
                     className={clsx(

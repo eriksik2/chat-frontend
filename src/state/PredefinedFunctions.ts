@@ -1,4 +1,4 @@
-import { ApibotsPOSTBody, ApibotsPOSTResponse } from "../../pages/api/bots";
+import { itrpc } from "@/util/trcp";
 import AIFunction from "./AIFunction";
 import { getGlobalOpenAI } from "./OpenAI";
 
@@ -78,24 +78,17 @@ const predefinedFunctionsList: AIFunction[] = [
       model: string;
       system_message: string;
     }): Promise<string> {
-      const res = await fetch("/api/bots", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          description: description ?? "",
-          model: model,
-          systemMessage: system_message,
-          temperature: 0.8,
-          frequency_bias: 0.0,
-          presence_bias: 0.0,
-          tags: [],
-        } satisfies ApibotsPOSTBody),
+      const data = await itrpc.bots.create.mutate({
+        name: name,
+        description: description ?? "",
+        model: model,
+        systemMessage: system_message,
+        temperature: 0.8,
+        frequency_bias: 0.0,
+        presence_bias: 0.0,
+        tags: [],
       });
-      const bot = (await res.json()) as ApibotsPOSTResponse;
-      return `{ "url" = "https://${window.location.hostname}/bots/${bot.id}" }`;
+      return `{ "url" = "https://${window.location.hostname}/bots/${data.id}" }`;
     },
   }),
 ];

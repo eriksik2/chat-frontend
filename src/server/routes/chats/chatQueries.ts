@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { authorizedProcedure, publicProcedure, router } from "../trpc";
+import { authorizedProcedure, publicProcedure, router } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 
-export const chatsRouter = router({
+export const chatQueriesRouter = router({
   // Get a chat
   get: publicProcedure
     .input(
@@ -96,47 +96,22 @@ export const chatsRouter = router({
     };
   }),
 
-  // Post a message to a chat
-  postMessage: authorizedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        author: z.union([z.literal("USER"), z.literal("CHATBOT")]),
-        content: z.string(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.chatMessage.create({
-        data: {
-          author: input.author,
-          content: input.content,
-          chat: {
-            connect: {
-              authorId: ctx.uid,
-              id: input.id,
-            },
-          },
-        },
-      });
-    }),
+  // Get id of newest chat
+  newest: authorizedProcedure.query(async ({ input, ctx }) => {
+    const chat = await ctx.prisma.chat.findFirst({
+      where: {
+        authorId: ctx.uid,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      select: {
+        id: true,
+      },
+    });
 
-  // Rename a chat
-  rename: authorizedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    )
-    .mutation(async ({ input, ctx }) => {
-      await ctx.prisma.chat.update({
-        where: {
-          id: input.id,
-          authorId: ctx.uid,
-        },
-        data: {
-          name: input.name,
-        },
-      });
-    }),
+    return {
+      id: chat?.id ?? null,
+    };
+  }),
 });

@@ -1,12 +1,9 @@
 import Link from "next/link";
-import { useApiGET } from "@/api/fetcher";
-import { ApiChatLatestGETResponse } from "../api/chats/latest";
-import Chat from "@/components/chat/Chat";
 import ChatPage from "./[chat]";
 import { useRouter } from "next/router";
-import { ApibotGETResponse } from "../api/bots/[bot]";
-import { ApiBotStatsGETResponse } from "../api/bots/[bot]/stats";
 import { ChatBotCard } from "@/components/chatbot/ChatBotCard";
+import { trpc } from "@/util/trcp";
+import { useEffect } from "react";
 
 export type ChatsPageQuery = {
   chatbot?: string;
@@ -15,23 +12,19 @@ export type ChatsPageQuery = {
 export default function ChatsPage() {
   const router = useRouter();
   const { chatbot } = router.query as ChatsPageQuery;
-  const { data, error, reloading } =
-    useApiGET<ApiChatLatestGETResponse>("/api/chats/latest");
+  const { data, error, isInitialLoading } = trpc.chats.newest.useQuery();
 
-  const loading = data === undefined && reloading;
-  if (loading) return null;
-  if (error !== null && error.status === 401)
+  useEffect(() => {
+    if (data?.id) {
+      router.replace(`/chats/${data.id}`);
+    }
+  }, [data?.id]);
+
+  if (isInitialLoading) return null;
+  if (error?.data?.code === "UNAUTHORIZED")
     return <LogInPrompt chatbot={chatbot} />;
-  if (error !== null)
-    return (
-      <div>
-        <h1 className="text-2xl">Error</h1>
-        <div>{error.status}</div>
-        <div>{error.message}</div>
-      </div>
-    );
 
-  if (data === null) {
+  if (!data?.id) {
     return (
       <div className="flex h-full flex-col items-center justify-center">
         <p className="text-2xl">You do not have any chats yet.</p>
@@ -50,7 +43,8 @@ export default function ChatsPage() {
     );
   }
 
-  return (
+  return null;
+  /*return (
     <div className="flex h-full flex-col items-center justify-center">
       <p className="text-2xl">Select a chat from the sidebar.</p>
       <br />
@@ -65,7 +59,7 @@ export default function ChatsPage() {
         page to create a new one.
       </p>
     </div>
-  );
+  );*/
 }
 
 ChatsPage.getLayout = ChatPage.getLayout;
@@ -75,34 +69,10 @@ type LogInPromptProps = {
 };
 
 function LogInPrompt(props: LogInPromptProps) {
-  const {
-    data: chatbotStats,
-    error: statsError,
-    reloading: statsReloading,
-  } = useApiGET<ApiBotStatsGETResponse>(
-    props.chatbot ? `/api/bots/${props.chatbot}/stats` : null,
-  );
-  const {
-    data: chatbot,
-    error,
-    reloading,
-  } = useApiGET<ApibotGETResponse>(
-    props.chatbot ? `/api/bots/${props.chatbot}` : null,
-  );
-
   return (
     <div className="flex h-full flex-col items-center justify-center text-center">
-      {chatbot !== undefined && (
-        <div className="flex flex-col items-center gap-4 pb-14 text-start sm:pb-24">
-          <ChatBotCard id={chatbot.id} />
-          {chatbotStats !== undefined && (
-            <p>
-              {chatbotStats.chats}{" "}
-              {chatbotStats.chats === 1 ? "person" : "people"} chatting right
-              now.
-            </p>
-          )}
-        </div>
+      {props.chatbot !== undefined && (
+        <ChatBotCardWithCount chatbot={props.chatbot} />
       )}
 
       <p className="text-4xl">Log in to access chat.</p>
@@ -123,6 +93,32 @@ function LogInPrompt(props: LogInPromptProps) {
         We will never send you an email and we won{"'"}t use any of your
         personal data.
       </p>
+    </div>
+  );
+}
+
+type ChatBotCardWithCountProps = {
+  chatbot: string;
+};
+
+function ChatBotCardWithCount(props: ChatBotCardWithCountProps) {
+  const {
+    data: chatbotStats,
+    error: statsError,
+    isInitialLoading: statsLoading,
+  } = trpc.bots.getNumberOfChats.useQuery({
+    chatbotId: props.chatbot,
+  });
+
+  return (
+    <div className="flex flex-col items-center gap-4 pb-14 text-start sm:pb-24">
+      <ChatBotCard id={props.chatbot} />
+      {chatbotStats !== undefined && (
+        <p>
+          {chatbotStats.count} {chatbotStats.count === 1 ? "person" : "people"}{" "}
+          chatting right now.
+        </p>
+      )}
     </div>
   );
 }

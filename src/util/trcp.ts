@@ -1,5 +1,5 @@
 import { AppRouter } from "@/server/routes/_app";
-import { httpBatchLink } from "@trpc/client";
+import { createTRPCProxyClient, httpBatchLink } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
 
 // @ts-ignore
@@ -48,4 +48,24 @@ export const trpc = createTRPCNext<AppRouter>({
    * @link https://trpc.io/docs/ssr
    **/
   ssr: false,
+});
+
+export const itrpc = createTRPCProxyClient<AppRouter>({
+  transformer: superjson,
+  links: [
+    httpBatchLink({
+      /**
+       * If you want to use SSR, you need to use the server's full URL
+       * @link https://trpc.io/docs/ssr
+       **/
+      url: `${getBaseUrl()}/api/trpc`,
+
+      // You can pass any HTTP headers you wish here
+      async headers() {
+        return {
+          // authorization: getAuthCookie(),
+        };
+      },
+    }),
+  ],
 });

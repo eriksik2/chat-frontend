@@ -34,6 +34,7 @@ const t = initTRPC.context<typeof createContext>().create({
  * Routers
  */
 export const router = t.router;
+export const mergeRouters = t.mergeRouters;
 
 /**
  * Middleware
