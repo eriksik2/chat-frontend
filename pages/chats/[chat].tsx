@@ -1,14 +1,11 @@
 import { ReactElement, ReactNode } from "react";
 import { useRouter } from "next/router";
 import clsx from "clsx";
-import BotsPage from "../bots";
 import TabsLayout from "@/components/Layout/TabsLayout";
-import { ApiChatsGETResponse } from "../api/chats";
 import Chat from "@/components/chat/Chat";
-import { useApiGET } from "@/api/fetcher";
 import Link from "next/link";
 import { FaTrash } from "react-icons/fa6";
-import { preload, useSWRConfig } from "swr";
+import { trpc } from "@/util/trcp";
 
 type ChatPageProps = {};
 
@@ -19,7 +16,7 @@ export default function ChatPage(props: ChatPageProps) {
   return <Chat id={router.query.chat} />;
 }
 
-function ChatButtonBuilder({
+function ChatButton({
   name,
   icon,
   route,
@@ -28,10 +25,17 @@ function ChatButtonBuilder({
   icon: ReactNode;
   route: string;
 }) {
+  const chatId = route.substring(1).split("/")[1];
+
   const router = useRouter();
-  const swr = useSWRConfig();
+  const trpcUtils = trpc.useUtils();
+  const { mutateAsync: deleteChat, error: deleteError } =
+    trpc.chats.delete.useMutation({
+      onSuccess() {
+        trpcUtils.chats.all.invalidate();
+      },
+    });
   const active = router.asPath.includes(route);
-  preload(`${route}`, (url) => fetch(url).then((res) => res.json()));
   return (
     <Link
       href={route}
@@ -50,12 +54,10 @@ function ChatButtonBuilder({
       <button
         onClick={async (e) => {
           e.preventDefault();
-          e.stopPropagation();
-          const response = await fetch(`/api${route}`, {
-            method: "DELETE",
-          });
-          swr.mutate("/api/chats");
-          router.replace("/api/chats/latest?redirect=true");
+          await deleteChat({ id: chatId });
+          if (active) {
+            router.replace("/chats");
+          }
         }}
       >
         <FaTrash />
@@ -65,18 +67,13 @@ function ChatButtonBuilder({
 }
 
 function ChatPageLayout(props: { page: ReactElement }) {
-  const { data, error, reloading } =
-    useApiGET<ApiChatsGETResponse>("/api/chats");
-  const chats = data;
-  const loading = chats === undefined && reloading;
+  const { data, isInitialLoading, error } = trpc.chats.all.useQuery();
+  const chats = data?.chats;
+  const loading = isInitialLoading;
 
   // TODO better loading and null handling
   if (error !== null) {
-    console.error(
-      "Error while loading chats side bar: ",
-      error.status,
-      error.message,
-    );
+    console.error("Error while loading chats side bar: ", error.message);
     return props.page;
   }
 
@@ -101,7 +98,7 @@ function ChatPageLayout(props: { page: ReactElement }) {
           icon: "🤖",
         };
       })}
-      buttonBuilder={ChatButtonBuilder}
+      buttonBuilder={(params) => <ChatButton {...params} />}
     >
       {props.page}
     </TabsLayout>

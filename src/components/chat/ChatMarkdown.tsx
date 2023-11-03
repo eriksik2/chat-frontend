@@ -8,7 +8,7 @@ import remarkMath from "remark-math";
 
 import ChatCode from "./ChatCode";
 import remarkGfm from "remark-gfm";
-import ChatBotCardStatic, { ChatBotCard } from "../chatbot/ChatBotCard";
+import { ChatBotCard } from "../chatbot/ChatBotCard";
 
 type ChatMarkdownProps = {
   content: string;

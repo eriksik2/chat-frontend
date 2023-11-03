@@ -34,21 +34,35 @@ export default function ChatCode(props: ChatCodeProps) {
     key: any,
   ): React.ReactNode {
     if (row.type === "text") {
-      const regex = /^[a-zA-Z_][a-zA-Z-_0-9]*$/;
       const canHighlight =
-        row.value !== undefined && regex.test(String(row.value).trim());
+        row.value !== undefined &&
+        /^[a-zA-Z_][a-zA-Z-_0-9]*$/.test(String(row.value).trim());
+
       if (!canHighlight) return row.value;
+
       const shouldHighlight =
         canHighlight &&
         highlight !== null &&
-        String(row.value).includes(highlight);
+        String(row.value).trim() === highlight.trim();
+
+      if (!shouldHighlight)
+        return (
+          <span onClick={() => setHighlight(String(row.value!).trim())}>
+            {row.value}
+          </span>
+        );
+
+      const splits = /^(\s*)([^\s]*)(\s*\n?)$/.exec(String(row.value));
+      if (splits === null) return row.value;
+
       return (
-        <span
-          className={clsx(shouldHighlight && "bg-gray-300")}
-          onClick={() => setHighlight(String(row.value!).trim())}
-        >
-          {row.value}
-        </span>
+        <>
+          {splits[1]}
+          <span className={clsx(shouldHighlight && "bg-gray-300")}>
+            {splits[2]}
+          </span>
+          {splits[3]}
+        </>
       );
     } else if (row.type === "element") {
       var style: React.CSSProperties = {};

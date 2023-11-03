@@ -99,7 +99,7 @@ model PublishedChatBot {
     ChatBotRatings ChatBotRating[]
     ratingsTotal   Int             @default(0)
     ratingsCount   Int             @default(0)
-    rating         Float           @default(0.0)
+    rating         Float?
 
     publishedAt DateTime @default(now()) @map(name: "published_at")
 }

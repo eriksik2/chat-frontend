@@ -1,12 +1,10 @@
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import ChatBotList from "../chatbot/ChatBotList";
-import { useApiPOST } from "@/api/fetcher";
 import { useState } from "react";
 import { FaCirclePlus } from "react-icons/fa6";
-import { ApibotsPOSTBody } from "../../../pages/api/bots";
 import Modal from "../Modal";
 import ChatBotEditStatic from "../chatbot/ChatBotEdit";
+import { trpc } from "@/util/trcp";
 
 type ProfileProps = {
   user: {
@@ -27,10 +25,7 @@ export default function Profile(props: ProfileProps) {
       ? "anon"
       : "user";
 
-  const { post: postBot, error: postError } = useApiPOST<
-    ApibotsPOSTBody,
-    never
-  >(`/api/bots`);
+  const { mutate: postBot, error: postError } = trpc.bots.create.useMutation();
 
   const [showAdd, setShowAdd] = useState<boolean>(false);
 

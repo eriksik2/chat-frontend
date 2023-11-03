@@ -1,29 +1,12 @@
 import { FaPen, FaStar, FaTrash } from "react-icons/fa6";
 import clsx from "clsx";
-import { ApibotsGETResponse } from "../../../pages/api/bots";
-import { useApiDELETE, useApiGET, useApiPOST } from "@/api/fetcher";
-import {
-  ApiChatsPOSTBody,
-  ApiChatsPOSTResponse,
-} from "../../../pages/api/chats";
 import { useRouter } from "next/router";
-import Modal from "../Modal";
-import { ChatBotEdit } from "./ChatBotEdit";
 import { useState } from "react";
 import { useSWRConfig } from "swr";
 import { useSession } from "next-auth/react";
 import LoadingIcon from "../util/LoadingIcon";
-import { ApibotGETResponse } from "../../../pages/api/bots/[bot]";
-import {
-  ApiBotPublishDELETEResponse,
-  ApiBotPublishPOSTResponse,
-} from "../../../pages/api/bots/[bot]/publish";
-import {
-  ApiBotFavouriteDELETEResponse,
-  ApiBotFavouriteGETResponse,
-  ApiBotFavouritePOSTResponse,
-} from "../../../pages/api/bots/[bot]/favourite";
 import ChatBotRating from "./ChatBotRating";
+import { trpc } from "@/util/trcp";
 
 type ChatBotCardProps = {
   id: string;
@@ -34,19 +17,16 @@ type ChatBotCardProps = {
 
 export function ChatBotCard(props: ChatBotCardProps) {
   const {
-    data: chatbot,
+    data,
+    isInitialLoading,
     error: chatbotError,
-    reloading: chatbotReloading,
-  } = useApiGET<ApibotGETResponse>(`/api/bots/${props.id}`);
-
-  const {
-    data: isFav,
-    error: favError,
-    reloading: favReloading,
-  } = useApiGET<ApiBotFavouriteGETResponse>(`/api/bots/${props.id}/favourite`);
+  } = trpc.bots.get.useQuery({
+    id: props.id,
+  });
+  const chatbot = data?.bot ?? undefined;
 
   const showLoading = props.showLoading ?? true;
-  const loading = chatbot === undefined && chatbotReloading;
+  const loading = chatbot === undefined && isInitialLoading;
 
   if (loading) return showLoading ? <LoadingIcon /> : null;
 
@@ -66,16 +46,30 @@ export function ChatBotCard(props: ChatBotCardProps) {
     <ChatBotCardStatic
       chatbot={chatbot!}
       showTools={props.showTools}
-      isFav={isFav?.favourite}
       onEdit={props.onEdit}
     />
   );
 }
 
 type ChatBotCardStaticProps = {
-  chatbot: ApibotGETResponse;
+  chatbot: {
+    id: string;
+    name: string;
+    description: string;
+    model: string;
+    published: {
+      ratingsCount: number;
+      rating: number | null;
+      yourRating: number | null;
+      publishedAt: Date;
+    } | null;
+    author: {
+      id: number;
+      name: string;
+    };
+    favoritedAt: Date | null;
+  };
   showTools?: boolean;
-  isFav?: boolean;
   onEdit?: (id: string) => void;
 };
 
@@ -86,37 +80,69 @@ const tiltZoomFactor = 1.2;
 export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   const swr = useSWRConfig();
   const router = useRouter();
-  const { post: postChat, error: postChatError } = useApiPOST<
-    ApiChatsPOSTBody,
-    ApiChatsPOSTResponse
-  >(`/api/chats`);
 
-  const { post: publish, error: publishError } = useApiPOST<
-    {},
-    ApiBotPublishPOSTResponse
-  >(`/api/bots/${props.chatbot.id}/publish`);
-  const { del: unpublish, error: unpublishError } = useApiDELETE<
-    {},
-    ApiBotPublishDELETEResponse
-  >(`/api/bots/${props.chatbot.id}/publish`);
+  const { mutateAsync: postChat, error: postChatError } =
+    trpc.chats.create.useMutation();
 
-  const { post: favourite, error: favouriteError } = useApiPOST<
-    {},
-    ApiBotFavouritePOSTResponse
-  >(`/api/bots/${props.chatbot.id}/favourite`);
-  const { del: unfavourite, error: unfavouriteError } = useApiDELETE<
-    {},
-    ApiBotFavouriteDELETEResponse
-  >(`/api/bots/${props.chatbot.id}/favourite`);
+  const trpcUtils = trpc.useUtils();
+
+  const {
+    mutate: publish,
+    error: publishError,
+    isLoading: publishLoading,
+  } = trpc.bots.publish.useMutation({
+    onSuccess() {
+      trpcUtils.bots.invalidate();
+    },
+  });
+  const {
+    mutate: unpublish,
+    error: unpublishError,
+    isLoading: unpublishLoading,
+  } = trpc.bots.unpublish.useMutation({
+    onSuccess() {
+      trpcUtils.bots.invalidate();
+    },
+  });
+
+  const {
+    mutate: favorite,
+    error: favouriteError,
+    isLoading: favouriteLoading,
+  } = trpc.bots.favorite.useMutation({
+    onSuccess() {
+      trpcUtils.bots.get.invalidate({ id: props.chatbot.id });
+    },
+  });
+
+  const {
+    mutate: unfavorite,
+    error: unfavouriteError,
+    isLoading: unfavouriteLoading,
+  } = trpc.bots.unfavorite.useMutation({
+    onSuccess() {
+      trpcUtils.bots.get.invalidate({ id: props.chatbot.id });
+    },
+  });
+
+  const {
+    mutate: rate,
+    error: rateError,
+    isLoading: rateLoading,
+  } = trpc.bots.rate.useMutation({
+    onSuccess() {
+      trpcUtils.bots.get.invalidate({ id: props.chatbot.id });
+    },
+  });
 
   const isPublished = props.chatbot.published !== null;
-  const isFavourite = props.isFav ?? null;
+  const isFavourite = props.chatbot.favoritedAt !== null ?? null;
 
   const { data: session } = useSession();
   const loggedIn = session !== null;
   const ownsBot =
-    props.chatbot.author.email !== null &&
-    session?.user?.email === props.chatbot.author.email;
+    props.chatbot.author.id !== null &&
+    session?.user?.id === props.chatbot.author.id;
   const showTools = props.showTools ?? false;
 
   const [doTilt, setDoTilt] = useState<boolean>(false);
@@ -180,11 +206,11 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
               return;
             }
             const response = await postChat({
-              chatName: `New chat with ${props.chatbot.name}`,
+              name: `New chat with ${props.chatbot.name}`,
               chatbotId: props.chatbot.id,
             });
-            if (response.chatId !== null) {
-              router.push(`/chats/${response.chatId}`);
+            if (response.id !== null) {
+              router.push(`/chats/${response.id}`);
             }
           }}
         >
@@ -197,8 +223,8 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
               ownsBot ? "block" : "hidden",
             )}
             onClick={async () => {
-              if (isFavourite) await unfavourite({});
-              else await favourite({});
+              if (isFavourite) await unfavorite({ id: props.chatbot.id });
+              else await favorite({ id: props.chatbot.id });
             }}
           >
             {isFavourite ? (
@@ -209,15 +235,33 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
           </button>
         )}
         <div className="flex-grow" />
-        {!(ownsBot && showTools) && <ChatBotRating id={props.chatbot.id} />}
+        {!(ownsBot && showTools) && (
+          <ChatBotRating
+            ratingsCount={props.chatbot.published?.ratingsCount ?? undefined}
+            rating={props.chatbot.published?.rating ?? undefined}
+            yourRating={props.chatbot.published?.yourRating ?? undefined}
+            onRate={async (rating) => {
+              await rate({
+                id: props.chatbot.id,
+                rating,
+              });
+            }}
+          />
+        )}
         <button
           className={clsx(
             "rounded bg-slate-500 p-1",
             ownsBot && showTools ? "block" : "hidden",
           )}
           onClick={async () => {
-            if (isPublished) await unpublish({});
-            else await publish({});
+            if (isPublished)
+              await unpublish({
+                id: props.chatbot.id,
+              });
+            else
+              await publish({
+                id: props.chatbot.id,
+              });
           }}
         >
           {isPublished ? "Unpublish" : "Publish"}

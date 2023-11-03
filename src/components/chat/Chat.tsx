@@ -5,18 +5,12 @@ import ChatMessageComponent, {
 } from "@/components/chat/ChatMessageComponent";
 import ChatTextBox from "@/components/chat/ChatTextBox";
 import clsx from "clsx";
-import { useApiGET, useApiPOST } from "@/api/fetcher";
 import OpenAI from "openai";
-import { ChatCompletionMessageParam } from "openai/resources/chat/index.mjs";
 import Completion, { CompletionMessage } from "@/state/Completion";
-import {
-  ApiChatGETResponse,
-  ApiChatPOSTBody,
-  ApiChatPOSTResponse,
-} from "../../../pages/api/chats/[chat]";
 import { getGlobalOpenAI, setGlobalOpenAI } from "@/state/OpenAI";
 import ChatBotDetails from "../chatbot/ChatBotDetails";
 import { useSession } from "next-auth/react";
+import { trpc } from "@/util/trcp";
 
 type ChatProps = {
   id: string;
@@ -24,17 +18,20 @@ type ChatProps = {
 
 export default function Chat(props: ChatProps) {
   const { data: session } = useSession();
-  const { data, error, reloading, mutate } = useApiGET<ApiChatGETResponse>(
-    `/api/chats/${props.id}`,
-  );
-  const unauthenticated = !session?.user;
-  const loading = data === undefined && reloading;
-  const chat = data;
 
-  const { post: postMessage, error: postError } = useApiPOST<
-    ApiChatPOSTBody,
-    ApiChatPOSTResponse
-  >(`/api/chats/${props.id}`);
+  const trpcUtils = trpc.useUtils();
+  const { data, isInitialLoading, error } = trpc.chats.get.useQuery({
+    id: props.id,
+  });
+  const unauthenticated = !session?.user;
+  const loading = isInitialLoading;
+  const chat = data?.chat;
+
+  const { mutate: postMessage, error: postError } =
+    trpc.chats.postMessage.useMutation();
+
+  const { mutate: postName, error: nameError } =
+    trpc.chats.rename.useMutation();
 
   const [aiCompletion, setAiCompletion] = useState<Completion | null>(null);
 
@@ -105,8 +102,8 @@ export default function Chat(props: ChatProps) {
           const content = msg.content.reduce<string>((acc, cont) => {
             return cont.type === "md" ? acc + cont.content : acc;
           }, "");
-          postMessage({
-            type: "name",
+          postName({
+            id: props.id,
             name: content,
           });
         },
@@ -127,24 +124,24 @@ export default function Chat(props: ChatProps) {
       ],
     };
 
-    const newChat =
-      chat === undefined
-        ? null
-        : {
-            author: chat.author,
-            messages: [
-              ...chat.messages,
-              {
-                id: "",
-                author: "USER" as const,
-                content: JSON.stringify(message.content),
-              },
-            ],
-            chatbot: chat.chatbot,
-          };
-    newChat && mutate(newChat, false);
+    trpcUtils.chats.get.setData({ id: props.id }, (oldData) => {
+      return {
+        chat: {
+          ...oldData!.chat,
+          messages: [
+            ...oldData!.chat.messages,
+            {
+              id: "",
+              author: "USER" as const,
+              createdAt: new Date(),
+              content: JSON.stringify(message.content),
+            },
+          ],
+        },
+      };
+    });
     await postMessage({
-      type: "message",
+      id: props.id,
       author: "USER",
       content: JSON.stringify(message.content),
     });
@@ -187,7 +184,6 @@ export default function Chat(props: ChatProps) {
     return (
       <div>
         <h1 className="text-2xl">Error</h1>
-        <div>{error.status}</div>
         <div>{error.message}</div>
       </div>
     );
@@ -254,7 +250,7 @@ export default function Chat(props: ChatProps) {
               </div>
             )}
             <div className="relative flex-grow">
-              <div className="no-scrollbar flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
+              <div className="no-scrollbar absolute bottom-0 left-0 right-0 top-0 flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
                 <div className="flex w-full flex-col items-stretch justify-start px-4 pb-20 pt-8">
                   <div
                     className={clsx(
@@ -296,24 +292,27 @@ export default function Chat(props: ChatProps) {
                         onComplete={(message) => {
                           setAiCompletion(null);
                           const json = JSON.stringify(message);
-                          const newChat =
-                            chat === undefined
-                              ? null
-                              : {
-                                  author: chat.author,
+                          trpcUtils.chats.get.setData(
+                            { id: props.id },
+                            (oldData) => {
+                              return {
+                                chat: {
+                                  ...oldData!.chat,
                                   messages: [
-                                    ...chat.messages,
+                                    ...oldData!.chat.messages,
                                     {
                                       id: "",
                                       author: "CHATBOT" as const,
                                       content: json,
+                                      createdAt: new Date(),
                                     },
                                   ],
-                                  chatbot: chat.chatbot,
-                                };
-                          newChat && mutate(newChat, false);
+                                },
+                              };
+                            },
+                          );
                           postMessage({
-                            type: "message",
+                            id: props.id,
                             author: "CHATBOT" as const,
                             content: json,
                           });

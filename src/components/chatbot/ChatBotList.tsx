@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import Modal from "../Modal";
 
-import useSWR from "swr";
-import { ApibotsGETResponse } from "../../../pages/api/bots";
 import { ChatBotEdit } from "./ChatBotEdit";
 import clsx from "clsx";
 import { Filter, defaultFilter } from "./ChatBotFilters";
 import LoadingIcon from "../util/LoadingIcon";
 import { ChatBotCard } from "./ChatBotCard";
 import PageSelector from "../util/PageSelector";
+import { trpc } from "@/util/trcp";
 
 type ChatBotListProps = {
   filter?: Filter;
@@ -23,54 +22,47 @@ export default function ChatBotList(props: ChatBotListProps) {
   const filter = props.filter ?? defaultFilter;
 
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState<number | null>(null);
 
-  const query = useMemo(() => {
-    const q = new URLSearchParams();
-    filter.search.trim() !== "" && q.set("search", filter.search);
-    filter.searchDescription && q.set("searchByDesc", "1");
-    filter.searchSystemMessage && q.set("searchBySysm", "1");
-    q.set("models", filter.models.join(","));
-    q.set("maxTemp", filter.temperature[1].toString());
-    q.set("minTemp", filter.temperature[0].toString());
-    q.set("sortBy", filter.sortBy);
+  const {
+    data: countData,
+    error: countError,
+    isInitialLoading: countLoading,
+  } = trpc.bots.search.useQuery({
+    search: filter.search,
+    searchByDesc: filter.searchDescription,
+    searchBySysm: filter.searchSystemMessage,
+    models: filter.models,
+    maxTemp: filter.temperature[1],
+    minTemp: filter.temperature[0],
+    sortBy: filter.sortBy,
+    user: props.userId,
+    published: props.published,
+    getCount: true,
+  });
 
-    props.userId !== undefined && q.set("user", `${props.userId}`);
-    props.published !== undefined && q.set("published", `${props.published}`);
+  const totalPages = countData?.count ? Math.ceil(countData?.count / 8) : null;
 
-    q.set("page", page.toString());
-    q.set("show", "8");
-    return q;
-  }, [filter, page]);
+  const { data, error, isInitialLoading } = trpc.bots.search.useQuery({
+    search: filter.search,
+    searchByDesc: filter.searchDescription,
+    searchBySysm: filter.searchSystemMessage,
+    models: filter.models,
+    maxTemp: filter.temperature[1],
+    minTemp: filter.temperature[0],
+    sortBy: filter.sortBy,
+    user: props.userId,
+    published: props.published,
+    page: page,
+    show: 8,
+  });
 
-  useEffect(() => {
-    const countQuery = new URLSearchParams(query);
-    countQuery.set("getCount", "1");
-    fetch(`/api/bots?${countQuery.toString()}`)
-      .then((res) => res.json())
-      .then((res: ApibotsGETResponse & { type: "count" }) => {
-        setTotalPages(res.pages);
-      });
-  }, [query]);
-
-  const data = useSWR(
-    `/api/bots?${query.toString()}`,
-    (url: string) =>
-      fetch(url).then(
-        (res) => res.json() as Promise<ApibotsGETResponse & { type: "data" }>,
-      ),
-    {
-      keepPreviousData: true,
-    },
-  );
-  const bots = data.data?.data;
-  const loading = data.isLoading;
+  const bots = data?.bots ?? [];
 
   const [editId, setEditId] = useState<string | null>(null);
 
   return (
     <div>
-      <div className={clsx(loading ? "visible" : "invisible")}>
+      <div className={clsx(isInitialLoading ? "visible" : "invisible")}>
         <LoadingIcon />
       </div>
       <div className="flex flex-col gap-4 pb-8">

@@ -7,10 +7,11 @@ import clsx from "clsx";
 import RootLayout from "@/components/Layout/RootLayout";
 
 import { Analytics } from "@vercel/analytics/react";
+import { trpc } from "@/util/trcp";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps) {
   const getLayout =
     (Component as any).getLayout ?? ((page: JSX.Element) => page);
 
@@ -30,3 +31,5 @@ export default function MyApp({ Component, pageProps }: AppProps) {
     </div>
   );
 }
+
+export default trpc.withTRPC(MyApp);
