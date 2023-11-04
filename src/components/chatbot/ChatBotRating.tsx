@@ -60,25 +60,29 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
             const isHalfFilled = viewRating - i >= 0.3 && viewRating - i < 0.8;
             const isUnfilled = viewRating - i < 0.3;
 
-            return (
-              <div key={i} className="text-xl">
-                {isFilled && (
-                  <FaStar
-                    className={clsx(
-                      isPersonal ? "text-yellow-500" : "text-blue-500",
-                    )}
-                  />
-                )}
-                {isHalfFilled && (
-                  <FaStarHalfStroke
-                    className={clsx(
-                      isPersonal ? "text-yellow-500" : "text-blue-500",
-                    )}
-                  />
-                )}
-                {isUnfilled && <FaStar className="text-gray-500" />}
-              </div>
-            );
+            if (isFilled)
+              return (
+                <FaStar
+                  key={i}
+                  className={clsx(
+                    "text-xl",
+                    isPersonal ? "text-yellow-400" : "text-blue-500",
+                  )}
+                />
+              );
+            else if (isHalfFilled)
+              return (
+                <FaStarHalfStroke
+                  key={i}
+                  className={clsx(
+                    "text-xl",
+                    isPersonal ? "text-yellow-400" : "text-blue-500",
+                  )}
+                />
+              );
+            else if (isUnfilled)
+              return <FaStar key={i} className="text-xl text-gray-500" />;
+            return null;
           })}
       </div>
       {props.ratingsCount !== undefined && (
