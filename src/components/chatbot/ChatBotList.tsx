@@ -53,7 +53,7 @@ export default function ChatBotList(props: ChatBotListProps) {
     user: props.userId,
     published: props.published,
     page: page,
-    show: 8,
+    show: 10,
   });
 
   const bots = data?.bots ?? [];
