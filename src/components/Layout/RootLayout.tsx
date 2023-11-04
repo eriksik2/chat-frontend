@@ -7,6 +7,7 @@ import TabsLayout, {
 import LogInButton from "../LogInButton";
 import DrawerLayout from "./DrawerLayout";
 import Link from "next/link";
+import Image from "next/Image";
 
 type RootLayoutProps = {
   children: React.ReactElement;
@@ -19,7 +20,12 @@ export default function RootLayout(props: RootLayoutProps) {
         <DrawerLayout
           headerContent={
             <Link href="/">
-              <h1 className="flex gap-2 text-2xl">chat.eriksik</h1>
+              <Image
+                src="/logo.svg"
+                alt="chat.eriksik logo"
+                width={100 * 0.65}
+                height={75 * 0.65}
+              />
             </Link>
           }
           drawerContent={
@@ -55,7 +61,12 @@ export default function RootLayout(props: RootLayoutProps) {
           before={
             <div className="px-3 py-4">
               <Link href="/">
-                <h1 className="flex gap-2 text-3xl">chat.eriksik</h1>
+                <Image
+                  src="/logo.svg"
+                  alt="chat.eriksik logo"
+                  width={100}
+                  height={75}
+                />
               </Link>
             </div>
           }
