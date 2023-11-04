@@ -85,7 +85,11 @@ export default function RootLayout(props: RootLayoutProps) {
               name: "Chatbots",
               route: "/bots",
               isActive: (activeRoute, btnRoute) => {
-                return activeRoute.startsWith("/bots");
+                return (
+                  activeRoute.startsWith("/bots") ||
+                  activeRoute === "/" ||
+                  activeRoute === ""
+                );
               },
               icon: <FaUsersGear className="text-2xl" />,
             },
