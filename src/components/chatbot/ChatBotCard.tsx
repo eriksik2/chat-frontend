@@ -73,9 +73,9 @@ type ChatBotCardStaticProps = {
   onEdit?: (id: string) => void;
 };
 
-const tiltRotationFactor = 3;
-const tiltTranslationFactor = 2;
-const tiltZoomFactor = 1.2;
+const tiltRotationFactor = 1.5;
+const tiltTranslationFactor = 1.25;
+const tiltZoomFactor = 0.8;
 
 export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   const swr = useSWRConfig();
@@ -151,7 +151,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   return (
     <div
       className={clsx(
-        "flex w-96 flex-col justify-between rounded bg-gradient-to-br from-slate-500/80 via-slate-300 to-slate-500/60 p-2 shadow-inner",
+        "flex w-96 flex-col justify-between rounded border border-slate-200 bg-slate-100 p-2 shadow-md",
         "relative overflow-hidden",
       )}
       onMouseMove={(e) => {
@@ -197,100 +197,104 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
         <p className="max-w-xs">{props.chatbot.description}</p>
         <br />
       </div>
-      <div className="flex flex-row justify-end gap-2 pt-2">
-        <button
-          className="rounded bg-blue-500 p-1 text-sm shadow-inner"
-          onClick={async () => {
-            if (!loggedIn) {
-              router.push(`/chats?chatbot=${props.chatbot.id}`);
-              return;
-            }
-            const response = await postChat({
-              name: `New chat with ${props.chatbot.name}`,
-              chatbotId: props.chatbot.id,
-            });
-            if (response.id !== null) {
-              router.push(`/chats/${response.id}`);
-            }
-          }}
-        >
-          New Chat
-        </button>
-        {isFavourite !== null && (
+      <div className="h-2" />
+      <div className="flex flex-row items-end justify-between gap-2">
+        <div className="flex flex-row gap-2">
           <button
-            className={clsx(
-              "rounded bg-slate-500 p-1",
-              ownsBot ? "block" : "hidden",
-            )}
+            className="rounded bg-blue-500 px-2 py-1 text-base text-slate-900 shadow-md"
             onClick={async () => {
-              if (isFavourite) await unfavorite({ id: props.chatbot.id });
-              else await favorite({ id: props.chatbot.id });
+              if (!loggedIn) {
+                router.push(`/chats?chatbot=${props.chatbot.id}`);
+                return;
+              }
+              const response = await postChat({
+                name: `New chat with ${props.chatbot.name}`,
+                chatbotId: props.chatbot.id,
+              });
+              if (response.id !== null) {
+                router.push(`/chats/${response.id}`);
+              }
             }}
           >
-            {isFavourite ? (
-              <FaStar className="text-yellow-300" />
-            ) : (
-              <FaStar className="text-gray-400" />
-            )}
+            Start Chat
           </button>
-        )}
-        <div className="flex-grow" />
-        {!(ownsBot && showTools) && (
-          <ChatBotRating
-            ratingsCount={props.chatbot.published?.ratingsCount ?? undefined}
-            rating={props.chatbot.published?.rating ?? undefined}
-            yourRating={props.chatbot.published?.yourRating ?? undefined}
-            onRate={async (rating) => {
-              await rate({
-                id: props.chatbot.id,
-                rating,
-              });
-            }}
-          />
-        )}
-        <button
-          className={clsx(
-            "rounded bg-slate-500 p-1",
-            ownsBot && showTools ? "block" : "hidden",
+          {isFavourite !== null && (
+            <button
+              className={clsx(
+                "rounded bg-slate-500 px-[0.37rem] text-lg",
+                ownsBot ? "block" : "hidden",
+              )}
+              onClick={async () => {
+                if (isFavourite) await unfavorite({ id: props.chatbot.id });
+                else await favorite({ id: props.chatbot.id });
+              }}
+            >
+              {isFavourite ? (
+                <FaStar className="text-yellow-300" />
+              ) : (
+                <FaStar className="text-gray-400" />
+              )}
+            </button>
           )}
-          onClick={async () => {
-            if (isPublished)
-              await unpublish({
-                id: props.chatbot.id,
-              });
-            else
-              await publish({
-                id: props.chatbot.id,
-              });
-          }}
-        >
-          {isPublished ? "Unpublish" : "Publish"}
-        </button>
-        {props.onEdit && (
+        </div>
+        <div className="flex flex-row gap-2">
+          {!(ownsBot && showTools) && (
+            <ChatBotRating
+              ratingsCount={props.chatbot.published?.ratingsCount ?? undefined}
+              rating={props.chatbot.published?.rating ?? undefined}
+              yourRating={props.chatbot.published?.yourRating ?? undefined}
+              onRate={async (rating) => {
+                await rate({
+                  id: props.chatbot.id,
+                  rating,
+                });
+              }}
+            />
+          )}
           <button
             className={clsx(
               "rounded bg-slate-500 p-1",
               ownsBot && showTools ? "block" : "hidden",
             )}
-            onClick={() => props.onEdit?.(props.chatbot.id)}
+            onClick={async () => {
+              if (isPublished)
+                await unpublish({
+                  id: props.chatbot.id,
+                });
+              else
+                await publish({
+                  id: props.chatbot.id,
+                });
+            }}
           >
-            <FaPen />
+            {isPublished ? "Unpublish" : "Publish"}
           </button>
-        )}
-        <button
-          className={clsx(
-            "rounded bg-red-400 p-1",
-            ownsBot && showTools ? "block" : "hidden",
+          {props.onEdit && (
+            <button
+              className={clsx(
+                "rounded bg-slate-500 p-1",
+                ownsBot && showTools ? "block" : "hidden",
+              )}
+              onClick={() => props.onEdit?.(props.chatbot.id)}
+            >
+              <FaPen />
+            </button>
           )}
-          onClick={async () => {
-            const response = await fetch(`/api/bots/${props.chatbot.id}`, {
-              method: "DELETE",
-            });
-            swr.mutate("/api/bots");
-          }}
-        >
-          <FaTrash />
-        </button>
+          <button
+            className={clsx(
+              "rounded bg-red-400 p-1",
+              ownsBot && showTools ? "block" : "hidden",
+            )}
+            onClick={async () => {
+              const response = await fetch(`/api/bots/${props.chatbot.id}`, {
+                method: "DELETE",
+              });
+              swr.mutate("/api/bots");
+            }}
+          >
+            <FaTrash />
+          </button>
+        </div>
       </div>
     </div>
   );
