@@ -65,7 +65,7 @@ export default function RootLayout(props: RootLayoutProps) {
       </div>
       <div className="hidden h-full flex-col items-stretch justify-stretch sm:flex">
         <TabsLayout
-          barClassName={clsx("bg-white shadow-lg border border-slate-200")}
+          barClassName={clsx("bg-white shadow-lg border border-slate-200 z-20")}
           tabsLocation="top"
           tabsGap="3rem"
           before={
