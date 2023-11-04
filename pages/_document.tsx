@@ -4,7 +4,6 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        <title>Chat Labs</title>
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
       <body>
