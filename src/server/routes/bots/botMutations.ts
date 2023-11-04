@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { authorizedProcedure, router } from "../../trpc";
+import { TRPCError } from "@trpc/server";
 
 export const botMutationsRouter = router({
   // Create a new bot
@@ -194,6 +195,19 @@ export const botMutationsRouter = router({
           },
         });
       } else {
+        const data = await ctx.prisma.publishedChatBot.findUnique({
+          where: {
+            id: input.id,
+          },
+          select: {
+            ratingsCount: true,
+            ratingsTotal: true,
+          },
+        });
+        if (!data) throw new TRPCError({ code: "NOT_FOUND" });
+        const newCount = data.ratingsCount + 1;
+        const newTotal = data.ratingsTotal + input.rating;
+        const newAvg = newTotal / newCount;
         await ctx.prisma.publishedChatBot.update({
           where: {
             id: input.id,
@@ -209,12 +223,9 @@ export const botMutationsRouter = router({
                 },
               },
             },
-            ratingsTotal: {
-              increment: input.rating,
-            },
-            ratingsCount: {
-              increment: 1,
-            },
+            ratingsTotal: newTotal,
+            ratingsCount: newCount,
+            rating: newAvg,
           },
         });
       }
