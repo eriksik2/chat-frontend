@@ -60,8 +60,9 @@ export default function RootLayout(props: RootLayoutProps) {
         <TabsLayout
           barClassName={clsx("bg-white shadow-lg border border-slate-200")}
           tabsLocation="top"
+          tabsGap="3rem"
           before={
-            <div className="px-3 py-2">
+            <div className="py-2">
               <Link href="/">
                 <Image
                   src="/logo.svg"
