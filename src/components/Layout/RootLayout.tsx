@@ -1,4 +1,10 @@
-import { FaBars, FaGithub, FaRegComments, FaUsersGear } from "react-icons/fa6";
+import {
+  FaBars,
+  FaDiscord,
+  FaGithub,
+  FaRegComments,
+  FaUsersGear,
+} from "react-icons/fa6";
 import TabsLayout, {
   TabBar,
   TabsLayoutProps,
@@ -76,7 +82,13 @@ export default function RootLayout(props: RootLayoutProps) {
           after={
             <>
               <div className="flex-grow" />
-              <div className="flex items-center gap-4 px-4 text-4xl">
+              <div className="flex items-center gap-8 text-4xl">
+                <Link
+                  className="text-3xl"
+                  href={"https://discord.gg/thBm4EQ8SM"}
+                >
+                  <FaDiscord />
+                </Link>
                 <LogInButton />
               </div>
             </>
