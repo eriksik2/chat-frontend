@@ -4,12 +4,14 @@ import { useRouter } from "next/router";
 import { ChatBotCard } from "@/components/chatbot/ChatBotCard";
 import { trpc } from "@/util/trcp";
 import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export type ChatsPageQuery = {
   chatbot?: string;
 };
 
 export default function ChatsPage() {
+  const { data: session } = useSession();
   const router = useRouter();
   const { chatbot } = router.query as ChatsPageQuery;
   const { data, error, isInitialLoading } = trpc.chats.newest.useQuery();
@@ -20,9 +22,9 @@ export default function ChatsPage() {
     }
   }, [data?.id]);
 
+  if (!session || !session.user) return <LogInPrompt chatbot={chatbot} />;
+
   if (isInitialLoading) return null;
-  if (error?.data?.code === "UNAUTHORIZED")
-    return <LogInPrompt chatbot={chatbot} />;
 
   if (!data?.id) {
     return (
@@ -44,22 +46,6 @@ export default function ChatsPage() {
   }
 
   return null;
-  /*return (
-    <div className="flex h-full flex-col items-center justify-center">
-      <p className="text-2xl">Select a chat from the sidebar.</p>
-      <br />
-      <p>
-        Or go to{" "}
-        <Link
-          href="/bots"
-          className="text-blue-500 visited:text-purple-600 hover:underline"
-        >
-          Chatbots
-        </Link>{" "}
-        page to create a new one.
-      </p>
-    </div>
-  );*/
 }
 
 ChatsPage.getLayout = ChatPage.getLayout;
