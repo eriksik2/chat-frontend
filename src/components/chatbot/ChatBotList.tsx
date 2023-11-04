@@ -65,8 +65,8 @@ export default function ChatBotList(props: ChatBotListProps) {
       <div className={clsx(isInitialLoading ? "visible" : "invisible")}>
         <LoadingIcon />
       </div>
-      <div className="flex flex-col gap-4 pb-8">
-        <div className="flex flex-row flex-wrap items-stretch justify-center gap-8">
+      <div className="flex flex-col gap-4 p-8">
+        <div className="grid grid-cols-1 justify-items-center gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {(bots ?? []).map((bot) => {
             return (
               <ChatBotCard
