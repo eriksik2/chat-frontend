@@ -18,7 +18,7 @@ export default function Dropdown(props: DropdownProps) {
         setOpen(false);
       }}
     >
-      <div onClick={() => setOpen(!open)}>{props.children}</div>
+      <button onClick={() => setOpen(!open)}>{props.children}</button>
       <div
         className={clsx(
           "absolute right-0 z-10 mt-2 w-48 rounded-md border border-gray-300 bg-white py-2 shadow-md",
