@@ -3,6 +3,7 @@ import {
   FaDiscord,
   FaGithub,
   FaRegComments,
+  FaTwitter,
   FaUsersGear,
 } from "react-icons/fa6";
 import TabsLayout, {
@@ -83,12 +84,14 @@ export default function RootLayout(props: RootLayoutProps) {
             <>
               <div className="flex-grow" />
               <div className="flex items-center gap-8 text-4xl">
-                <Link
-                  className="text-3xl"
-                  href={"https://discord.gg/thBm4EQ8SM"}
-                >
-                  <FaDiscord />
-                </Link>
+                <div className="flex items-center gap-4 text-3xl">
+                  <Link href={"https://twitter.com/ErikSik"}>
+                    <FaTwitter />
+                  </Link>
+                  <Link href={"https://discord.gg/thBm4EQ8SM"}>
+                    <FaDiscord />
+                  </Link>
+                </div>
                 <LogInButton />
               </div>
             </>
