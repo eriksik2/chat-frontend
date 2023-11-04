@@ -72,6 +72,7 @@ export default function RootLayout(props: RootLayoutProps) {
             <div className="py-2">
               <Link href="/">
                 <Image
+                  className="transition-colors duration-100 hover:text-slate-500"
                   src="/logo.svg"
                   alt="chat.eriksik logo"
                   width={100}
@@ -85,10 +86,16 @@ export default function RootLayout(props: RootLayoutProps) {
               <div className="flex-grow" />
               <div className="flex items-center gap-8 text-4xl">
                 <div className="flex items-center gap-4 text-3xl">
-                  <Link href={"https://twitter.com/ErikSik"}>
+                  <Link
+                    href={"https://twitter.com/ErikSik"}
+                    className="transition-colors duration-100 hover:text-slate-500"
+                  >
                     <FaTwitter />
                   </Link>
-                  <Link href={"https://discord.gg/thBm4EQ8SM"}>
+                  <Link
+                    href={"https://discord.gg/thBm4EQ8SM"}
+                    className="transition-colors duration-100 hover:text-slate-500"
+                  >
                     <FaDiscord />
                   </Link>
                 </div>
