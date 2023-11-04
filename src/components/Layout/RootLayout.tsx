@@ -7,7 +7,7 @@ import TabsLayout, {
 import LogInButton from "../LogInButton";
 import DrawerLayout from "./DrawerLayout";
 import Link from "next/link";
-import Image from "next/Image";
+import Image from "next/image";
 
 type RootLayoutProps = {
   children: React.ReactElement;
