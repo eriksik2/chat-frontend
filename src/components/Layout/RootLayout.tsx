@@ -40,7 +40,7 @@ export default function RootLayout(props: RootLayoutProps) {
                   Chatbots
                 </Link>
                 <Link
-                  href="/api/chats/latest?redirect=true"
+                  href="/chats"
                   className="flex w-full justify-center gap-4 text-2xl"
                 >
                   <FaRegComments className="text-2xl" />
@@ -59,7 +59,7 @@ export default function RootLayout(props: RootLayoutProps) {
         <TabsLayout
           tabsLocation="top"
           before={
-            <div className="px-3 py-4">
+            <div className="px-3 py-2">
               <Link href="/">
                 <Image
                   src="/logo.svg"
@@ -89,7 +89,7 @@ export default function RootLayout(props: RootLayoutProps) {
             },
             {
               name: "Chats",
-              route: "/api/chats/latest?redirect=true",
+              route: "/chats",
               isActive: (activeRoute, btnRoute) => {
                 return activeRoute.startsWith("/chats");
               },

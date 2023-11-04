@@ -30,8 +30,8 @@ export default function LogInButton() {
         <Image
           src={session.user.image ?? "/images/placeholder-profile.png"}
           alt="Profile picture"
-          width={40}
-          height={40}
+          width={45}
+          height={45}
           className="rounded-full"
         />
       </Dropdown>
