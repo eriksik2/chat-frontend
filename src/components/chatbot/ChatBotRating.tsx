@@ -1,4 +1,4 @@
-import { FaStar, FaStarHalfStroke } from "react-icons/fa6";
+import { FaStar } from "react-icons/fa6";
 import { useState } from "react";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
@@ -70,17 +70,26 @@ export default function ChatBotRating(props: ChatBotRatingProps) {
                   )}
                 />
               );
-            else if (isHalfFilled)
+            else if (isHalfFilled) {
               return (
-                <FaStarHalfStroke
-                  key={i}
-                  className={clsx(
-                    "text-xl",
-                    isPersonal ? "text-yellow-400" : "text-blue-500",
-                  )}
-                />
+                <span key={i} className="relative text-xl">
+                  <span
+                    className="absolute bottom-0 left-0 top-0 overflow-hidden"
+                    style={{
+                      right: `${(viewRating - i) * 100}%`,
+                    }}
+                  >
+                    <FaStar
+                      key={i}
+                      className={clsx(
+                        isPersonal ? "text-yellow-400" : "text-blue-500",
+                      )}
+                    />
+                  </span>
+                  <FaStar key={i} className="text-gray-500" />
+                </span>
               );
-            else if (isUnfilled)
+            } else if (isUnfilled)
               return <FaStar key={i} className="text-xl text-gray-500" />;
             return null;
           })}
