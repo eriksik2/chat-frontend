@@ -22,6 +22,7 @@ export type TabsLayoutProps = {
   tabBarWidth?: `${number}${"" | "em" | "rem" | "px"}` | "auto";
   before?: React.ReactNode;
   after?: React.ReactNode;
+  barClassName?: string;
   scrollable?: boolean;
   buttonBuilder?: (params: {
     name: string;
@@ -52,6 +53,7 @@ export const TabsLayoutDefaultProps: OnlyOptional<
   tabBarWidth: () => "auto",
   before: () => <></>,
   after: () => <></>,
+  barClassName: () => "",
   scrollable: () => false,
   buttonBuilder: ({ showPageName }) =>
     defaultButtonBuilderBuilder(showPageName),
@@ -71,6 +73,8 @@ export function getTabsLayoutProps(
     props.tabBarWidth ?? TabsLayoutDefaultProps.tabBarWidth({});
   const before = props.before ?? TabsLayoutDefaultProps.before({});
   const after = props.after ?? TabsLayoutDefaultProps.after({});
+  const barClassName =
+    props.barClassName ?? TabsLayoutDefaultProps.barClassName({});
   const scrollable = props.scrollable ?? TabsLayoutDefaultProps.scrollable({});
   const buttonBuilder =
     props.buttonBuilder ??
@@ -84,6 +88,7 @@ export function getTabsLayoutProps(
     tabBarWidth,
     before,
     after,
+    barClassName,
     scrollable,
     buttonBuilder,
     children: props.children,
@@ -100,6 +105,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
     tabBarWidth,
     before,
     after,
+    barClassName,
     scrollable,
     buttonBuilder,
     children,
@@ -124,7 +130,7 @@ export default function TabsLayout(_props: TabsLayoutProps) {
           : "flex-row-reverse",
       )}
     >
-      <div>
+      <div className={barClassName}>
         <TabBar
           tabsDir={tabsDir}
           tabsAlign={tabsAlign}
@@ -234,10 +240,12 @@ function DefaultTabButton(params: DefaultTabButtonProps) {
     <Link href={params.route}>
       <div
         className={clsx(
-          "w-24 rounded-full p-2 px-4",
-          checkIsActive(router.asPath, params.route) &&
-            "bg-gradient-to-br from-slate-400/50  to-slate-400/75 shadow-inner",
-          "hover:bg-gradient-to-br hover:from-slate-500/50 hover:via-slate-400 hover:to-slate-500/75",
+          "border-b px-1 py-2",
+          checkIsActive(router.asPath, params.route)
+            ? "border-b-slate-500"
+            : "border-b-transparent",
+          "hover:text-gray-500",
+          "transition-all",
         )}
       >
         <div className="flex flex-col items-center">

@@ -151,7 +151,7 @@ export default function ChatBotCardStatic(props: ChatBotCardStaticProps) {
   return (
     <div
       className={clsx(
-        "flex w-96 flex-col justify-between rounded border border-slate-200 bg-slate-100 p-2 shadow-md",
+        "flex w-96 flex-col justify-between rounded border border-slate-300 bg-slate-200 p-2 shadow-md",
         "relative overflow-hidden",
       )}
       onMouseMove={(e) => {

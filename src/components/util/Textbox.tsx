@@ -29,8 +29,7 @@ export default function Textbox(props: TextboxProps) {
         "rounded shadow-inner",
         !styleOverrides.padding && "px-2 py-1",
         !styleOverrides.height && "h-[calc(0.5rem+1lh)]",
-        !styleOverrides.bg &&
-          "bg-gradient-to-tr from-gray-100 via-white to-gray-50",
+        !styleOverrides.bg && "bg-white",
         props.className,
       )}
       placeholder={props.placeholder}

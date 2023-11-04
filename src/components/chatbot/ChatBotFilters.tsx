@@ -46,7 +46,7 @@ export function ChatBotFilters(props: ChatBotFiltersProps) {
     <div className="flex max-w-2xl flex-col gap-2">
       <div>
         <Textbox
-          className="w-full"
+          className="w-full bg-gray-200"
           placeholder="Search"
           value={props.value.search}
           onChange={(value) =>

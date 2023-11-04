@@ -8,6 +8,7 @@ import LogInButton from "../LogInButton";
 import DrawerLayout from "./DrawerLayout";
 import Link from "next/link";
 import Image from "next/image";
+import clsx from "clsx";
 
 type RootLayoutProps = {
   children: React.ReactElement;
@@ -57,6 +58,7 @@ export default function RootLayout(props: RootLayoutProps) {
       </div>
       <div className="hidden h-full flex-col items-stretch justify-stretch sm:flex">
         <TabsLayout
+          barClassName={clsx("bg-white shadow-lg border border-slate-200")}
           tabsLocation="top"
           before={
             <div className="px-3 py-2">
