@@ -87,6 +87,15 @@ export default function RootLayout(props: RootLayoutProps) {
               <div className="flex items-center gap-8 text-4xl">
                 <div className="flex items-center gap-4 text-3xl">
                   <Link
+                    className={clsx(
+                      "transition-colors duration-100 hover:text-slate-500",
+                      "rounded-lg border border-slate-700 px-2 py-1 text-base shadow-md",
+                    )}
+                    href={"https://donate.stripe.com/5kAdRG2Pa3QV8pO5kk"}
+                  >
+                    Donate
+                  </Link>
+                  <Link
                     href={"https://twitter.com/ErikSik"}
                     className="transition-colors duration-100 hover:text-slate-500"
                   >

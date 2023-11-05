@@ -3,6 +3,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import Image from "next/image";
 import Dropdown from "./util/Dropdown";
+import { FaRegUser } from "react-icons/fa6";
 
 export default function LogInButton() {
   const { data: session } = useSession();
@@ -42,11 +43,11 @@ export default function LogInButton() {
     <Link href={session ? "/api/auth/signout" : "/api/auth/signin"}>
       <div
         className={clsx(
-          "flex items-center gap-2 rounded-lg border border-slate-700 px-2 py-1 text-base shadow-md",
+          "flex aspect-square items-center justify-center gap-2 rounded-full border-2 border-slate-700 p-3 text-base shadow-md",
           "transition-colors duration-100 hover:border-slate-500 hover:text-slate-500",
         )}
       >
-        {session ? "Log out" : "Log in"}
+        <FaRegUser />
       </div>
     </Link>
   );
