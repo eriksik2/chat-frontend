@@ -150,8 +150,8 @@ export default function Chat(props: ChatProps) {
 
     const comp = new Completion(
       openai,
-      chat.chatbot.model,
       String(session.user?.id ?? ""),
+      chat.chatbot.model,
       chat.chatbot.temperature,
       chat.chatbot.systemMessage,
       [
