@@ -27,14 +27,25 @@ export default function RootLayout(props: RootLayoutProps) {
       <div className="h-full w-full sm:hidden">
         <DrawerLayout
           headerContent={
-            <Link href="/">
-              <Image
-                src="/logo.svg"
-                alt="chat.eriksik logo"
-                width={100 * 0.65}
-                height={75 * 0.65}
-              />
-            </Link>
+            <div className="flex items-center justify-between ">
+              <Link href="/">
+                <Image
+                  src="/logo.svg"
+                  alt="chat.eriksik logo"
+                  width={100 * 0.65}
+                  height={75 * 0.65}
+                />
+              </Link>
+              <Link
+                className={clsx(
+                  "transition-colors duration-100 hover:text-slate-500",
+                  "rounded-lg border border-slate-700 px-2 py-1 text-base shadow-md",
+                )}
+                href={"https://donate.stripe.com/5kAdRG2Pa3QV8pO5kk"}
+              >
+                Donate
+              </Link>
+            </div>
           }
           drawerContent={
             <>

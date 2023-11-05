@@ -20,10 +20,9 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
           transform: !open ? "translateX(0)" : "perspective(500px) scale(0.95)",
         }}
       >
-        <div className="flex items-center p-3 px-4">
-          {props.headerContent}
-          <div className="flex-grow" />
-          <button className="" onClick={() => setOpen(!open)}>
+        <div className="flex items-center px-4 py-3">
+          <div className="flex-grow">{props.headerContent}</div>
+          <button className="pl-4" onClick={() => setOpen(!open)}>
             <FaBars className="text-2xl" />
           </button>
         </div>
@@ -49,7 +48,7 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
           }}
           onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         >
-          <div className="flex h-full w-full flex-col bg-slate-300">
+          <div className="flex h-full w-full flex-col bg-white">
             <div className="flex items-center p-3 px-4">
               <div className="invisible">{props.headerContent}</div>
               <div className="flex-grow" />
