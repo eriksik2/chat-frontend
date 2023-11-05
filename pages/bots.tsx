@@ -7,8 +7,10 @@ import { useState } from "react";
 import clsx from "clsx";
 import ChatBotList from "@/components/chatbot/ChatBotList";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 export default function BotsPage() {
+  const { data: session } = useSession();
   const [filter, setFilter] = useState<Filter>(defaultFilter);
 
   return (
@@ -28,7 +30,11 @@ export default function BotsPage() {
                 Want to create your own? Go to your{" "}
                 <Link
                   className="text-blue-600 visited:text-purple-500"
-                  href={"/user/profile"}
+                  href={
+                    session && session.user
+                      ? "/user/profile"
+                      : "/api/auth/signin"
+                  }
                 >
                   profile
                 </Link>{" "}
