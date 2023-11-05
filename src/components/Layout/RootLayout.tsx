@@ -45,13 +45,14 @@ export default function RootLayout(props: RootLayoutProps) {
         <DrawerLayout
           headerContent={
             <div className="flex items-center justify-between ">
-              <Link href="/">
+              <Link href="/" className="flex font-semibold">
                 <Image
                   src="/logo.svg"
                   alt="chat.eriksik logo"
                   width={100 * 0.65}
                   height={75 * 0.65}
                 />
+                beta
               </Link>
               <Link
                 className={clsx(
@@ -104,7 +105,7 @@ export default function RootLayout(props: RootLayoutProps) {
           tabsGap="3rem"
           before={
             <div className="py-2">
-              <Link href="/">
+              <Link href="/" className="flex font-semibold">
                 <Image
                   className="transition-colors duration-100 hover:text-slate-500"
                   src="/logo.svg"
@@ -112,6 +113,7 @@ export default function RootLayout(props: RootLayoutProps) {
                   width={100}
                   height={75}
                 />
+                beta
               </Link>
             </div>
           }

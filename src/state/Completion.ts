@@ -23,10 +23,12 @@ export default class Completion {
   system_message: string | null;
   messages: CompletionMessage[];
   functions: AIFunction[];
+  uid: string;
   didRun: boolean = false;
 
   constructor(
     openai: OpenAI,
+    uid: string,
     model: string,
     temperature: number,
     system_message: string | null,
@@ -34,6 +36,7 @@ export default class Completion {
     functions: string[] = [],
   ) {
     this.openai = openai;
+    this.uid = uid;
     this.model = model;
     this.temperature = temperature;
     this.system_message = system_message;
@@ -143,6 +146,7 @@ export default class Completion {
         temperature: this.temperature,
         stream: true,
         n: 1,
+        user: this.uid,
         messages: messages,
         function_call: has_no_fn ? undefined : allow_fn ? "auto" : "none",
         functions: has_no_fn ? undefined : fn_specs,
