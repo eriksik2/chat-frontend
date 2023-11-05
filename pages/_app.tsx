@@ -37,7 +37,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <div
         className={clsx(
           inter.className,
-          "relative h-screen w-screen",
+          "fixed h-full w-full",
           "bg-white",
           "dark:text-black",
         )}
