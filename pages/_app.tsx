@@ -20,7 +20,7 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <link rel="shortcut icon" href="/favicon.svg" />
-        <title key="title">Chat Labs</title>
+        <title key="title">{"С𐌝"} Labs</title>
         <meta
           key="keywords"
           name="keywords"
