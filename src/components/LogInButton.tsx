@@ -61,16 +61,26 @@ export default function LogInButton(props: LogInButtonProps) {
     );
   }
 
-  return (
-    <Link href={session ? "/api/auth/signout" : "/api/auth/signin"}>
+  return false ? (
+    "log in"
+  ) : (
+    <Link
+      className="flex items-center justify-center gap-4"
+      href="/api/auth/signin"
+    >
       <div
         className={clsx(
           "flex aspect-square items-center justify-center gap-2 rounded-full border-2 border-slate-700 p-3 text-base shadow-md",
           "transition-colors duration-100 hover:border-slate-500 hover:text-slate-500",
         )}
       >
-        <FaRegUser />
+        <FaRegUser width={45} height={45} />
       </div>
+      {mobile && (
+        <div className="rounded-lg border border-slate-700 px-2 py-1 text-base shadow-md">
+          Log in
+        </div>
+      )}
     </Link>
   );
 }
