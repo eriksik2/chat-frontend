@@ -114,7 +114,7 @@ export default function ChatMarkdown(props: ChatMarkdownProps) {
 
         a(props) {
           const isBotCardTest =
-            /https:\/\/(?:chat\.eriksik.com|localhost|localhost:3000)\/bots\/([-_0-9a-zA-Z]+)/.exec(
+            /https:\/\/(?:www\.chatlabs\.me|chatlabs\.me|localhost|localhost:3000)\/bots\/([-_0-9a-zA-Z]+)/.exec(
               props.href as string,
             );
           if (isBotCardTest) {
