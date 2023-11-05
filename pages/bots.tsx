@@ -18,13 +18,13 @@ export default function BotsPage() {
             <div className="max-w-2xl">
               <h1 className="pb-2 text-5xl">Chatbots</h1>
               <p>
-                List of chatbots tagged by categories. You can select a
-                pre-existing bot or add, edit, and remove chatbots as needed.
+                Here you can search for chatbots to chat with. Each of these has
+                a different personality or use case.
               </p>
               <br />
               <p>
-                Select a chatbot and press the New Chat button, then you can
-                chat with it in the Chats tab.
+                Find the one you want and press the Start Chat button to start
+                chatting.
               </p>
             </div>
           </div>
