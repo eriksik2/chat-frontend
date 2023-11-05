@@ -52,7 +52,7 @@ const predefinedFunctionsList: AIFunction[] = [
       {
         name: "description",
         description: "A description of the chatbot, for the user to read.",
-        required: false,
+        required: true,
       },
       {
         name: "model",
@@ -74,7 +74,7 @@ const predefinedFunctionsList: AIFunction[] = [
       system_message,
     }: {
       name: string;
-      description?: string;
+      description: string;
       model: string;
       system_message: string;
     }): Promise<string> {
