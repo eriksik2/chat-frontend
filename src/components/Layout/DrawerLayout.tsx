@@ -46,7 +46,7 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
             transition: "all 0.2s ease-in-out",
             transform: open ? "translateX(0)" : "translateX(100%)",
           }}
-          onClick={(e) => e.target === e.currentTarget && setOpen(false)}
+          onClick={(e) => setOpen(false)}
         >
           <div className="flex h-full w-full flex-col bg-white shadow-xl">
             <div className="flex items-center p-3 px-4">
