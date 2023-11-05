@@ -27,7 +27,8 @@ export default function BotsPage() {
               </p>
               <br />
               <p>
-                Want to create your own? Go to your{" "}
+                <span className="font-semibold">Want to create your own?</span>{" "}
+                Go to your{" "}
                 <Link
                   className="text-blue-600 visited:text-purple-500"
                   href={
@@ -39,7 +40,7 @@ export default function BotsPage() {
                   profile
                 </Link>{" "}
                 and click the Create a chatbot button. You can also just ask any
-                chatbot with the Chat Labs plugin enabled to create one for you.
+                chatbot with the Chat Labs plugin to create one for you.
               </p>
             </div>
           </div>
