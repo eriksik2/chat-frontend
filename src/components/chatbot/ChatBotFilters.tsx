@@ -29,7 +29,7 @@ type ChatBotFiltersProps = {
 };
 
 export function ChatBotFilters(props: ChatBotFiltersProps) {
-  const [showFilters, setShowFilters] = useState<boolean>(true);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   function reset() {
     props.onChange({
