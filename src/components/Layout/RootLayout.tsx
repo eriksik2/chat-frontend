@@ -3,7 +3,7 @@ import {
   FaDiscord,
   FaGithub,
   FaRegComments,
-  FaTwitter,
+  FaXTwitter,
   FaUsersGear,
 } from "react-icons/fa6";
 import TabsLayout, {
@@ -17,6 +17,23 @@ import Link from "next/link";
 import Image from "next/image";
 import clsx from "clsx";
 
+const links = (
+  <>
+    <Link
+      href={"https://twitter.com/ErikSik"}
+      className="transition-colors duration-100 hover:text-slate-500"
+    >
+      <FaXTwitter />
+    </Link>
+    <Link
+      href={"https://discord.gg/thBm4EQ8SM"}
+      className="transition-colors duration-100 hover:text-slate-500"
+    >
+      <FaDiscord />
+    </Link>
+  </>
+);
+
 type RootLayoutProps = {
   children: React.ReactElement;
 };
@@ -24,7 +41,7 @@ type RootLayoutProps = {
 export default function RootLayout(props: RootLayoutProps) {
   return (
     <div className="h-full w-full">
-      <div className="h-full w-full sm:hidden">
+      <div className="h-full w-full md:hidden">
         <DrawerLayout
           headerContent={
             <div className="flex items-center justify-between ">
@@ -48,9 +65,16 @@ export default function RootLayout(props: RootLayoutProps) {
             </div>
           }
           drawerContent={
-            <>
-              <div className="h-36" />
-              <div className="flex flex-col gap-2">
+            <div className="flex h-full flex-col items-stretch justify-stretch p-4">
+              <div className="flex flex-grow flex-col items-center justify-center gap-3">
+                <h1 className="pb-10 text-4xl">Chat Labs</h1>
+                <h3 className="text-xl">Find us on</h3>
+                <div className="flex items-center justify-center gap-8 text-5xl">
+                  {links}
+                </div>
+              </div>
+              <div className="mx-auto h-px w-1/2 bg-slate-300" />
+              <div className="flex flex-grow flex-col items-center justify-center gap-8">
                 <Link
                   href="/bots"
                   className="flex w-full justify-center gap-4 text-2xl"
@@ -66,15 +90,14 @@ export default function RootLayout(props: RootLayoutProps) {
                   Chats
                 </Link>
               </div>
-              <div className="h-36" />
-              <LogInButton />
-            </>
+              <LogInButton mobile={true} />
+            </div>
           }
         >
           {props.children}
         </DrawerLayout>
       </div>
-      <div className="hidden h-full flex-col items-stretch justify-stretch sm:flex">
+      <div className="hidden h-full flex-col items-stretch justify-stretch md:flex">
         <TabsLayout
           barClassName={clsx("bg-white shadow-lg border border-slate-200 z-20")}
           tabsLocation="top"
@@ -106,18 +129,7 @@ export default function RootLayout(props: RootLayoutProps) {
                   >
                     Donate
                   </Link>
-                  <Link
-                    href={"https://twitter.com/ErikSik"}
-                    className="transition-colors duration-100 hover:text-slate-500"
-                  >
-                    <FaTwitter />
-                  </Link>
-                  <Link
-                    href={"https://discord.gg/thBm4EQ8SM"}
-                    className="transition-colors duration-100 hover:text-slate-500"
-                  >
-                    <FaDiscord />
-                  </Link>
+                  {links}
                 </div>
                 <LogInButton />
               </div>

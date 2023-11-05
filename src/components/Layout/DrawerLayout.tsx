@@ -41,14 +41,14 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
         }}
       >
         <div
-          className="h-full w-full pl-28"
+          className="h-full w-full pl-28 sm:pl-72"
           style={{
             transition: "all 0.2s ease-in-out",
             transform: open ? "translateX(0)" : "translateX(100%)",
           }}
           onClick={(e) => e.target === e.currentTarget && setOpen(false)}
         >
-          <div className="flex h-full w-full flex-col bg-white">
+          <div className="flex h-full w-full flex-col bg-white shadow-xl">
             <div className="flex items-center p-3 px-4">
               <div className="invisible">{props.headerContent}</div>
               <div className="flex-grow" />
@@ -56,9 +56,7 @@ export default function DrawerLayout(props: DrawerLayoutProps) {
                 <FaX className="text-2xl" />
               </button>
             </div>
-            <div className="flex flex-grow flex-col items-center justify-center">
-              {props.drawerContent}
-            </div>
+            <div className="flex-grow">{props.drawerContent}</div>
           </div>
         </div>
       </div>

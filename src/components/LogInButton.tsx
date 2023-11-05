@@ -5,11 +5,39 @@ import Image from "next/image";
 import Dropdown from "./util/Dropdown";
 import { FaRegUser } from "react-icons/fa6";
 
-export default function LogInButton() {
+type LogInButtonProps = {
+  mobile?: boolean;
+};
+
+export default function LogInButton(props: LogInButtonProps) {
   const { data: session } = useSession();
 
+  const mobile = props.mobile ?? false;
+
   if (session && session.user) {
-    return (
+    const pfp = (
+      <Image
+        src={session.user.image ?? "/images/placeholder-profile.png"}
+        alt="Profile picture"
+        width={45}
+        height={45}
+        className="rounded-full"
+      />
+    );
+    return mobile ? (
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/user/profile" className="flex items-center gap-4">
+          {pfp}
+          <span className="text-2xl font-semibold">{session.user.name}</span>
+        </Link>
+        <Link
+          className="rounded-lg border border-slate-700 px-2 py-1 text-base shadow-md"
+          href={"/api/auth/signout"}
+        >
+          Log out
+        </Link>
+      </div>
+    ) : (
       <Dropdown
         dropdown={
           <div className="flex flex-col items-stretch py-2 text-base">
@@ -28,13 +56,7 @@ export default function LogInButton() {
           </div>
         }
       >
-        <Image
-          src={session.user.image ?? "/images/placeholder-profile.png"}
-          alt="Profile picture"
-          width={45}
-          height={45}
-          className="rounded-full"
-        />
+        {pfp}
       </Dropdown>
     );
   }
