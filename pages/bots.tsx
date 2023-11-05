@@ -32,7 +32,9 @@ export default function BotsPage() {
             <ChatBotFilters value={filter} onChange={setFilter} />
           </div>
         </div>
-        <ChatBotList filter={filter} />
+        <div className="lg:px-44">
+          <ChatBotList filter={filter} />
+        </div>
       </div>
     </div>
   );
