@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import clsx from "clsx";
+import {
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { FaChevronUp } from "react-icons/fa6";
 
 type ChatTextBoxProps = {
   onSend: (message: string) => void;
@@ -33,27 +41,32 @@ export default function ChatTextBox(props: ChatTextBoxProps) {
   }
 
   return (
-    <div className="flex h-full w-1/2 flex-row items-center justify-center gap-4">
+    <div className="flex h-full w-full max-w-screen-sm flex-row items-center justify-center gap-4 px-4 drop-shadow-sm">
       <button
-        className="rounded-full bg-blue-500 px-4 py-2 text-white drop-shadow-lg "
+        className="rounded-full bg-blue-500 px-2 py-2 text-white drop-shadow-lg"
         onClick={(event) => {
           event.preventDefault();
           setBigEditor(!bigEditor);
           return false;
         }}
       >
-        ^
+        <FaChevronUp
+          className={clsx(
+            "transition-transform duration-200",
+            bigEditor && "rotate-180 transform",
+          )}
+        />
       </button>
-      <div onKeyDown={onKey}>
+      <div onKeyDown={onKey} className="flex flex-grow items-center">
         <textarea
           wrap={bigEditor ? "soft" : "off"}
           rows={1}
           cols={40}
-          className="no-scrollbar resize-none rounded-xl bg-white px-3 py-2 text-black drop-shadow-lg"
+          className="no-scrollbar resize-none rounded-xl bg-gray-100 px-3 py-2 text-black shadow-inner"
           style={{
             height: !bigEditor ? `calc(1rem + ${1}lh)` : "65vh",
-            width: !bigEditor ? `calc(1.5rem + ${60}ch)` : "50vw",
-            transition: "height 0.2s ease-in-out, width 0.2s ease-in-out",
+            width: !bigEditor ? `100%` : "50vw",
+            transition: "height 0.2s ease-in-out",
           }}
           value={value}
           onChange={(e) => {

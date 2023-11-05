@@ -322,12 +322,6 @@ export default function Chat(props: ChatProps) {
               </div>
               {!unauthenticated && (
                 <div className="absolute bottom-0 left-0 right-0 z-10 flex flex-col items-center">
-                  {false && (
-                    <>
-                      <div>Waiting for response...</div>
-                      <div className="h-2" />
-                    </>
-                  )}
                   <ChatTextBox onSend={onUserSend} canSend={true} />
                   <div className="h-4" />
                 </div>
