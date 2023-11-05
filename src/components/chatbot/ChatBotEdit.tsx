@@ -71,7 +71,6 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
                 GPT-4 (32K)
               </option>
               <option value="gpt-3.5-turbo">GPT-3.5</option>
-              <option value="mock">Test mock</option>
             </select>
           </div>
           <div>

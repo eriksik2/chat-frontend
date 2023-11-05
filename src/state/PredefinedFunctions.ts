@@ -40,9 +40,9 @@ const predefinedFunctionsList: AIFunction[] = [
   }),
   AIFunction.create({
     name: "create_new_chatbot",
-    display_name: "chat.eriksik API",
+    display_name: "Chat Labs",
     description:
-      "Creates a new chatbot which the user can chat with, using the chat.eriksik API.",
+      "Creates a new chatbot which the user can chat with, using Chat Labs.",
     params: [
       {
         name: "name",

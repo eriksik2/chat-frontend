@@ -6,6 +6,7 @@ import {
 import { useState } from "react";
 import clsx from "clsx";
 import ChatBotList from "@/components/chatbot/ChatBotList";
+import Link from "next/link";
 
 export default function BotsPage() {
   const [filter, setFilter] = useState<Filter>(defaultFilter);
@@ -19,12 +20,20 @@ export default function BotsPage() {
               <h1 className="pb-2 text-5xl">Chatbots</h1>
               <p>
                 Here you can search for chatbots to chat with. Each of these has
-                a different personality or use case.
+                a different personality or use case. Find the one you want and
+                press the Start Chat button to start chatting.
               </p>
               <br />
               <p>
-                Find the one you want and press the Start Chat button to start
-                chatting.
+                Want to create your own? Go to your{" "}
+                <Link
+                  className="text-blue-600 visited:text-purple-500"
+                  href={"/user/profile"}
+                >
+                  profile
+                </Link>{" "}
+                and click the Create a chatbot button. You can also just ask any
+                chatbot with the Chat Labs plugin enabled to create one for you.
               </p>
             </div>
           </div>
