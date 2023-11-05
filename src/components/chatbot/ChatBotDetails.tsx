@@ -12,7 +12,12 @@ export default function ChatBotDetails(props: ChatBotDetailsProps) {
     id: props.id,
   });
 
-  if (isInitialLoading) return <LoadingIcon />;
+  if (isInitialLoading)
+    return (
+      <div className="flex items-center justify-center">
+        <LoadingIcon />
+      </div>
+    );
   if (data === undefined) return null;
   const bot = data.bot;
 

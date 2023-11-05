@@ -232,19 +232,21 @@ export default function Chat(props: ChatProps) {
       ) : (
         <div className="absolute bottom-0 left-0 right-0 top-0">
           <div className="flex h-full w-full flex-row items-stretch justify-stretch">
-            {chat && (
-              <div className="w-[17rem] flex-shrink-0">
-                <div className="flex justify-center p-1 pt-12">
-                  <h2 className="text-2xl">This chat</h2>
-                </div>
-                <ChatBotDetails id={chat.chatbot.id} />
-                {unauthenticated && (
-                  <div className="flex w-full justify-center p-2">
-                    Shared by {chat.author.name}
+            <div className="w-[17rem] flex-shrink-0">
+              {chat && (
+                <>
+                  <div className="flex justify-center p-1 pt-12">
+                    <h2 className="text-2xl">This chat</h2>
                   </div>
-                )}
-              </div>
-            )}
+                  <ChatBotDetails id={chat.chatbot.id} />
+                  {unauthenticated && (
+                    <div className="flex w-full justify-center p-2">
+                      Shared by {chat.author.name}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
             <div className="relative flex-grow">
               <div className="no-scrollbar absolute bottom-0 left-0 right-0 top-0 flex h-full flex-grow flex-col items-center overflow-auto scroll-smooth">
                 <div className="flex w-full flex-col items-stretch justify-start px-4 pb-20 pt-8">
