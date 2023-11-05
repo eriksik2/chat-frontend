@@ -74,8 +74,6 @@ export default function Profile(props: ProfileProps) {
                 name: bot.name,
                 description: bot.description,
                 model: bot.model,
-                frequency_bias: bot.frequency_bias,
-                presence_bias: bot.presence_bias,
                 temperature: bot.temperature,
                 systemMessage: bot.systemMessage,
                 tags: [],

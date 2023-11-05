@@ -20,8 +20,6 @@ export default class Completion {
   openai: OpenAI;
   model: string;
   temperature: number;
-  frequency_penalty: number;
-  presence_penalty: number;
   system_message: string | null;
   messages: CompletionMessage[];
   functions: AIFunction[];
@@ -31,8 +29,6 @@ export default class Completion {
     openai: OpenAI,
     model: string,
     temperature: number,
-    frequency_penalty: number,
-    presence_penalty: number,
     system_message: string | null,
     messages: CompletionMessage[],
     functions: string[] = [],
@@ -40,8 +36,6 @@ export default class Completion {
     this.openai = openai;
     this.model = model;
     this.temperature = temperature;
-    this.frequency_penalty = frequency_penalty;
-    this.presence_penalty = presence_penalty;
     this.system_message = system_message;
     this.messages = messages;
     this.functions = functions
@@ -147,8 +141,6 @@ export default class Completion {
       const stream = await this.openai.chat.completions.create({
         model: this.model,
         temperature: this.temperature,
-        frequency_penalty: this.frequency_penalty,
-        presence_penalty: this.presence_penalty,
         stream: true,
         n: 1,
         messages: messages,

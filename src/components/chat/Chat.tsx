@@ -80,8 +80,6 @@ export default function Chat(props: ChatProps) {
         openai!,
         "gpt-4",
         0.5,
-        0,
-        0,
         "When the user sends a message containing a chat transcript you have to provide a short name for the chat. This name must be at most one sentence and at least 2 words long. The name has to capture the essence of the given chat. Your response MUST only contain the name of the chat, without quotes or other formatting. Be specific and concrete about what's happening in the chat, don't try to give it a fancy or clever name.",
         [
           {
@@ -153,8 +151,6 @@ export default function Chat(props: ChatProps) {
       openai,
       chat.chatbot.model,
       chat.chatbot.temperature,
-      chat.chatbot.frequency_bias,
-      chat.chatbot.presence_bias,
       chat.chatbot.systemMessage,
       [
         ...chat.messages.map((message) => {

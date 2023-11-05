@@ -10,8 +10,6 @@ type ChatBotEditData = {
   name: string;
   description: string;
   model: string;
-  frequency_bias: number;
-  presence_bias: number;
   temperature: number;
   systemMessage: string | null;
 };
@@ -28,12 +26,7 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
     props.chatbot?.description ?? "",
   );
   const [model, setModel] = useState<string>(props.chatbot?.model ?? "gpt-4");
-  const [frequency_bias, setFrequencyBias] = useState<number>(
-    props.chatbot?.frequency_bias ?? 0,
-  );
-  const [presence_bias, setPresenceBias] = useState<number>(
-    props.chatbot?.presence_bias ?? 0,
-  );
+
   const [temperature, setTemperature] = useState<number>(
     props.chatbot?.temperature ?? 0.7,
   );
@@ -83,36 +76,6 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
           </div>
           <div>
             <div className="flex w-full flex-row gap-3">
-              <p>Frequency penalty</p>
-              <input
-                type="range"
-                min="-2.0"
-                max="2.0"
-                step="0.1"
-                className="flex-grow"
-                value={frequency_bias}
-                onChange={(e) => setFrequencyBias(parseFloat(e.target.value))}
-              />
-            </div>
-            {frequency_bias}
-          </div>
-          <div>
-            <div className="flex w-full flex-row gap-3">
-              <p>Presence penalty</p>
-              <input
-                type="range"
-                min="-2.0"
-                max="2.0"
-                step="0.1"
-                className="flex-grow"
-                value={presence_bias}
-                onChange={(e) => setPresenceBias(parseFloat(e.target.value))}
-              />
-            </div>
-            {presence_bias}
-          </div>
-          <div>
-            <div className="flex w-full flex-row gap-3">
               <p>Temperature</p>
               <input
                 type="range"
@@ -152,8 +115,6 @@ export default function ChatBotEditStatic(props: ChatBotEditStaticProps) {
               name,
               description,
               model,
-              frequency_bias,
-              presence_bias,
               temperature,
               systemMessage,
             });
@@ -189,8 +150,6 @@ export function ChatBotEdit(props: ChatBotEditProps) {
         name: bot.name,
         description: bot.description,
         model: bot.model,
-        frequency_bias: bot.frequency_bias,
-        presence_bias: bot.presence_bias,
         temperature: bot.temperature,
         systemMessage: bot.systemMessage,
       }}
@@ -201,8 +160,6 @@ export function ChatBotEdit(props: ChatBotEditProps) {
           name: chatbot.name,
           description: chatbot.description,
           model: chatbot.model,
-          frequency_bias: chatbot.frequency_bias,
-          presence_bias: chatbot.presence_bias,
           temperature: chatbot.temperature,
           systemMessage: chatbot.systemMessage,
           tags: bot.tags,
