@@ -208,8 +208,6 @@ export const botQueriesRouter = router({
           model: true,
           systemMessage: true,
           temperature: true,
-          frequency_bias: true,
-          presence_bias: true,
 
           favorites: !ctx.uid
             ? undefined

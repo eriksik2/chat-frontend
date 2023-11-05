@@ -84,8 +84,6 @@ const predefinedFunctionsList: AIFunction[] = [
         model: model,
         systemMessage: system_message,
         temperature: 0.8,
-        frequency_bias: 0.0,
-        presence_bias: 0.0,
         tags: [],
       });
       return `{ "url" = "https://${window.location.hostname}/bots/${data.id}" }`;

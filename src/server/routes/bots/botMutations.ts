@@ -14,8 +14,6 @@ export const botMutationsRouter = router({
         model: z.string(),
         systemMessage: z.string().min(1).max(1000).nullable(),
         temperature: z.number().min(0).max(2),
-        frequency_bias: z.number().min(-2).max(2),
-        presence_bias: z.number().min(-2).max(2),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -31,8 +29,6 @@ export const botMutationsRouter = router({
           model: input.model,
           systemMessage: input.systemMessage,
           temperature: input.temperature,
-          frequency_bias: input.frequency_bias,
-          presence_bias: input.presence_bias,
 
           author: {
             connect: {
@@ -47,8 +43,6 @@ export const botMutationsRouter = router({
           model: input.model,
           systemMessage: input.systemMessage,
           temperature: input.temperature,
-          frequency_bias: input.frequency_bias,
-          presence_bias: input.presence_bias,
         },
         select: {
           id: true,

@@ -43,8 +43,6 @@ export const chatQueriesRouter = router({
               model: true,
               systemMessage: true,
               temperature: true,
-              frequency_bias: true,
-              presence_bias: true,
               plugins: true,
             },
           },

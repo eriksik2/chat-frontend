@@ -76,12 +76,10 @@ model ChatBot {
     featured    Boolean  @default(false)
     createdAt   DateTime @default(now()) @map(name: "created_at")
 
-    model          String
-    systemMessage  String?
-    temperature    Float    @default(0.7)
-    frequency_bias Float    @default(0.0)
-    presence_bias  Float    @default(0.0)
-    plugins        String[] @default([])
+    model         String
+    systemMessage String?
+    temperature   Float    @default(0.7)
+    plugins       String[] @default([])
 
     published PublishedChatBot?
 
