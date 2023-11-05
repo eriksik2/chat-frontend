@@ -107,7 +107,7 @@ export default function ChatCode(props: ChatCodeProps) {
   }: rendererProps): React.ReactNode {
     return (
       <div
-        className="rounded bg-white"
+        className="rounded bg-slate-100"
         tabIndex={0}
         onBlur={() => {
           setHighlight(null);
